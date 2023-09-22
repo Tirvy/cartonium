@@ -1,0 +1,1 @@
+export const apiURL = 'https://www.boardgamegeek.com/xmlapi2';
