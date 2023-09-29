@@ -19,12 +19,18 @@ export class GameBox implements GameBoxInterface {
     get computed() {
         const bgg: any = this.infoBgg || {};
         const tesera: any = this.infoTesera || {};
+
+        const bggUserRating = bgg.stats?.rating?.["@_value"];
+        const like = bggUserRating && +bggUserRating >= 8;
         return {
             title: bgg?.name?.['#text'] || tesera.title,
             photoUrl: bgg.thumbnail || tesera.photoUrl,
             ratingTesera: tesera.ratingUser,
             ratingBgg: bgg.stats?.rating?.average['@_value'],
-            
+            wantToPlay: !!+bgg.status?.['@_wanttoplay'],
+            own: !!+bgg.status?.['@_own'],
+            bggId: !!+bgg['@_objectid'],
+            like: like,
         }
     }
 }

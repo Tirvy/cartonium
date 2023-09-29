@@ -2,62 +2,107 @@
     <v-app>
 
         <v-main>
+            <v-container>
 
-            <v-row>
-                <v-col cols="12" v-for="item in fetchedCollection" :key="item.id">
-                    <v-card>
-                        <div class="d-flex flex-no-wrap justify-start ">
-                            <v-avatar class="ma-3" size="100" rounded="0">
-                                <v-img :src="item.computed.photoUrl"></v-img>
-                            </v-avatar>
-                            <v-card-item class="flex-0-1" style="min-width: 0;">
-                                <v-card-title>
-                                    {{ item.computed.title }}
-                                </v-card-title>
-                            </v-card-item>
-                        </div>
+                <v-row>
+                    <v-col cols="12" v-for="item in fetchedCollection" :key="item.id">
+                        <v-lazy min-height="100" transition="none">
+                            <LibraryItem :value="item" />
+                        </v-lazy>
+                    </v-col>
+                </v-row>
 
-                    </v-card>
-                </v-col>
-            </v-row>
+            </v-container>
         </v-main>
+
+        <v-app-bar :elevation="2">
+
+            <template v-slot:prepend>
+                <v-avatar color="yellow">A</v-avatar>
+            </template>
+
+            <v-app-bar-title>Ареночка</v-app-bar-title>
+        </v-app-bar>
+
 
 
         <v-navigation-drawer location="right" v-model="drawerState">
-            <v-row>
+            <v-container>
+                <v-row>
 
-                <v-col sm="12">
+                    <v-col sm="12">
 
-                    <v-btn-toggle v-model="dataSourceChosen" color="primary" variant="text">
-                        <v-btn v-for="dataSource in dataSources" :value="dataSource.apiName">
-                            {{ dataSource.name }}
-                        </v-btn>
-                    </v-btn-toggle>
-                </v-col>
-                <v-col cols="12">
+                        <v-btn-toggle v-model="dataSourceChosen" variant="outlined" color="primary" shaped mandatory>
+                            <v-btn v-for="dataSource in dataSources" :value="dataSource.apiName">
+                                {{ dataSource.name }}
+                            </v-btn>
+                        </v-btn-toggle>
+                    </v-col>
+                    <v-col cols="12">
 
-                    <v-text-field v-model="username" label="Search"></v-text-field>
-                    <v-btn @click="fetchData">Search</v-btn>
-                </v-col>
-            </v-row>
+                        <v-text-field v-model="username" label="Search"></v-text-field>
+                        <v-btn @click="fetchData" :loading="loading">Search</v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-navigation-drawer>
 
-        <v-footer app color="grey" height="44">
-        </v-footer>
+        <v-bottom-navigation grow color="grey" height="44">
+            <v-btn v-for="page in pages">
+                <v-icon>{{ page.icon }}</v-icon>
+                <span>{{page.title}}</span>
+            </v-btn>
+        </v-bottom-navigation>
     </v-app>
 </template>
 
   
 <script setup lang="ts">
+const route = useRoute();
+const clubName = route.params.clubname;
+definePageMeta({
+  title: 'Arenochka'
+})
+
+const pages = [
+    {
+        title: 'club collection',
+        path: `/clubs/${clubName}/collection`,
+        icon: 'collection',
+    },
+    {
+        title:'favorites',
+        path: `/clubs/${clubName}/favorites`,
+        icon: 'person',
+    },
+    {
+        title: 'club info',
+        path: `/clubs/${clubName}/informaion`,
+        icon: 'informaion',
+    },
+    {
+        title: 'bookings',
+        path: `/clubs/${clubName}/bookings`,
+        icon: 'table',
+    },
+    {
+        title:'settings',
+        path: `/clubs/${clubName}/settings`,
+        icon: 'settings',
+    }
+];
 
 const dataSources = ref([{ name: 'bgg', apiName: 'bgg' }, { name: 'tesera', apiName: 'tesera' }]);
 const dataSourceChosen = ref(dataSources.value[0].apiName);
-const username: Ref<string> = ref('tirvy')
+const username: Ref<string> = ref('pitusw')
 const fetchedCollection: Ref<GameBoxInterface[]> = ref([])
 const drawerState: Ref<boolean> = ref(true);
+const loading: Ref<boolean> = ref(false);
 
 const fetchData = async () => {
+    loading.value = true;
     const ret = await $fetch(`/api/${dataSourceChosen.value}/get-user-collection`, { query: { username: username.value } })
     fetchedCollection.value = ret.map((item: any) => new GameBox(item));
+    loading.value = false;
 }
 </script>
