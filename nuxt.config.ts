@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/',
       callback: '/confirm',
-      exclude: ['*/**'],
+      exclude: ['users/*'],
     },
   },
   css: ['vuetify/lib/styles/main.sass'],

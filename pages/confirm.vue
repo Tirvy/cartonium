@@ -6,7 +6,7 @@ const user = useSupabaseUser()
 
 watch(user, () => {
   if (user.value) {
-    return navigateTo('/tasks')
+    return navigateTo('/clubs/emarena/add-games')
   }
 }, { immediate: true })
 </script>

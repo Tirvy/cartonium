@@ -9,17 +9,40 @@ const myCustomDarkTheme: ThemeDefinition = {
   },
 }
 
+const myCustomWarnTheme: ThemeDefinition = {
+  dark: false,
+  colors: {
+    primary: '#944a00',
+    secondary: '#755845',
+    accent: '#5f6135',
+    error: '#ba1a1a',
+    warning: '#009688',
+    info: '#4caf50',
+    success: '#8bc34a',
+    background: '#fffbff',
+    surface: '#fffbff',
+    outline: '#84746a',
+  }
+}
+
 export default defineNuxtPlugin(nuxtApp => {
   const vuetify = createVuetify({
     ssr: true,
     components,
     directives,
     theme: {
-      defaultTheme: 'myCustomDarkTheme',
+      defaultTheme: 'myCustomWarnTheme',
       themes: {
-        myCustomDarkTheme
+        myCustomDarkTheme,
+        myCustomWarnTheme
       }
     },
+    defaults: {
+      VBtn: {
+        color: 'primary',
+        variant: 'outlined',
+      },
+    }
   })
 
   nuxtApp.vueApp.use(vuetify)

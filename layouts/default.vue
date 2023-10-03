@@ -1,46 +1,71 @@
 <template>
   <v-app id="inspire">
-    <v-app-bar class="px-3" flat density="compact">
-      <v-tabs centered color="grey-darken-2">
-        <v-tab to="/visits-offload">visits</v-tab>
-        <v-tab to="/visiters-offload">visiters</v-tab>
-      </v-tabs>
+
+    <v-app-bar dense>
+
+      <template v-slot:prepend>
+        <v-avatar color="yellow">A</v-avatar>
+      </template>
+
+      <v-app-bar-title>Ареночка</v-app-bar-title>
       <v-spacer></v-spacer>
+      <v-btn @click="switchTheme">
+        theme-icon
+      </v-btn>
     </v-app-bar>
 
-    <v-main class="bg-grey-lighten-3">
-      <v-container>
-        <v-row>
+    <slot />
 
-          <v-col cols="12" md="12">
-            <v-sheet min-height="70vh" rounded="lg">
-              <slot />
-            </v-sheet>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
+    <v-bottom-navigation grow color="grey" height="44">
+      <v-btn v-for="page in pages">
+        <v-icon>{{ page.icon }}</v-icon>
+        <span>{{ page.title }}</span>
+      </v-btn>
+    </v-bottom-navigation>
+
   </v-app>
 </template>
 
 <script setup>
-const links = [
-  'Dashboard',
-  'Messages',
-  'Profile',
-  'Updates',
-]
-</script>
+const route = useRoute();
+const clubName = route.params.clubname;
+definePageMeta({
+  title: 'Arenochka'
+})
+const pages = [
+    {
+        title: 'club collection',
+        path: `/clubs/${clubName}/collection`,
+        icon: 'collection',
+    },
+    {
+        title:'favorites',
+        path: `/clubs/${clubName}/favorites`,
+        icon: 'person',
+    },
+    {
+        title: 'club info',
+        path: `/clubs/${clubName}/informaion`,
+        icon: 'informaion',
+    },
+    {
+        title: 'bookings',
+        path: `/clubs/${clubName}/bookings`,
+        icon: 'table',
+    },
+    {
+        title:'settings',
+        path: `/clubs/${clubName}/settings`,
+        icon: 'settings',
+    }
+];
 
-<script>
-export default {
-  data: () => ({
-    links: [
-      'Dashboard',
-      'Messages',
-      'Profile',
-      'Updates',
-    ],
-  }),
+
+
+import { useTheme } from 'vuetify'
+const theme = useTheme()
+
+function switchTheme() {
+  theme.global.name.value = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme'
 }
 </script>
