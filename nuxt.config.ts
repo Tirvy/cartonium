@@ -1,7 +1,14 @@
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/supabase'],
+  modules: [
+    (_options, nuxt) => {
+      nuxt.hooks.hook('vite:extendConfig', (config) => {
+        config.plugins.push(vuetify({ autoImport: true }))
+      })
+    }, '@nuxtjs/supabase'],
   supabase: {
     redirectOptions: {
       login: '/',
@@ -15,5 +22,12 @@ export default defineNuxtConfig({
   },
   typescript: {
     typeCheck: true,
-  }
+  },
+  vite: {
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    },
+  },
 })

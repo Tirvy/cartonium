@@ -1,14 +1,64 @@
-export default interface GameBoxInterface  {
-    infoBgg: Object | null
-    infoTesera: Object | null
-    bggid: number | null
-    bggPhotoUrl: string | null
-    bggRating: number | null
-    bggUrl: string | null
-    teseraid: number | null
-    teseraPhotoUrl: string | null
-    teseraRating: number | null
-    teseraUrl: string | null
+export interface GameBoxInterface {
+    aliasTesera: string | null
+    id: number
+    idBgg: number | null
+    idTesera: number | null
+    linkBgg: string | null
+    linkTesera: string | null
+    photoUrl: string | null
+    playersGood: number[] | null
+    playersMax: number | null
+    playersMin: number | null
+    playtimeAvg: number | null
+    playtimeMax: number | null
+    playtimeMin: number | null
+    ratingBgg: number | null
+    ratingTesera: number | null
+    title: string
+    titleTranslations: JSON | null
+    year: number | null
+}
+
+export class GameBox implements GameBoxInterface {
+    constructor(obj: any) {
+        this.aliasTesera = obj.aliasTesera;
+        this.id = obj.id;
+        this.idBgg = obj.idBgg;
+        this.idTesera = obj.idTesera;
+        this.linkBgg = obj.linkBgg;
+        this.linkTesera = obj.linkTesera;
+        this.photoUrl = obj.photoUrl;
+        this.playersGood = obj.playersGood;
+        this.playersMax = obj.playersMax;
+        this.playersMin = obj.playersMin;
+        this.playtimeAvg = obj.playtimeAvg;
+        this.playtimeMax = obj.playtimeMax;
+        this.playtimeMin = obj.playtimeMin;
+        this.ratingBgg = obj.ratingBgg;
+        this.ratingTesera = obj.ratingTesera;
+        this.title = obj.title;
+        this.titleTranslations = obj.titleTranslations;
+        this.year = obj.year;
+    }
+    aliasTesera: string | null
+    id: number
+    idBgg: number | null
+    idTesera: number | null
+    linkBgg: string | null
+    linkTesera: string | null
+    photoUrl: string | null
+    playersGood: number[] | null
+    playersMax: number | null
+    playersMin: number | null
+    playtimeAvg: number | null
+    playtimeMax: number | null
+    playtimeMin: number | null
+    ratingBgg: number | null
+    ratingTesera: number | null
+    title: string
+    titleTranslations: JSON | null
+    year: number | null
+        ;
 }
 
 /*

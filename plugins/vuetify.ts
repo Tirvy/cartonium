@@ -1,6 +1,12 @@
+import '@mdi/font/css/materialdesignicons.css'
+import 'vuetify/styles'
+
 import { createVuetify, ThemeDefinition } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import {
+  VDataTable,
+} from "vuetify/labs/VDataTable";
 
 const myCustomDarkTheme: ThemeDefinition = {
   dark: true,
@@ -28,7 +34,10 @@ const myCustomWarnTheme: ThemeDefinition = {
 export default defineNuxtPlugin(nuxtApp => {
   const vuetify = createVuetify({
     ssr: true,
-    components,
+    components: {
+      ...components,
+      VDataTable,
+    },
     directives,
     theme: {
       defaultTheme: 'myCustomWarnTheme',
