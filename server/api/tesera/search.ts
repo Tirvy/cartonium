@@ -1,5 +1,19 @@
 import { apiURL } from "./common";
+import { searchResultTesera } from "~/types/index";
 
+
+function formatRet(item: any): searchResultTesera {
+  const titles = ['', '1', '2', '3', '4', '5', '6']
+    .map((suffix: string) => {
+      return item['title' + suffix];
+    })
+    .filter(e => e);
+  return {
+    alias: item.alias,
+    titles: [item.value, ...titles],
+    photoUrl: item.photoUrl,
+  }
+}
 
 
 export default defineEventHandler(async (event) => {
@@ -11,7 +25,10 @@ export default defineEventHandler(async (event) => {
     }
 
     const res: any = await $fetch(`${apiURL}/search`, { query: { query: title } });
-    return res;
+    if (Array.isArray(res)) {
+      return res.map(item => formatRet(item));
+    }
+    return [];
   } catch (error: unknown) {
     if (error instanceof Error) {
       return { result: [], error: error.message };

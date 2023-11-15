@@ -3,58 +3,104 @@
         <v-container>
             <v-row>
                 <v-col cols="12">
-                    <v-card>
-                        <v-card-title>
-                            Преобразуем список игр в понятный проге
-                        </v-card-title>
-                        <div class="w-100 d-flex align-start">
 
-                            <v-card-text>
-                                <v-textarea class="w-100" clearable variant="outlined" label="games list"
-                                    v-model="gamesList">
-                                </v-textarea>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-btn @click="getGamesTrimmed">Разобрать список</v-btn>
-                            </v-card-actions>
-                        </div>
-                    </v-card>
+                    <v-breadcrumbs :items="breadcrumbItems">
+                        <template v-slot:divider>
+                            <v-icon icon="mdi-chevron-right"></v-icon>
+                        </template>
+                    </v-breadcrumbs>
+                </v-col>
+                <v-col cols="12">
+                    <pages-components-get-games-list :progress="getGamesAliasesProgress" @input="getGamesBaseInfo" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12">
                     <v-card>
                         <v-card-title>
-                            Получаем alias'ы с тесеры
+                            Добавляем недостающие игры в бд
                         </v-card-title>
-                        <v-card-actions>
-                            <div>
-
-                                <v-btn :loading="getGamesAliasesLoading" @click="getGamesAliases">Получить
-                                    alias'ы</v-btn>
-                                <v-progress-linear v-if="getGamesAliasesProgress"
-                                    :model-value="getGamesAliasesProgress"></v-progress-linear>
-                            </div>
-                            <div>
-
-                                <v-btn @click="getGameBoxData">
-                                    Получить данные от внешних бд
-                                </v-btn>
-                            </div>
-                            <div>
-
-                                <v-btn>
-                                    Отправить всё в супабейз
-                                </v-btn>
-                            </div>
-                        </v-card-actions>
                         <v-card-text>
                             <v-btn-toggle v-model="tableSourceChosen" variant="outlined" color="primary" shaped mandatory>
                                 <v-btn v-for="dataSource in dataSources" :value="dataSource">
                                     {{ dataSource.title }}: {{ gamesListFormattedFilteredHashed[dataSource.alias].length }}
                                 </v-btn>
                             </v-btn-toggle>
-                            <v-data-table v-model="selected" :headers="headersList" :items="gamesListFormatted" show-select
-                                item-value="baseTitle">
+                            <v-table>
+                                <thead>
+                                    <tr>
+                                        <td rowspan="2">
+                                            Введенное имя
+                                        </td>
+                                        <td rowspan="2">
+                                            Есть в БД
+                                        </td>
+                                        <td colspan="2">
+                                            Нет в БД
+                                        </td>
+                                        <td rowspan="2">
+                                            Действия
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Игра с тесеры
+                                        </td>
+                                        <td>
+                                            Игра с бгг
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="gameInfo in gamesListSearched" :key="gameInfo.baseTitle">
+                                        <td>
+                                            {{ gameInfo.baseTitle }}
+                                        </td>
+                                        <td>
+                                            -
+                                        </td>
+                                        <td class="cell-game-thing">
+                                            <PagesComponentsGetGamesTableItem :items="gameInfo.gameTeseraVariants"
+                                                :source="'tesera'" :value="gameInfo.gameTesera">
+                                            </PagesComponentsGetGamesTableItem>
+                                        </td>
+                                        <td class="cell-game-thing">
+                                            <PagesComponentsGetGamesTableItem :items="gameInfo.gameBggVariants"
+                                                :source="'bgg'" :value="gameInfo.gameBgg">
+                                            </PagesComponentsGetGamesTableItem>
+                                        </td>
+                                        <td>
+                                            кнопки
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-table>
+                        </v-card-text>
+
+                        <v-card-actions>
+                            <div>
+                                <v-btn @click="getGameBoxData">
+                                    Получить данные от внешних бд
+                                </v-btn>
+                            </div>
+                        </v-card-actions>
+
+                    </v-card>
+                </v-col>
+                <v-divider />
+                <v-col cols="12">
+                    <v-card>
+                        <v-card-title>
+                            Отправляем новые игры в бд
+                        </v-card-title>
+                        <v-card-actions>
+                            <div>
+                                <v-btn @click="sendGameboxesToSupabase">
+                                    Отправить в супабейз
+                                </v-btn>
+                            </div>
+                        </v-card-actions>
+                        <v-card-text>
+                            <v-data-table select-strategy="all" :headers="headersGameBoxList" :items="saveData">
                             </v-data-table>
                         </v-card-text>
 
@@ -67,117 +113,131 @@
 </template>
 
 <script setup lang="ts">
-import { GameBox } from "@/types/gameBox.ts";
+import { GameBox } from "~/types/gameBox.js";
+import type { searchResultTesera, searchResultBgg } from "@/types/index.d.ts";
+import { Ref, ref, computed } from 'vue';
+
 const saveData: Ref<GameBox[]> = ref([]);
 
-
 const timeout = (ms: number) => new Promise(res => setTimeout(res, ms));
-const gamesListFormatted = ref([]);
+const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
 
-// making games list
-const gamesList = ref('');
-function getGamesTrimmed() {
-    const splitted = gamesList.value.trim().split(/[\t\n]/);
-    gamesListFormatted.value = splitted.filter((q: string) => !!q).map((item: any) => {
-        return {
-            baseTitle: item.trim(),
-            titles: [],
-            alias: '',
-            error: '',
-        }
-    });
+interface SearchedGameBox {
+    baseTitle: string,
+    gameTeseraVariants: searchResultTesera[],
+    gameBggVariants: searchResultBgg[],
+    gameTesera: searchResultTesera | null,
+    gameBgg: searchResultBgg | null,
 }
 
+const breadcrumbItems = [
+    {
+        title: 'Вводим список',
+        disabled: false,
+        href: 'breadcrumbs_dashboard',
+    },
+    {
+        title: 'Получаем названия',
+        disabled: false,
+        href: 'breadcrumbs_dashboard',
+    },
+    {
+        title: 'Отправляем данные',
+        disabled: false,
+        href: 'breadcrumbs_dashboard',
+    },
+];
 
 // leech aliases from tesera
-const gameBoxesAliasesGot = ref(0);
+const getGamesAliasesProgress = ref(0);
 
-const getGamesAliasesProgress = computed(() => {
-    return gamesListFormatted.value.length ? (100 * gameBoxesAliasesGot.value / gamesListFormatted.value.length) : 0;
-});
-const getGamesAliasesLoading = computed(() => {
-    return gameBoxesAliasesGot.value > 0 && gameBoxesAliasesGot.value < gamesListFormatted.value.length;
-})
+const requestInterval = 300;
 
-async function getGamesAliases() {
-    const requestInterval = 200;
-    gameBoxesAliasesGot.value = 0;
-    if (gamesListFormatted.value.length > 0) {
-        gamesListFormatted.value.slice(0, 10).forEach((gameInfo: any, index: number) => {
-            setTimeout(async () => {
-                const ret = await $fetch('/api/tesera/search', { query: { title: gameInfo.baseTitle } });
+async function getGamesBaseInfo(gamesList: string[]) {
 
-                if (!Array.isArray(ret)) {
-                    gameInfo.error = ret;
-                    return;
+    const retHashed = {} as any;
+    gamesListSearched.value = [];
+
+    gamesList.forEach((gameTitle: string, index: number) => {
+        setTimeout(async () => {
+            const ret: SearchedGameBox = {
+                baseTitle: gameTitle,
+                gameTeseraVariants: [] as searchResultTesera[],
+                gameBggVariants: [] as searchResultBgg[],
+                gameTesera: null,
+                gameBgg: null,
+            }
+            const resTesera: any = await $fetch('/api/tesera/search', { query: { title: gameTitle } });
+            console.log(resTesera);
+
+            if (Array.isArray(resTesera) && resTesera.length) {
+                ret.gameTeseraVariants = resTesera;
+                ret.gameTesera = resTesera[0];
+                const resBgg = await $fetch('/api/bgg/search', { query: { titles: resTesera[0].titles } });
+                if (Array.isArray(resBgg) && resBgg.length) {
+                    ret.gameBggVariants = resBgg;
+                    ret.gameBgg = resBgg[0];
                 }
-                if (!ret || !ret.length) {
-                    gameInfo.error = 'not found';
-                    return;
-                }
-                gameInfo.alias = ret[0].alias;
-                gameInfo.titles = ['title', 'title2', 'title3'].map((key: string) => ret[0][key]).filter((title: string) => !!title);
-                gameBoxesAliasesGot.value++;
-            }, index * requestInterval);
-        });
-        await timeout((gamesListFormatted.value.length + 1) * 1000);
-        gamesListFormatted.value = [...gamesListFormatted.value];
-    }
+            }
 
+            console.log(ret);
+
+            retHashed[ret.baseTitle] = ret;
+
+            if (Object.values(retHashed).length === gamesList.length) {
+                getGamesAliasesProgress.value = 0;
+
+                gamesListSearched.value = gamesList.map(gameTitle => {
+                    return retHashed[gameTitle];
+                });
+            } else {
+                getGamesAliasesProgress.value = (100 * gamesListSearched.value.length / gamesList.length);
+            }
+        }, index * requestInterval);
+    });
 };
 
 
 // data-table
-const selected = ref([]);
-const headersList =
-    [
-        {
-            key: 'baseTitle',
-            title: 'baseTitle',
-        },
-        {
-            align: 'start',
-            sortable: false,
-            key: 'alias',
-            title: 'alias',
-        },
-        {
-            key: 'titles',
-            title: 'title',
-        },
-        { key: 'error', },
-    ];
-const gameBoxes: GameBox[] = ref([]);
+const selected: Ref<string[]> = ref([]);
 
-
-
-
-
-
-// leech data from bgg
+// leech data from bgg and tesera
 
 async function getGameBoxData() {
     const requestInterval = 200;
-    if (gamesListFormatted.value.length > 0) {
-        gamesListFormatted.value.slice(0, 2).forEach((gameInfo: any, index: number) => {
-            setTimeout(async () => {
-                const teseraRet = await $fetch('/api/tesera/get-game-by-alias', { query: { alias: gameInfo.alias } });
-                let bggRet;
-                if ((teseraRet as GameBox).idBgg) {
-                    bggRet = await $fetch('/api/bgg/search', { query: { id: (teseraRet as GameBox).idBgg } })
-                } else {
-                    bggRet = await $fetch('/api/bgg/search', { query: { titles: [...gameInfo.titles, gameInfo.baseTitle] } })
-                }
-                saveData.value.push(new GameBox({
-                    ...teseraRet,
-                    ...bggRet,
-                }));
-            }, index * requestInterval);
-        });
-        await timeout((gamesListFormatted.value.length + 1) * 1000);
-        console.log(saveData.value);
+    if (gamesListSearched.value.length > 0) {
+        gamesListSearched.value
+            .forEach((gameInfo: any, index: number) => {
+                setTimeout(async () => {
+                    let ret = {
+                        titles: [] as string[],
+                    };
+                    if (gameInfo.gameTesera) {
+                        let teseraRet: any = await $fetch('/api/tesera/get-gamebox', { query: { alias: gameInfo.gameTesera.alias } });
+                        ret.titles.push(teseraRet.title as string);
+                        ret = { ...teseraRet, ...ret };
+                    }
+                    if (gameInfo.gameBgg) {
+                        let bggRet: any = await $fetch('/api/bgg/get-gamebox', { query: { id: gameInfo.gameBgg.id } })
+                        ret.titles.push(bggRet.title as string);
+                        ret = { ...bggRet, ...ret };
+                    }
+                    saveData.value.push(new GameBox(ret));
+                }, index * requestInterval);
+            });
+        await timeout((gamesListSearched.value.length + 1) * 1000);
     }
 };
+
+
+// headersGameBoxList
+
+const headersGameBoxList = Object.getOwnPropertyNames(new GameBox({})).map((key: string) => {
+    return {
+        title: key,
+        key: key,
+    }
+});
 
 
 // table data
@@ -197,11 +257,11 @@ const dataSources = ref([
 ]);
 const tableSourceChosen = ref(dataSources.value[0]);
 
-const gamesListFormattedFilteredHashed = computed(() => {
+const gamesListFormattedFilteredHashed: any = computed(() => {
     return {
-        all: gamesListFormatted.value,
-        ok: gamesListFormatted.value.filter((item: any) => item.alias),
-        error: gamesListFormatted.value.filter((item: any) => item.error),
+        all: gamesListSearched.value,
+        ok: gamesListSearched.value.filter((item: any) => item.alias),
+        error: gamesListSearched.value.filter((item: any) => item.error),
     }
 })
 
@@ -209,4 +269,25 @@ const gamesListFormattedFiltered = computed(() => {
     return gamesListFormattedFilteredHashed.value[tableSourceChosen.value.alias];
 })
 
+
+
+// to supabase 
+
+async function sendGameboxesToSupabase() {
+    if (saveData.value.length) {
+        let ret: any = await $fetch('/api/supabase/gamebox-add', {
+            method: "POST", body: saveData.value
+        });
+        console.log(ret);
+    }
+}
+
 </script>
+
+<style scoped>
+.cell-game-thing {
+    vertical-align: top;
+    padding: 5px 0;
+    width: 30%;
+}
+</style>

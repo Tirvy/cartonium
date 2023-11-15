@@ -15,14 +15,14 @@ export interface GameBoxInterface {
     ratingBgg: number | null
     ratingTesera: number | null
     title: string
-    titleTranslations: JSON | null
+    titles: Array<string> | null
     year: number | null
 }
 
 export class GameBox implements GameBoxInterface {
     constructor(obj: any) {
         this.aliasTesera = obj.aliasTesera;
-        this.id = obj.id;
+        this.id = obj.id; 
         this.idBgg = obj.idBgg;
         this.idTesera = obj.idTesera;
         this.linkBgg = obj.linkBgg;
@@ -37,8 +37,11 @@ export class GameBox implements GameBoxInterface {
         this.ratingBgg = obj.ratingBgg;
         this.ratingTesera = obj.ratingTesera;
         this.title = obj.title;
-        this.titleTranslations = obj.titleTranslations;
+        this.titles = obj.titles;
         this.year = obj.year;
+    }
+    get isComplete(): boolean {
+        return !!(this.idBgg && this.idTesera);
     }
     aliasTesera: string | null
     id: number
@@ -56,7 +59,7 @@ export class GameBox implements GameBoxInterface {
     ratingBgg: number | null
     ratingTesera: number | null
     title: string
-    titleTranslations: JSON | null
+    titles: Array<string> | null
     year: number | null
         ;
 }

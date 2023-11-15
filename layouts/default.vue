@@ -18,7 +18,7 @@
 
     <v-bottom-navigation grow color="grey" height="44">
       <v-btn v-for="page in pages">
-        <v-icon>{{ page.icon }}</v-icon>
+        <v-icon :icon="page.icon"></v-icon>
         <span>{{ page.title }}</span>
       </v-btn>
     </v-bottom-navigation>
@@ -29,34 +29,31 @@
 <script setup>
 const route = useRoute();
 const clubName = route.params.clubname;
-definePageMeta({
-  title: 'Arenochka'
-})
 const pages = [
     {
         title: 'club collection',
         path: `/clubs/${clubName}/collection`,
-        icon: 'collection',
+        icon: 'mdi-list-box',
     },
     {
         title:'favorites',
         path: `/clubs/${clubName}/favorites`,
-        icon: 'person',
+        icon: 'mdi-heart',
     },
     {
         title: 'club info',
         path: `/clubs/${clubName}/informaion`,
-        icon: 'informaion',
+        icon: 'mdi-information',
     },
     {
         title: 'bookings',
         path: `/clubs/${clubName}/bookings`,
-        icon: 'table',
+        icon: 'mdi-table-furniture',
     },
     {
         title:'settings',
         path: `/clubs/${clubName}/settings`,
-        icon: 'settings',
+        icon: 'mdi-cog',
     }
 ];
 
