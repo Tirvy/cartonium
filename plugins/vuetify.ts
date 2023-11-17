@@ -4,9 +4,6 @@ import 'vuetify/styles'
 import { createVuetify, ThemeDefinition } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import {
-  VDataTable,
-} from "vuetify/labs/VDataTable";
 
 const myCustomDarkTheme: ThemeDefinition = {
   dark: true,
@@ -36,7 +33,6 @@ export default defineNuxtPlugin(nuxtApp => {
     ssr: true,
     components: {
       ...components,
-      VDataTable,
     },
     directives,
     theme: {

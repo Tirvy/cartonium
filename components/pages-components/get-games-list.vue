@@ -10,7 +10,7 @@
             <v-textarea counter rows="14" class="w-100" row-height="12" label="games list" v-model="gamesList">
             </v-textarea>
         </v-card-text>
-        <v-card-actions class="flex-justify justify-end">
+        <v-card-actions>
             <div>
 
                 <v-btn :loading="isLoading" :disabled="!gamesList" @click="getGamesBaseInfo">

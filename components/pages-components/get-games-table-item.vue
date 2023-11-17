@@ -1,7 +1,7 @@
 <template>
     <div>
-        <v-select label="варианты" :items="selectorVariants" :readonly="props.items.length < 2" :value="selectedItemName"
-            @input="selectVariant"></v-select>
+        <v-select label="варианты" :items="selectorVariants" :readonly="props.items.length < 2" :model-value="selectedItemName"
+            @update:model-value="selectVariant"></v-select>
         <v-img style="max-height: 160px;" v-if="source === 'tesera'" :src="selectedItem.photoUrl"></v-img>
         <div v-if="source === 'bgg'">
             year: {{ selectedItem.year }}
@@ -13,7 +13,7 @@
 import type { searchResultTesera, searchResultBgg } from "@/types/index.d.ts";
 
 const props = defineProps({
-    value: {
+    modelValue: {
         type: Object,
     },
     items: {
@@ -30,7 +30,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-    (e: 'input', value: any): void
+    (e: 'update:modelValue', value: any): void
 }>()
 
 function selectVariant(title: string) {
@@ -38,7 +38,7 @@ function selectVariant(title: string) {
     if (!variant) {
         console.log(title, props.items);
     }
-    emit('input', variant);
+    emit('update:modelValue', variant);
 }
 
 function getItemName(item) {
@@ -50,7 +50,7 @@ const selectorVariants = computed(() => {
 })
 
 const selectedItem = computed(() => {
-    if (props.value) return props.value;
+    if (props.modelValue) return props.modelValue;
     return {};
 })
 
