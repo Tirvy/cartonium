@@ -16,6 +16,9 @@ export default defineNuxtConfig({
       exclude: ['users/*'],
     },
   },
+  runtimeConfig: {
+    clubId: 2,
+  },
   css: ['vuetify/lib/styles/main.sass'],
   build: {
     transpile: ['vuetify'],

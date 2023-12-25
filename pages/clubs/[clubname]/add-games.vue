@@ -11,18 +11,33 @@
                     </v-breadcrumbs>
                 </v-col>
                 <v-col cols="12">
-                    <pages-components-get-games-list :progress="getGamesAliasesProgress" @input="getGamesBaseInfo" />
+                    <pages-components-get-games-list :progress="getGamesAliasesProgress" @input="saveGamesList" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12">
-                    <pages-components-get-games-add-gameboxes :items="gamesListSearched" @getGameBoxData="getGameBoxData"/>
+                    <pages-components-get-games-add-existing :items="gameboxesListExisting"
+                        @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12">
-                    <pages-components-get-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase" />
+                    <pages-components-get-games-add-gameboxes :items="gamesListSearched" @getGameBoxData="getGameBoxData" />
+                </v-col>
+                <v-divider />
+                <v-col cols="12">
+                    <pages-components-get-games-data-verify :items="saveData"
+                        @sendGameboxesToSupabase="sendGameboxesToSupabase" />
                 </v-col>
             </v-row>
         </v-container>
+        <v-snackbar v-model="snackbar" multi-line>
+            {{ snackbarText }}
+
+            <template v-slot:actions>
+                <v-btn color="red" variant="text" @click="snackbar = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
 
     </v-main>
 </template>
@@ -31,8 +46,11 @@
 import { GameBox } from "~/types/gameBox.js";
 import type { searchResultTesera, searchResultBgg } from "@/types/index.d.ts";
 import { ref, computed } from 'vue';
+import type { Ref } from 'vue'
 
 const saveData: Ref<GameBox[]> = ref([]);
+const snackbar = ref(false);
+const snackbarText = ref('wow');
 
 const timeout = (ms: number) => new Promise(res => setTimeout(res, ms));
 const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
@@ -45,28 +63,91 @@ interface SearchedGameBox {
     gameBgg: searchResultBgg | null,
 }
 
-const breadcrumbItems = [
+const breadcrumbItemsSource = [
     {
-        title: 'Вводим список',
-        disabled: false,
+        title: 'Вводим список названий',
+        disabled: true,
         href: 'breadcrumbs_dashboard',
     },
     {
-        title: 'Получаем названия',
-        disabled: false,
+        title: 'Добавляем найденные игры в клуб',
+        disabled: true,
         href: 'breadcrumbs_dashboard',
     },
     {
-        title: 'Отправляем данные',
-        disabled: false,
+        title: 'Добавляем новые игры в БД',
+        disabled: true,
+        href: 'breadcrumbs_dashboard',
+    },
+    {
+        title: 'Добавляем новые игры в клуб',
+        disabled: true,
         href: 'breadcrumbs_dashboard',
     },
 ];
+
+const breadcrumbItems = computed(() => {
+    let ret = [breadcrumbItemsSource[0]];
+    if (gameboxesListExisting) {
+        ret.push(breadcrumbItemsSource[1]);
+    }
+})
 
 // leech aliases from tesera
 const getGamesAliasesProgress = ref(0);
 
 const requestInterval = 300;
+
+const gamesTitlesList = ref([]) as Ref<string[]>;
+const gameboxesListExistingHashed: Ref<any> = ref({});
+const gameboxesListExisting = computed(() => {
+    return hashedListToSorted(gameboxesListExistingHashed.value, gamesTitlesList.value);
+});
+const gamesTitlesListMissing = computed(() => {
+    return gamesTitlesList.value.filter(title => !gameboxesListExistingHashed.value[title]);
+});
+
+function showSnackbar(text: string) {
+    snackbarText.value = text;
+    snackbar.value = true;
+
+}
+
+async function saveGamesList(gamesList: string[]) {
+    gamesTitlesList.value = gamesList;
+    gameboxesListExistingHashed.value = await stepGetExistingGameboxes(gamesTitlesList.value);
+    if (!gameboxesListExisting.value.length) {
+        await getGamesBaseInfo(gamesTitlesList.value);
+        showSnackbar('Не надено игр в базе, надо импортить из бгг');
+    } else if (gamesTitlesList.value.length > gameboxesListExisting.value.length) {
+        showSnackbar('Часть игр найдена, сначала добавь их');
+    } else {
+        showSnackbar('Все игры найдены');
+    }
+}
+
+async function stepGetExistingGameboxes(gamesList: string[]) {
+    let existingGameboxesHashed: any = {};
+    const promisesList = gamesList.map(async (gameTitle) => {
+        const ret = await $fetch('/api/supabase/check-game-exists', { query: { title: gameTitle } });
+        if (ret && ret.length > 0) {
+            existingGameboxesHashed[gameTitle] = ret[0];
+        }
+    })
+    await Promise.all(promisesList);
+    return existingGameboxesHashed;
+}
+
+async function addTheseExisting(selectedExisting: GameBox[]) {
+    console.log(selectedExisting);
+    const ret = await $fetch('/api/supabase/add-games-to-club', { method: 'post', body: { gameBoxIds: selectedExisting.map(gameBox => gameBox.id) } });
+    await getGamesBaseInfo(gamesTitlesListMissing.value);
+    if (gamesTitlesList.value.length > selectedExisting.length) {
+        showSnackbar('Добавлены выбранные игры. Остальные надо импортить');
+    } else {
+        showSnackbar('Игры добавлены в клуб. Можно уходить');
+    }
+}
 
 async function getGamesBaseInfo(gamesList: string[]) {
 
@@ -83,7 +164,6 @@ async function getGamesBaseInfo(gamesList: string[]) {
                 gameBgg: null,
             }
             const resTesera: any = await $fetch('/api/tesera/search', { query: { title: gameTitle } });
-            console.log(resTesera);
 
             if (Array.isArray(resTesera) && resTesera.length) {
                 ret.gameTeseraVariants = resTesera;
@@ -94,8 +174,6 @@ async function getGamesBaseInfo(gamesList: string[]) {
                     ret.gameBgg = resBgg[0];
                 }
             }
-
-            console.log(ret);
 
             retHashed[ret.baseTitle] = ret;
 
@@ -149,8 +227,20 @@ async function sendGameboxesToSupabase() {
         let ret: any = await $fetch('/api/supabase/gamebox-add', {
             method: "POST", body: saveData.value
         });
-        console.log(ret);
+        showSnackbar('Все игры добавлены в бд');
     }
+}
+
+// stuff helper
+
+function hashedListToSorted(toSort: any, sortSource: string[]) {
+    let ret: any[] = [];
+    sortSource.forEach(title => {
+        if (toSort[title]) {
+            ret.push(toSort[title]);
+        }
+    })
+    return ret;
 }
 
 </script>

@@ -17,7 +17,7 @@
     <slot />
 
     <v-bottom-navigation grow color="grey" height="44">
-      <v-btn v-for="page in pages">
+      <v-btn v-for="page in pages" :to="page.path">
         <v-icon :icon="page.icon"></v-icon>
         <span>{{ page.title }}</span>
       </v-btn>
@@ -36,8 +36,13 @@ const pages = [
         icon: 'mdi-list-box',
     },
     {
+        title: 'add games',
+        path: `/clubs/${clubName}/add-games`,
+        icon: 'mdi-add',
+    },
+    {
         title:'favorites',
-        path: `/clubs/${clubName}/favorites`,
+        path: `/clubs/favorites`,
         icon: 'mdi-heart',
     },
     {
@@ -52,7 +57,7 @@ const pages = [
     },
     {
         title:'settings',
-        path: `/clubs/${clubName}/settings`,
+        path: `/settings`,
         icon: 'mdi-cog',
     }
 ];
