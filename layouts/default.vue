@@ -31,7 +31,7 @@ const route = useRoute();
 const clubName = route.params.clubname;
 const pages = [
     {
-        title: 'club collection',
+        title: 'collection',
         path: `/clubs/${clubName}/collection`,
         icon: 'mdi-list-box',
     },
@@ -40,14 +40,14 @@ const pages = [
         path: `/clubs/${clubName}/add-games`,
         icon: 'mdi-add',
     },
+    // {
+    //     title:'favorites',
+    //     path: `/clubs/favorites`,
+    //     icon: 'mdi-heart',
+    // },
     {
-        title:'favorites',
-        path: `/clubs/favorites`,
-        icon: 'mdi-heart',
-    },
-    {
-        title: 'club info',
-        path: `/clubs/${clubName}/informaion`,
+        title: 'info',
+        path: `/clubs/${clubName}/information`,
         icon: 'mdi-information',
     },
     {

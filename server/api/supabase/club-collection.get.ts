@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const { clubId } = useRuntimeConfig(event);
 
   const client = await serverSupabaseClient(event)
-  clubId
+  
   const { data, error } = await client.from('gameboxes_with_club_id').select('*').contains('club_id', [2]);
   if (error) {
     throw createError({ statusMessage: error.message })
