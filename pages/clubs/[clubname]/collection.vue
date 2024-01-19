@@ -16,29 +16,27 @@
     <v-navigation-drawer location="right" v-model="drawerState">
         <v-list density="compact" nav>
             <v-list-item>
-
-                <v-text-field v-model="filter.title" label="title"></v-text-field>
+                <v-text-field v-model="filter.title" label="title" clearable></v-text-field>
             </v-list-item>
             <v-list-item>
-
-                <v-text-field v-model="filter.minRating" :rules="[ruleIsNumber]" label="Min Rating, 0 - 10"></v-text-field>
+                <v-text-field v-model="filter.minRating" :rules="[ruleIsNumber]" label="Min Rating, 0 - 10" clearable></v-text-field>
             </v-list-item>
             <v-list-item>
-
-                <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" label="playerCount, 0 - 100"></v-text-field>
+                <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" label="playerCount" clearable></v-text-field>
+            </v-list-item>
+            <v-list-item>
+                <v-text-field v-model="filter.maxPlaytime" :rules="[ruleIsNumber]" label="max playtime, hours" clearable></v-text-field>
             </v-list-item>
         </v-list>
-        <v-divider />
-        <v-btn @click="fetchData" :loading="loading">Search</v-btn>
     </v-navigation-drawer>
 </template>
 
   
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { Ref } from 'vue'
-import type { GameBoxInterface, GameBox } from '~/types/gameBox.ts';
-import { ruleIsNumber } from '@/utils/rules.ts';
+import type { Ref, ComputedRef } from 'vue'
+import { GameBox } from "~/types/gameBox.js";
+import { ruleIsNumber } from '@/utils/rules.js';
 import GameboxItem from '~/components/GameboxItem.vue';
 
 
@@ -52,6 +50,7 @@ const filter = ref(
         title: '',
         minRating: 0,
         playerCount: 0,
+        maxPlaytime: 0,
     }
 );
 
@@ -60,11 +59,12 @@ const filter = ref(
 //     minRating: ref(0),
 // };
 
-const collectionFiltered = computed(() => {
+const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
     const title = fetchedCollection.value.filter(item => item.title.toUpperCase().includes(filter.value.title.toUpperCase()))
     const rating = title.filter(item => item.ratingTesera > filter.value.minRating || item.ratingBgg > filter.value.minRating);
     const players = rating.filter(item => !filter.value.playerCount || item.playersGood?.includes(+filter.value.playerCount))
-    return players;
+    const playtime = rating.filter(item => !filter.value.maxPlaytime || (item.playtimeMax < +filter.value.maxPlaytime * 60))
+    return playtime.map(item => new GameBox(item));
 });
 
 const fetchData = async () => {

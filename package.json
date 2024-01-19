@@ -18,7 +18,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.17.0",
-    "nuxt": "^3.6.5",
+    "nuxt": "^3.9.0",
     "prettier": "^3.0.2",
     "typescript": "^5.1.6",
     "vite-plugin-vuetify": "^1.0.2",

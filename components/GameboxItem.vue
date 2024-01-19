@@ -35,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import { GameBox } from "~/types/gameBox.js";
+
 const props = defineProps({
     value: {
         type: GameBox,

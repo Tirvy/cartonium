@@ -8,13 +8,13 @@ const { auth } = useSupabaseClient()
 
 watchEffect(() => {
   if (user.value) {
-    navigateTo('/clubs/emarena/add-games')
+    navigateTo('/clubs/emarena/collection')
   }
 })
 
-async function signInWithGitHub() {
+async function signInWithProvider(provider: string) {
   const { data, error } = await auth.signInWithOAuth({
-    provider: 'github',
+    provider,
   })
 }
 </script>
@@ -27,12 +27,24 @@ async function signInWithGitHub() {
           <v-card-title>
             Sign in to your account
           </v-card-title>
-          <v-card-actions>
+          <div>
+            <v-divider />
 
-            <v-btn @click="signInWithGitHub">connect with Github</v-btn>
+            <div class="text-center">
+              connect with
+            </div>
+
+          </div>
+          <v-card-actions>
+            <v-btn icon="mdi-github" @click="signInWithProvider('github')"></v-btn>
+            <v-btn icon="mdi-google" @click="signInWithProvider('google')"></v-btn>
+            <v-btn icon="mdi-facebook" @click="signInWithProvider('facebook')"></v-btn>
+            <v-btn icon="mdi-discord" @click="signInWithProvider('discord')">d</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style></style>
