@@ -40,7 +40,7 @@ const pages = [
   },
   {
     title: 'info',
-    path: `/clubs/${clubName}/information`,
+    path: `/clubs/${clubName}/information/public`,
     icon: 'mdi-information',
   },
   {
