@@ -1,9 +1,8 @@
-import type { Database } from './database-visite.js'
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
-  const client = await serverSupabaseClient<Database>(event)
+  const client = await serverSupabaseClient(event)
   const body = await readBody(event);
   const gameBoxIds: Array<number> = body.gameBoxIds;
 
