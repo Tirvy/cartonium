@@ -1,9 +1,23 @@
 <template>
-    <v-main>
+    <v-main @keyup.esc="logi">
         <v-container>
-            <client-only fallback-tag="div" fallback="Loading editor...">
-                <QuillEditor theme="snow" />
-            </client-only>
+            <v-row>
+                <v-col>
+                    <div>
+                        <client-only fallback-tag="div" fallback="Loading editor...">
+                            <QuillEditor theme="snow" contentType="html" v-model:content="quillHtml" />
+                        </client-only>
+                    </div>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col>
+                    <v-btn @click="saveToDatabase">
+                        Сохранить
+                    </v-btn>
+                </v-col>
+
+            </v-row>
         </v-container>
     </v-main>
 </template>
@@ -11,6 +25,32 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue'
 
+const quillHtml = ref('');
+getInitialValues();
+
+
+
+
+
+async function getInitialValues() {
+    const data = await $fetch('/api/supabase/club-info');
+    quillHtml.value = data.text_html;
+}
+
+function logi() {
+    console.log(quillHtml.value)
+}
+
+async function saveToDatabase() {
+
+    let ret: any = await $fetch('/api/supabase/club-info', {
+        method: "POST", body: {
+            club_id: 2,
+            text_html: quillHtml.value,
+        }
+    });
+    console.log(ret);
+}
 
 </script>
 
