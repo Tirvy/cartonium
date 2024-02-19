@@ -29,7 +29,7 @@
   </v-app>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const route = useRoute();
 const clubName = route.params.clubname;
 const pages = [
@@ -45,7 +45,7 @@ const pages = [
   },
   {
     title: 'bookings',
-    path: `/clubs/${clubName}/bookings`,
+    path: `/clubs/${clubName}/gatherings`,
     icon: 'mdi-table-furniture',
   },
   {
