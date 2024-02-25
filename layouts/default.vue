@@ -58,7 +58,6 @@ const pages = [
 
 
 import { useTheme } from 'vuetify'
-import useClubPermissions from '@/composibles/useClubPermissions';
 const theme = useTheme()
 
 function switchTheme() {
@@ -66,19 +65,5 @@ function switchTheme() {
 }
 
 const user = useSupabaseUser()
-const permissions = useClubPermissions();
-
-await callOnce(async () => {
-  const clubs = await $fetch('/api/supabase/my-clubs-permissions', {
-    query: {
-      userid: user.value.id,
-    }
-  });
-  permissions.value = clubs;
-})
-
-function logUser() {
-  console.log(permissions.value)
-}
 
 </script>
