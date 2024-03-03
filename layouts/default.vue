@@ -4,7 +4,7 @@
     <v-app-bar dense>
 
       <template v-slot:prepend>
-        <v-avatar @click="logUser" color="yellow">A</v-avatar>
+        <v-avatar color="yellow">A</v-avatar>
       </template>
 
       <v-app-bar-title>Ареночка</v-app-bar-title>

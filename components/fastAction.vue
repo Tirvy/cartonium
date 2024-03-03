@@ -1,5 +1,10 @@
 
-// place at the root level of a page template
+<!-- // place at the root level of a page template -->
+<!-- // typical templates: -->
+<!-- //  -->
+<!-- <v-btn icon="mdi-pencil-outline" size="large" elevation="8" :to="" /> -->
+<!-- <v-btn icon="mdi-plus" size="large" elevation="8" :to="" /> -->
+
 
 <template>
     <v-layout-item model-value class="text-end pointer-events-none" position="bottom" size="88">

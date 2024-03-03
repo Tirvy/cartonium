@@ -1,20 +1,26 @@
 <template>
     <v-main>
-        <v-container>
-            <v-sheet>
+        <v-container class="d-flex justify-center">
+            <v-sheet max-width="600px">
                 <v-form>
                     <v-row>
                         <v-col>
-                            <date-text-picker label="dateee" v-model="startDate" color="primary"></date-text-picker>
+                            <date-text-picker label="Дата" v-model="startDate" color="primary"></date-text-picker>
 
                         </v-col>
                         <v-col>
-                            <v-text-field label="timee"></v-text-field>
+                            <v-text-field label="Время"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
                             <v-text-field label="Сколько человек планируется (максимум)" v-model="guestsMax"></v-text-field>
+
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-textarea label="Комментарий для админов клуба и/или присоединяющихся игроков"></v-textarea>
 
                         </v-col>
                     </v-row>
@@ -30,7 +36,10 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="1">
-                                    <v-divider vertical thickness="4" />
+                                    <div>
+                                        <v-divider vertical thickness="4" />
+
+                                    </div>
 
                                 </v-col>
                                 <v-col>
@@ -49,12 +58,6 @@
                             </v-row>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-textarea label="Комментарий для админов клуба и/или присоединяющихся игроков"></v-textarea>
-
-                        </v-col>
-                    </v-row>
                 </v-form>
             </v-sheet>
         </v-container>
@@ -62,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute()
+const route = useRoute();
 const router = useRouter();
 const item = ref('');
 
