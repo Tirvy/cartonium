@@ -18,10 +18,15 @@ const clubName = route.params.clubname;
 const editPath = `/clubs/${clubName}/information/edit`;
 
 const infoData = ref('');
+const currentClub = useState('club');
 
 async function getInfo() {
     // todo make fine handling
-    const data = await $fetch('/api/supabase/club-info');
+    const data = await $fetch('/api/supabase/club-info', {
+        query: {
+            clubid: currentClub.value.id
+        }
+    });
     infoData.value = data.text_html;
 }
 getInfo();

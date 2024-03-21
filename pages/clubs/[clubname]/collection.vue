@@ -16,22 +16,25 @@
     <v-navigation-drawer location="right" v-model="drawerState">
         <v-list density="compact" nav>
             <v-list-item>
-                <v-text-field v-model="filter.title" label="title" clearable></v-text-field>
+                <v-text-field v-model="filter.title" label="Название" clearable></v-text-field>
             </v-list-item>
             <v-list-item>
-                <v-text-field v-model="filter.minRating" :rules="[ruleIsNumber]" label="Min Rating, 0 - 10" clearable></v-text-field>
+                <v-text-field v-model="filter.minRating" :rules="[ruleIsNumber]" label="Рейтинг, min, 0 - 10"
+                    clearable></v-text-field>
             </v-list-item>
             <v-list-item>
-                <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" label="playerCount" clearable></v-text-field>
+                <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" label="Кол-во игроков"
+                    clearable></v-text-field>
             </v-list-item>
             <v-list-item>
-                <v-text-field v-model="filter.maxPlaytime" :rules="[ruleIsNumber]" label="max playtime, hours" clearable></v-text-field>
+                <v-text-field v-model="filter.maxPlaytime" :rules="[ruleIsNumber]" label="Время игры, max, часов"
+                    clearable></v-text-field>
             </v-list-item>
         </v-list>
     </v-navigation-drawer>
 </template>
 
-  
+
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { Ref, ComputedRef } from 'vue'
@@ -54,10 +57,7 @@ const filter = ref(
     }
 );
 
-// {
-//     title: ref(''),
-//     minRating: ref(0),
-// };
+const currentClub = useState('club');
 
 const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
     const title = fetchedCollection.value.filter(item => item.title.toUpperCase().includes(filter.value.title.toUpperCase()))
@@ -69,7 +69,11 @@ const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
 
 const fetchData = async () => {
     loading.value = true;
-    const ret = await $fetch(`/api/supabase/club-collection`);
+    const ret = await $fetch(`/api/supabase/club-collection`, {
+        query: {
+            clubid: currentClub.value.id,
+        }
+    });
     fetchedCollection.value = ret;
     loading.value = false;
 }

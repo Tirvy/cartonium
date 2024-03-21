@@ -10,10 +10,10 @@
       <v-app-bar-title>Ареночка</v-app-bar-title>
       <v-spacer></v-spacer>
       <div v-if="user">
-        {{ user.email }}
+        user: {{ user.email }}
       </div>
       <v-btn @click="switchTheme">
-        theme-icon
+        <v-icon icon="mdi-theme-light-dark"></v-icon>
       </v-btn>
     </v-app-bar>
 
@@ -34,24 +34,24 @@ const route = useRoute();
 const clubName = route.params.clubname;
 const pages = [
   {
-    title: 'collection',
+    title: 'Коллекция',
     path: `/clubs/${clubName}/collection`,
     icon: 'mdi-list-box',
   },
   {
-    title: 'info',
+    title: 'О клубе',
     path: `/clubs/${clubName}/information/public`,
     icon: 'mdi-information',
   },
   {
-    title: 'bookings',
+    title: 'Брони',
     path: `/clubs/${clubName}/gatherings`,
     icon: 'mdi-table-furniture',
   },
   {
-    title: 'profile',
+    title: 'Профиль',
     path: `/profile`,
-    icon: 'mdi-cog',
+    icon: 'mdi-account',
   }
 ];
 

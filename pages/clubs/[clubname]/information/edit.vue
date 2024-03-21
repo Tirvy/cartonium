@@ -27,9 +27,7 @@ import { defineAsyncComponent } from 'vue'
 
 const quillHtml = ref('');
 getInitialValues();
-
-
-
+const currentClub = useState('club');
 
 
 async function getInitialValues() {
@@ -37,19 +35,14 @@ async function getInitialValues() {
     quillHtml.value = data.text_html;
 }
 
-function logi() {
-    console.log(quillHtml.value)
-}
-
 async function saveToDatabase() {
 
     let ret: any = await $fetch('/api/supabase/club-info', {
         method: "POST", body: {
-            club_id: 2,
+            club_id: currentClub.value.id,
             text_html: quillHtml.value,
         }
     });
-    console.log(ret);
 }
 
 </script>
