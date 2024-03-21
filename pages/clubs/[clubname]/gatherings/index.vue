@@ -18,16 +18,14 @@
 
 <script setup lang="ts">
 const gatherings = ref([]);
-const currentClub = useState('club');
 
-async function getGatherings() {
-    const { data } = $fetch('/api/supabase/gatherings', {
+const currentClub = useState('club');
+async function getBookings() {
+    const data = await $fetch('/api/supabase/gatherings-get', {
         query: {
-            clubid: currentClub.value.id
+            clubid: currentClub.value.id,
         }
     });
-    gatherings.value = data;
 }
-
-getGatherings();
+getBookings();
 </script>

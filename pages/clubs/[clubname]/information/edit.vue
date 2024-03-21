@@ -1,5 +1,5 @@
 <template>
-    <v-main @keyup.esc="logi">
+    <v-main>
         <v-container>
             <v-row>
                 <v-col>
@@ -26,19 +26,24 @@
 import { defineAsyncComponent } from 'vue'
 
 const quillHtml = ref('');
-getInitialValues();
 const currentClub = useState('club');
+getInitialValues();
 
 
 async function getInitialValues() {
-    const data = await $fetch('/api/supabase/club-info');
+    const data = await $fetch('/api/supabase/club-info', {
+        query: {
+            clubid: currentClub.value.id,
+        }
+    });
     quillHtml.value = data.text_html;
 }
 
 async function saveToDatabase() {
 
     let ret: any = await $fetch('/api/supabase/club-info', {
-        method: "POST", body: {
+        method: "POST",
+        body: {
             club_id: currentClub.value.id,
             text_html: quillHtml.value,
         }
