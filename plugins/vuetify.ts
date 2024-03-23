@@ -5,6 +5,8 @@ import { createVuetify, ThemeDefinition } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+import { ru } from 'vuetify/locale'
+
 const myCustomDarkTheme: ThemeDefinition = {
   dark: true,
   colors: {
@@ -47,7 +49,11 @@ export default defineNuxtPlugin(nuxtApp => {
         color: 'primary',
         variant: 'outlined',
       },
-    }
+    },
+    locale: {
+      locale: 'ru',
+      messages: { ru },
+    },
   })
 
   nuxtApp.vueApp.use(vuetify)
