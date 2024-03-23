@@ -29,6 +29,7 @@
     "@mdi/font": "^7.3.67",
     "@vueup/vue-quill": "^1.2.0",
     "fast-xml-parser": "^4.2.7",
+    "maska": "^2.1.11",
     "sass": "^1.66.1"
   }
 }
