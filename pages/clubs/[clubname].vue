@@ -7,6 +7,7 @@
 <script lang="ts" setup>
 import { abortNavigation } from 'nuxt/app';
 
+
 definePageMeta({
   middleware: [
     async function (to, from) {

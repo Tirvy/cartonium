@@ -1,11 +1,36 @@
 <template>
     <v-main>
         <v-container>
-            <v-list>
-                <v-list-item v-for="gathering in gatherings" :key="gathering.id">
-                     {{ gathering.ownner }}
-                </v-list-item>
-            </v-list>
+            <v-table>
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            Owner
+                        </th>
+                        <th class="text-left">
+                            comment_owner
+                        </th>
+                        <th>
+                            guests_max
+                        </th>
+                        <th>
+                            start_date
+                        </th>
+                        <th>
+                            start_time
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="gathering in gatherings" :key="gathering.id">
+                        <td>{{ gathering.owner }}</td>
+                        <td>{{ gathering.comment_owner }}</td>
+                        <td>{{ gathering.guests_max }}</td>
+                        <td>{{ gathering.start_date }}</td>
+                        <td>{{ gathering.start_time }}</td>
+                    </tr>
+                </tbody>
+            </v-table>
         </v-container>
     </v-main>
 
@@ -21,11 +46,14 @@ const gatherings = ref([]);
 
 const currentClub = useState('club');
 async function getBookings() {
-    const data = await $fetch('/api/supabase/gatherings-get', {
+    const data = await $fetch('/api/supabase/gatherings', {
         query: {
             clubid: currentClub.value.id,
         }
     });
+    if (Array.isArray(data)) {
+        gatherings.value = data;
+    }
 }
 getBookings();
 </script>

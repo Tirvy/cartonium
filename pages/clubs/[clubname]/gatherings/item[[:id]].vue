@@ -29,7 +29,7 @@
 
                         </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row v-if="clubPermissions">
                         <v-col>
                             <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
                         </v-col>
@@ -51,6 +51,9 @@ const route = useRoute();
 const router = useRouter();
 const item = ref('');
 
+const clubPermissions = useClubPermissions();
+const currentClub = useState('club');
+
 const timeMaskOptions = { mask: '##:##' };
 
 async function getItem() {
@@ -67,7 +70,7 @@ if (route.params.id) {
 
 const startDate = ref(new Date());
 const startTime = ref('')
-const guestsMax = ref(4);
+const guestsMax = ref('4');
 const commentOwner = ref('');
 
 const commentClub = ref('');
@@ -78,14 +81,17 @@ function allowedDates(val) {
 };
 
 function saveGathering() {
-    const { data } = $fetch('/api/supabase/gatherings', {
+    const { data } = $fetch('/api/supabase/gathering', {
+        method: 'post',
         body: {
-            start_date: startDate,
-            start_time: startTime,
-            comment_owner: commentOwner,
-            guests_max: guestsMax,
+            start_date: startDate.value,
+            start_time: startTime.value,
+            comment_owner: commentOwner.value,
+            guests_max: +(guestsMax.value.trim()) || 0,
 
-            comment_club: commentClub,
+            comment_club: commentClub.value,
+
+            club_id: currentClub.value.id,
         }
     })
 }
