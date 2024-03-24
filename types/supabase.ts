@@ -1,3 +1,6 @@
+
+// let movie: Tables<'clubs_collections'>;
+
 export type Json =
   | string
   | number

@@ -1,16 +1,18 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import { Database } from '~/types/supabase.js'
+import { Database } from "~/types/supabase.js";
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)
   const body = await readBody(event);
+  const query = getQuery(event);
+  const clubId = query.clubid as string;
   const gameBoxIds: Array<number> = body.gameBoxIds;
 
   const dataToSend = gameBoxIds.map(gameBoxId => {
     return {
       game_box_id: gameBoxId,
-      club_id: 2,
+      club_id: clubId,
     }
   })
 
