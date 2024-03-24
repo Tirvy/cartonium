@@ -1,4 +1,5 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
+import { Database } from '~/types/supabase.js'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -7,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusMessage: 'title required' })
   }
   const user = await serverSupabaseUser(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
 
   const { data, error } = await client.from('gameboxes').select('*').contains('titles', [title]);
   if (error) {

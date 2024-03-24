@@ -1,7 +1,8 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
+import { Database } from '~/types/supabase.js'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient(event);
+    const client = await serverSupabaseClient<Database>(event);
     const query = getQuery(event);
     const userid = query.userid as string;
     if (!userid) {

@@ -1,8 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server';
-import { log } from 'console';
+import { Database } from '~/types/supabase.js'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event);
+  const client = await serverSupabaseClient<Database>(event);
   const query = getQuery(event);
   const clubid = query.clubid as string;
   

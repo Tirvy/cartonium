@@ -1,8 +1,9 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
+import { Database } from '~/types/supabase.js'
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
-  const client = await serverSupabaseClient(event)
+  const client = await serverSupabaseClient<Database>(event)
   const body = await readBody(event);
   const gameBoxIds: Array<number> = body.gameBoxIds;
 
