@@ -10,6 +10,9 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }))
       })
     }, '@nuxtjs/supabase'],
+  imports: {
+    dirs: ['types/*.ts'],
+  },
   supabase: {
     redirectOptions: {
       login: '/',
