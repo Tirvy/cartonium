@@ -40,19 +40,20 @@
 
   
 <script setup lang="ts">
+import type { GameBox } from '~/types/frontend.js';
 
 
 const dataSources = ref([{ name: 'bgg', apiName: 'bgg' }, { name: 'tesera', apiName: 'tesera' }]);
 const dataSourceChosen = ref(dataSources.value[0].apiName);
 const username: Ref<string> = ref('pitusw')
-const fetchedCollection: Ref<GameBoxInterface[]> = ref([])
+const fetchedCollection: Ref<GameBox[]> = ref([])
 const drawerState: Ref<boolean> = ref(true);
 const loading: Ref<boolean> = ref(false);
 
 const fetchData = async () => {
     loading.value = true;
     const ret = await $fetch(`/api/${dataSourceChosen.value}/get-user-collection`, { query: { username: username.value } })
-    fetchedCollection.value = ret.map((item: any) => new GameBox(item));
+    fetchedCollection.value = ret;
     loading.value = false;
 }
 </script>

@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { GameBox } from "~/types/gameBox.js";
+import type { GameBox } from '~/types/frontend.js';
 import type { searchResultTesera, searchResultBgg } from "@/types/index.d.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'

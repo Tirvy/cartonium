@@ -1,5 +1,5 @@
 import { apiURL } from "./common";
-import { searchResultTesera } from "~/types/index";
+import type { searchResultTesera } from "~/types/index";
 
 
 function formatRet(item: any): searchResultTesera {

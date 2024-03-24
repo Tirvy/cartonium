@@ -1,6 +1,6 @@
 export const apiURL = 'https://api.tesera.ru';
 
-export function collectionParser(collection) {
+export function collectionParser(collection: any[]) {
     return collection.map((item) => {
         return {
             id: item.id,

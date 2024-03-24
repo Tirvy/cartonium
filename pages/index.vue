@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Provider } from '~/node_modules/@supabase/gotrue-js/src/lib/types.js';
 definePageMeta({
   layout: "login",
 })
@@ -14,7 +15,7 @@ watchEffect(() => {
 
 async function signInWithProvider(provider: string) {
   const { data, error } = await auth.signInWithOAuth({
-    provider,
+    provider: provider as Provider,
   })
 }
 </script>

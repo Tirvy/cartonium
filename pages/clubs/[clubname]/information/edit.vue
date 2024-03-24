@@ -23,10 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from 'vue';
+import type { Club } from '~/types/frontend.js';
 
 const quillHtml = ref('');
-const currentClub = useState('club');
+const currentClub: Ref<Club> = useState('club');
 getInitialValues();
 
 

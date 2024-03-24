@@ -1,3 +1,5 @@
+import type { ClubCollection, ClubInfo, Club, GameBox, Gathering } from '~/types/frontend.js';
+
 // clubs
 export function clubFromSupabase(data: any): Club {
     return {

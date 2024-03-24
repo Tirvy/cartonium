@@ -24,10 +24,10 @@
                 <tbody>
                     <tr v-for="gathering in gatherings" :key="gathering.id">
                         <td>{{ gathering.owner }}</td>
-                        <td>{{ gathering.comment_owner }}</td>
-                        <td>{{ gathering.guests_max }}</td>
-                        <td>{{ gathering.start_date }}</td>
-                        <td>{{ gathering.start_time }}</td>
+                        <td>{{ gathering.commentOwner }}</td>
+                        <td>{{ gathering.guestsMax }}</td>
+                        <td>{{ gathering.startDate }}</td>
+                        <td>{{ gathering.startTime }}</td>
                     </tr>
                 </tbody>
             </v-table>
@@ -42,9 +42,9 @@
 </template>
 
 <script setup lang="ts">
-const gatherings = ref([]);
+const gatherings: Ref<Gathering[]> = ref([]);
 
-const currentClub = useState('club');
+const currentClub: Ref<Club> = useState('club');
 async function getBookings() {
     const data = await $fetch('/api/supabase/gatherings', {
         query: {

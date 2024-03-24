@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server';
-import { Database } from '~/types/supabase.js'
+import type { Database } from '~/types/supabase.js';
+import { gatheringFromSupabase } from '~/server/transformers';
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event);
@@ -13,5 +14,5 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  return data
+  return data.map(gatheringFromSupabase);
 })

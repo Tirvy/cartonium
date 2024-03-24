@@ -30,10 +30,27 @@
 </template>
 
 <script setup lang="ts">
+import type { GameBox } from '~/types/frontend.js';
+
 const props = defineProps({
-    value: {
-        type: GameBox,
-        required: true,
-    },
+    value: Gamebox,
 }); 
+
+function computed(gamebox: GameBox) {
+        const bgg: any = gamebox.infoBgg || {};
+        const tesera: any = gamebox.infoTesera || {};
+
+        const bggUserRating = bgg.stats?.rating?.["@_value"];
+        const like = bggUserRating && +bggUserRating >= 8;
+        return {
+            title: bgg?.name?.['#text'] || tesera.title,
+            photoUrl: bgg.thumbnail || tesera.photoUrl,
+            ratingTesera: tesera.ratingUser,
+            ratingBgg: bgg.stats?.rating?.average['@_value'],
+            wantToPlay: !!+bgg.status?.['@_wanttoplay'],
+            own: !!+bgg.status?.['@_own'],
+            bggId: !!+bgg['@_objectid'],
+            like: like,
+        }
+    }
 </script>

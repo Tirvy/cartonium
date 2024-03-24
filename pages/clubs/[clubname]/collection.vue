@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { Ref, ComputedRef } from 'vue'
-import { GameBox } from "~/types/gameBox.js";
+import type { GameBox } from '~/types/frontend.js';
 import { ruleIsNumber } from '@/utils/rules.js';
 import GameboxItem from '~/components/GameboxItem.vue';
 
@@ -57,14 +57,14 @@ const filter = ref(
     }
 );
 
-const currentClub = useState('club');
+const currentClub: Ref<Club> = useState('club');
 
 const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
     const title = fetchedCollection.value.filter(item => item.title.toUpperCase().includes(filter.value.title.toUpperCase()))
     const rating = title.filter(item => item.ratingTesera > filter.value.minRating || item.ratingBgg > filter.value.minRating);
     const players = rating.filter(item => !filter.value.playerCount || item.playersGood?.includes(+filter.value.playerCount))
-    const playtime = rating.filter(item => !filter.value.maxPlaytime || (item.playtimeMax < +filter.value.maxPlaytime * 60))
-    return playtime.map(item => new GameBox(item));
+    const playtime = rating.filter(item => !filter.value.maxPlaytime || (+item.playtimeMax < +filter.value.maxPlaytime * 60))
+    return playtime;
 });
 
 const fetchData = async () => {

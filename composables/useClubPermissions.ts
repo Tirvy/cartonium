@@ -1,6 +1,6 @@
 export const useClubPermissions = () => {
   const clubPermissions = useState('clubPermissions');
-  const currentClub = useState('club');
+  const currentClub: Ref<Club> = useState('club');
   const permissionsOverride = useState('permissionsOverride');
   if (permissionsOverride.value?.active) {
     return permissionsOverride.value.value ? { club_id: currentClub.value.id } : undefined;

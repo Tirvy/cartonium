@@ -13,6 +13,7 @@
     </v-list>
 
     <v-btn variant="flat" @click="addGamebox">
+
       <template v-slot:append>
         <v-icon icon="mdi-plus"></v-icon>
         Добавить
@@ -22,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import type Gamebox from '@types/gameBox.ts';
+import type { GameBox } from '~/types/frontend.ts';
 
 const props = defineProps({
   gameboxes: Array<Gamebox>,

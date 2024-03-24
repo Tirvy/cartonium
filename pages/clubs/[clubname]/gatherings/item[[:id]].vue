@@ -52,15 +52,19 @@ const router = useRouter();
 const item = ref('');
 
 const clubPermissions = useClubPermissions();
-const currentClub = useState('club');
+const currentClub: Ref<Club> = useState('club');
 
 const timeMaskOptions = { mask: '##:##' };
 
 async function getItem() {
-    const { data } = $fetch('/api/supabase/gatherings');
-    const foundItem = data.find(item => item.id === route.params.id);
-    if (!foundItem) {
-        router.replace('./not-found');
+    if (route.params.id && +route.params.id > 0) {
+        const res = await $fetch('/api/supabase/gatherings');
+        const data: Gathering[] = res.data;
+        const findingId = +route.params.id;
+        const foundItem = data.find(item => item.id === findingId);
+        if (!foundItem) {
+            router.replace('./not-found');
+        }
     }
 }
 
@@ -76,12 +80,12 @@ const commentOwner = ref('');
 const commentClub = ref('');
 
 
-function allowedDates(val) {
-    return val > new Date(); 
+function allowedDates(val: Date) {
+    return val > new Date();
 };
 
-function saveGathering() {
-    const { data } = $fetch('/api/supabase/gathering', {
+async function saveGathering() {
+    const { data } = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
             start_date: startDate.value,

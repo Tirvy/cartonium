@@ -1,6 +1,6 @@
 import { apiURL } from "./common";
 import { XMLParser } from "fast-xml-parser";
-import { searchResultBgg } from "~/types/index";
+import type { searchResultBgg } from "~/types/index";
 
 const parser = new XMLParser({
   ignoreAttributes: false,

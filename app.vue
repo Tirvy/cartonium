@@ -12,7 +12,7 @@ const clubPermissions = useState('clubPermissions');
 await callOnce(async () => {
   const clubs = await $fetch('/api/supabase/my-clubs-permissions', {
     query: {
-      userid: user.value.id,
+      userid: user?.value?.id,
     }
   });
   clubPermissions.value = clubs;

@@ -12,13 +12,13 @@
     </fast-action>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const route = useRoute();
 const clubName = route.params.clubname;
 const editPath = `/clubs/${clubName}/information/edit`;
 
 const infoData = ref('');
-const currentClub = useState('club');
+const currentClub: Ref<Club> = useState('club');
 
 async function getInfo() {
     // todo make fine handling
