@@ -20,7 +20,8 @@
                 </v-col>
                 <v-divider />
                 <v-col cols="12">
-                    <pages-components-get-games-add-gameboxes :items="gamesListSearched" @getGameBoxData="getGameBoxData" />
+                    <pages-components-get-games-add-gameboxes :items="gamesListSearched"
+                        @getGameBoxData="getGameBoxData" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12">
@@ -43,8 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import type { GameBox } from '~/types/frontend.js';
-import type { searchResultTesera, searchResultBgg } from "@/types/index.d.ts";
+import type { GameBox, GameBoxDataTesera, GameBoxDataBgg } from '~/types/frontend.js';
+import type { SearchedGameBox, GameBoxSearchResult } from "~/types/frontend.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'
 
@@ -55,34 +56,22 @@ const snackbarText = ref('wow');
 const timeout = (ms: number) => new Promise(res => setTimeout(res, ms));
 const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
 
-interface SearchedGameBox {
-    baseTitle: string,
-    gameTeseraVariants: searchResultTesera[],
-    gameBggVariants: searchResultBgg[],
-    gameTesera: searchResultTesera | null,
-    gameBgg: searchResultBgg | null,
-}
-
 const breadcrumbItemsSource = [
     {
         title: 'Вводим список названий',
         disabled: true,
-        href: 'breadcrumbs_dashboard',
     },
     {
         title: 'Добавляем найденные игры в клуб',
         disabled: true,
-        href: 'breadcrumbs_dashboard',
     },
     {
         title: 'Добавляем новые игры в БД',
         disabled: true,
-        href: 'breadcrumbs_dashboard',
     },
     {
         title: 'Добавляем новые игры в клуб',
         disabled: true,
-        href: 'breadcrumbs_dashboard',
     },
 ];
 
@@ -91,6 +80,7 @@ const breadcrumbItems = computed(() => {
     if (gameboxesListExisting) {
         ret.push(breadcrumbItemsSource[1]);
     }
+    return ret;
 })
 
 // leech aliases from tesera
@@ -129,7 +119,7 @@ async function saveGamesList(gamesList: string[]) {
 async function stepGetExistingGameboxes(gamesList: string[]) {
     let existingGameboxesHashed: any = {};
     const promisesList = gamesList.map(async (gameTitle) => {
-        const ret = await $fetch('/api/supabase/check-game-exists', { query: { title: gameTitle } });
+        const ret: GameBox[] = await $fetch('/api/supabase/check-game-exists', { query: { title: gameTitle } });
         if (ret && ret.length > 0) {
             existingGameboxesHashed[gameTitle] = ret[0];
         }
@@ -158,8 +148,8 @@ async function getGamesBaseInfo(gamesList: string[]) {
         setTimeout(async () => {
             const ret: SearchedGameBox = {
                 baseTitle: gameTitle,
-                gameTeseraVariants: [] as searchResultTesera[],
-                gameBggVariants: [] as searchResultBgg[],
+                gameTeseraVariants: [] as GameBoxSearchResult[],
+                gameBggVariants: [] as GameBoxSearchResult[],
                 gameTesera: null,
                 gameBgg: null,
             }
@@ -200,19 +190,35 @@ async function getGameBoxData() {
             .forEach((gameInfo: any, index: number) => {
                 setTimeout(async () => {
                     let ret = {
+                        title: "",
                         titles: [] as string[],
+                        aliasTesera: null,
+                        idBgg: null,
+                        idTesera: null,
+                        linkBgg: null,
+                        linkTesera: null,
+                        photoUrl: null,
+                        playersGood: null,
+                        playersMax: null,
+                        playersMin: null,
+                        playtimeAvg: null,
+                        playtimeMax: null,
+                        playtimeMin: null,
+                        ratingBgg: null,
+                        ratingTesera: null,
+                        year: null,
                     };
                     if (gameInfo.gameTesera) {
-                        let teseraRet: any = await $fetch('/api/tesera/get-gamebox', { query: { alias: gameInfo.gameTesera.alias } });
-                        ret.titles.push(teseraRet.title as string);
+                        let teseraRet: GameBoxDataTesera = await $fetch('/api/tesera/get-gamebox', { query: { alias: gameInfo.gameTesera.alias } });
+                        ret.titles.push(teseraRet.title);
                         ret = { ...teseraRet, ...ret };
                     }
                     if (gameInfo.gameBgg) {
-                        let bggRet: any = await $fetch('/api/bgg/get-gamebox', { query: { id: gameInfo.gameBgg.id } })
+                        let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', { query: { id: gameInfo.gameBgg.id } })
                         ret.titles.push(bggRet.title as string);
                         ret = { ...bggRet, ...ret };
                     }
-                    saveData.value.push(new GameBox(ret));
+                    saveData.value.push(ret);
                 }, index * requestInterval);
             });
         await timeout((gamesListSearched.value.length + 1) * 1000);

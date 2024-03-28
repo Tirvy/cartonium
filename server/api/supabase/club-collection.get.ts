@@ -3,7 +3,7 @@ import type { Database } from '~/types/supabase.js'
 import type { GameBox } from "~/types/frontend.js";
 import { gameBoxFromSupabase } from '~/server/transformers.js';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<GameBox[]> => {
   const query = getQuery(event);
   const clubId = query.clubid as string;
 

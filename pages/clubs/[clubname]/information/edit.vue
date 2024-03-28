@@ -32,7 +32,7 @@ getInitialValues();
 
 
 async function getInitialValues() {
-    const data = await $fetch('/api/supabase/club-info', {
+    const data: {text_html: string} = await $fetch('/api/supabase/club-info', {
         query: {
             clubid: currentClub.value.id,
         }

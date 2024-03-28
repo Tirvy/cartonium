@@ -1,5 +1,6 @@
 import { apiURL } from "./common";
 import { XMLParser } from "fast-xml-parser";
+import type { GameBoxDataBgg } from '~/types/frontend'
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -31,19 +32,19 @@ function getName(obj: any): string {
   return obj.items.item.name['@_value'];
 }
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<GameBoxDataBgg | null> => {
   try {
     const query = getQuery(event);
     let id = +(query.id as string);
 
     if (!id) {
-      return { result: { query: 'id must be a number' } };
+      return null;
     }
 
     const res = await $fetch(`${apiURL}/thing`, { query: { id: id, stats: 1, } });
     const ret = parser.parse(res as string);
 
-    const retObject = {
+    const retObject: GameBoxDataBgg = {
       title: getName(ret),
       idBgg: +ret.items.item['@_id'],
       playersMin: +ret.items.item.minplayers['@_value'],
@@ -62,9 +63,10 @@ export default defineEventHandler(async (event) => {
   } catch (error: unknown) {
     console.log(String(error));
     if (error instanceof Error) {
-      return { result: [], error: error.message };
+      return null;
     }
   }
+  return null;
 });
 
 // search results

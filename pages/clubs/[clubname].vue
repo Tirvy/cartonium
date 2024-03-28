@@ -6,21 +6,23 @@
 
 <script lang="ts" setup>
 import { abortNavigation } from 'nuxt/app';
+import type { Club } from '~/types/frontend';
 
 
 definePageMeta({
   middleware: [
     async function (to, from) {
-      const currentClub: Ref<Club> = useState('club');
+      const currentClub: Ref<Club | null> = useState('club');
+      const clubname = to.params.clubname as string;
 
-      if (!currentClub.value || currentClub.value.title !== to.params.clubname) {
-        const newClubData = await getClubData(to.params.clubname);
+      if (!currentClub.value || currentClub.value.title !== clubname) {
+        const newClubData = await getClubData(clubname);
         if (!newClubData || !newClubData.id) {
           currentClub.value = null;
           return abortNavigation();
         }
         currentClub.value = newClubData;
-      
+
       }
 
       async function getClubData(clubname: string | undefined) {
@@ -31,7 +33,7 @@ definePageMeta({
           return null;
         }
 
-        const clubData = await $fetch('/api/supabase/club-data', {
+        const clubData: Club = await $fetch('/api/supabase/club-data', {
           query: {
             clubname: route.params.clubname,
           }

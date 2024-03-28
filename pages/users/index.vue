@@ -40,7 +40,7 @@
 
   
 <script setup lang="ts">
-import type { GameBox } from '~/types/frontend.js';
+import type { GameBox, GameBoxSearchResult } from '~/types/frontend.js';
 
 
 const dataSources = ref([{ name: 'bgg', apiName: 'bgg' }, { name: 'tesera', apiName: 'tesera' }]);
@@ -52,7 +52,7 @@ const loading: Ref<boolean> = ref(false);
 
 const fetchData = async () => {
     loading.value = true;
-    const ret = await $fetch(`/api/${dataSourceChosen.value}/get-user-collection`, { query: { username: username.value } })
+    const ret: GameBox[] = await $fetch(`/api/${dataSourceChosen.value}/get-user-collection`, { query: { username: username.value } })
     fetchedCollection.value = ret;
     loading.value = false;
 }

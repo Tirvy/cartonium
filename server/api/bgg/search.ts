@@ -1,12 +1,12 @@
 import { apiURL } from "./common";
 import { XMLParser } from "fast-xml-parser";
-import type { searchResultBgg } from "~/types/index";
+import type { GameBoxSearchResult } from "~/types/frontend";
 
 const parser = new XMLParser({
   ignoreAttributes: false,
 });
 
-function parseGameData(item: any): searchResultBgg {
+function parseGameData(item: any): GameBoxSearchResult {
   return {
     id: item['@_id'],
     title: item.name["@_value"],
@@ -14,7 +14,7 @@ function parseGameData(item: any): searchResultBgg {
   }
 }
 
-async function getGameData(searchTexts: String[]): Promise<searchResultBgg[]> {
+async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]> {
 
   let id = null;
 

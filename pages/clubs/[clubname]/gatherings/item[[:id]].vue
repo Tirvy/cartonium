@@ -47,6 +47,8 @@
 </template>
 
 <script setup lang="ts">
+import type { Gathering } from '~/types/frontend'
+
 const route = useRoute();
 const router = useRouter();
 const item = ref('');
@@ -58,7 +60,7 @@ const timeMaskOptions = { mask: '##:##' };
 
 async function getItem() {
     if (route.params.id && +route.params.id > 0) {
-        const res = await $fetch('/api/supabase/gatherings');
+        const res: { data: Gathering[] } = await $fetch('/api/supabase/gatherings');
         const data: Gathering[] = res.data;
         const findingId = +route.params.id;
         const foundItem = data.find(item => item.id === findingId);
@@ -85,7 +87,7 @@ function allowedDates(val: Date) {
 };
 
 async function saveGathering() {
-    const { data } = await $fetch('/api/supabase/gathering', {
+    const data: any = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
             start_date: startDate.value,
@@ -98,5 +100,6 @@ async function saveGathering() {
             club_id: currentClub.value.id,
         }
     })
+    console.log(data);
 }
 </script>

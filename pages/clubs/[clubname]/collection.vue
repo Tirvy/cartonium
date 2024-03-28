@@ -53,7 +53,7 @@ const filter = ref(
         title: '',
         minRating: 0,
         playerCount: 0,
-        maxPlaytime: 0,
+        maxPlaytime: "0",
     }
 );
 
@@ -61,15 +61,16 @@ const currentClub: Ref<Club> = useState('club');
 
 const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
     const title = fetchedCollection.value.filter(item => item.title.toUpperCase().includes(filter.value.title.toUpperCase()))
-    const rating = title.filter(item => item.ratingTesera > filter.value.minRating || item.ratingBgg > filter.value.minRating);
+    const rating = title.filter(item => (item.ratingTesera && item.ratingTesera > filter.value.minRating) || (item.ratingBgg && item.ratingBgg > filter.value.minRating));
     const players = rating.filter(item => !filter.value.playerCount || item.playersGood?.includes(+filter.value.playerCount))
-    const playtime = rating.filter(item => !filter.value.maxPlaytime || (+item.playtimeMax < +filter.value.maxPlaytime * 60))
+    const playtimeMax = +filter.value.maxPlaytime.trim();
+    const playtime = rating.filter(item => !playtimeMax || (item.playtimeMax && item.playtimeMax < +playtimeMax * 60))
     return playtime;
 });
 
 const fetchData = async () => {
     loading.value = true;
-    const ret = await $fetch(`/api/supabase/club-collection`, {
+    const ret: GameBox[] = await $fetch(`/api/supabase/club-collection`, {
         query: {
             clubid: currentClub.value.id,
         }

@@ -25,12 +25,12 @@
 <script lang="ts" setup>
 import type { GameBox } from '~/types/frontend.ts';
 
-const props = defineProps({
-  gameboxes: Array<Gamebox>,
-});
+const props = defineProps<{
+  gameboxes: GameBox[]
+}>();
 
 const emits = defineEmits<{
-  addGamebox: [Gamebox | null]
+  (e: 'addGamebox', gamebox: GameBox | null): void
 }>();
 
 function addGamebox() {

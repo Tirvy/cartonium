@@ -1,8 +1,8 @@
 import { apiURL } from "./common";
-import type { searchResultTesera } from "~/types/index";
+import type { GameBoxSearchResult } from "~/types/frontend";
 
 
-function formatRet(item: any): searchResultTesera {
+function formatRet(item: any): GameBoxSearchResult {
   const titles = ['', '1', '2', '3', '4', '5', '6']
     .map((suffix: string) => {
       return item['title' + suffix];

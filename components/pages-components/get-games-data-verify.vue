@@ -36,7 +36,9 @@ function sendGameboxesToSupabase() {
     emit('sendGameboxesToSupabase');
 }
 
-const headersGameBoxList = Object.getOwnPropertyNames(new GameBox({})).map((key: string) => {
+import columns from './gamebox-columns';
+
+const headersGameBoxList = columns.map((key: string) => {
     return {
         title: key,
         key: key,

@@ -2,7 +2,7 @@
     <v-card>
         <div class="d-flex flex-no-wrap justify-start ">
             <v-avatar class="ma-3" size="100" rounded="0">
-                <v-img height="100" :src="value.photoUrl"></v-img>
+                <v-img height="100" :src="value.photoUrl || ''"></v-img>
             </v-avatar>
             <v-card-item class="flex-0-1" style="min-width: 0;">
                 <v-card-title>
@@ -37,10 +37,7 @@
 <script setup lang="ts">
 import type { GameBox } from '~/types/frontend.js';
 
-const props = defineProps({
-    value: {
-        type: GameBox,
-        required: true,
-    },
-}); 
+const props = defineProps<{
+    value: GameBox
+}>(); 
 </script>

@@ -1,22 +1,84 @@
+export interface GameBoxSearchResult {
+    id?: number
+    title?: string
+    year?: number
+    alias?: string,
+    titles?: string[],
+    photoUrl?: string,
+
+}
+
+export interface SearchResultBgg {
+    id: number
+    title: string
+    year: number
+
+}
+
+export interface SearchResultTesera {
+
+    alias: string,
+    titles: string[],
+    photoUrl: string,
+}
+
+export interface SearchedGameBox {
+    baseTitle: string,
+    gameTeseraVariants: GameBoxSearchResult[],
+    gameBggVariants: GameBoxSearchResult[],
+    gameTesera: GameBoxSearchResult | null,
+    gameBgg: GameBoxSearchResult | null,
+}
+
+export interface GameBoxDataBgg {
+    title: string;
+    idBgg: number,
+    playersMin: number,
+    playersMax: number,
+    playersGood: number[],
+    playtimeMin: number,
+    playtimeMax: number,
+    playtimeAvg: number,
+    ratingBgg: number,
+    weightBgg: number,
+    year: number,
+    linkBgg: string,
+}
+
+export interface GameBoxDataTesera {
+    idBgg: number,
+    idTesera: number,
+    title: string,
+    aliasTesera: string,
+    photoUrl: string,
+    year: number,
+    ratingTesera: number,
+    ratingBgg: number,
+    playersMin: number,
+    playersMax: number,
+    linkTesera: string,
+}
+
+
 export interface GameBox {
-  aliasTesera: string | null;
-  id: number;
-  idBgg: number | null;
-  idTesera: number | null;
-  linkBgg: string | null;
-  linkTesera: string | null;
-  photoUrl: string | null;
-  playersGood: number[] | null;
-  playersMax: number | null;
-  playersMin: number | null;
-  playtimeAvg: number | null;
-  playtimeMax: number | null;
-  playtimeMin: number | null;
-  ratingBgg: number | null;
-  ratingTesera: number | null;
-  title: string;
-  titles: Array<string> | null;
-  year: number | null;
+    aliasTesera: string | null;
+    id?: number;
+    idBgg: number | null;
+    idTesera: number | null;
+    linkBgg: string | null;
+    linkTesera: string | null;
+    photoUrl: string | null;
+    playersGood: number[] | null;
+    playersMax: number | null;
+    playersMin: number | null;
+    playtimeAvg: number | null;
+    playtimeMax: number | null;
+    playtimeMin: number | null;
+    ratingBgg: number | null;
+    ratingTesera: number | null;
+    title: string;
+    titles: Array<string> | null;
+    year: number | null;
 }
 
 /*
@@ -118,28 +180,29 @@ export interface GameBox {
 }*/
 
 export interface Club {
-  id: string;
-  title: string;
-  urlName: string;
+    id: string;
+    title: string;
+    urlName: string;
 }
 
 export interface ClubCollection {
-  clubId: string;
-  gameBoxId: number;
-  id: number;
+    clubId: string;
+    gameBoxId: number;
+    id: number;
 }
 
 export interface ClubInfo {
-  clubId: string;
-  textHtml: string;
+    clubId: string;
+    textHtml: string;
 }
 
 export interface Gathering {
-  clubId: string;
-  date: string;
-  description: string;
-  id: number;
-  location: string;
-  time: string;
-  title: string;
+    clubId: string
+    commentClub: string
+    commentOwner: string
+    guestsMax: number
+    id: number
+    owner: string
+    startDate: string | null
+    startTime: string | null
 }

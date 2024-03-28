@@ -1,20 +1,21 @@
 import { apiURL } from "./common";
+import type { GameBoxDataTesera } from '~/types/frontend'
 
 
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<GameBoxDataTesera | null> => {
   try {
     const query = getQuery(event);
     const alias: string = (query.alias as string).trim();
     if (!alias) {
-      return { result: { error: 'alias must be a string' } };
+      return null;
     }
 
 
 
     const res: any = await $fetch(`${apiURL}//games/${alias}`);
 
-    const retObject = {
+    const retObject: GameBoxDataTesera = {
       idBgg: res.game.bggId,
       idTesera: res.game.teseraId,
       title: res.game.title,
@@ -30,8 +31,9 @@ export default defineEventHandler(async (event) => {
     return retObject;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return { result: [], error: error.message };
+      return null;
     }
     console.log(String(error));
   }
+  return null;
 });

@@ -54,11 +54,12 @@ export function gameBoxFromSupabase(data: any): GameBox {
 export function gatheringFromSupabase(data: any): Gathering {
     return {
         clubId: data.club_id,
-        date: data.date,
-        description: data.description,
+        commentClub: data.comment_club,
+        commentOwner: data.comment_owner,
+        guestsMax: data.guests_max,
         id: data.id,
-        location: data.location,
-        time: data.time,
-        title: data.title
+        owner: data.owner,
+        startDate: data.start_date,
+        startTime: data.start_time
     };
 }

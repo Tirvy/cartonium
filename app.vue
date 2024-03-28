@@ -15,6 +15,6 @@ await callOnce(async () => {
       userid: user?.value?.id,
     }
   });
-  clubPermissions.value = clubs;
+  clubPermissions.value = clubs as {club_id: string}[];
 })
 </script>

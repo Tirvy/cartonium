@@ -72,15 +72,16 @@
 </template>
 
 <script setup lang="ts">
+import type { SearchedGameBox } from "~/types/frontend.ts";
 
 const props = defineProps({
     items: {
-        type: Array<any>,
+        type: Array<SearchedGameBox>,
         default: [],
     },
 });
 
-const gamesListSearched = ref([]);
+const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
 
 watch((() => props.items),
     (value: Array<any>) => {

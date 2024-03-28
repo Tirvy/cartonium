@@ -33,13 +33,15 @@ const emit = defineEmits<{
     (e: 'sendGameboxesToSupabase', selected: Array<GameBox>): void
 }>()
 
-const selected: Ref<number[]> = ref([]);
+const selected: Ref<GameBox[]> = ref([]);
 
 function sendGameboxesToSupabase() {
-    emit('sendGameboxesToSupabase', selected.value);
+    emit('sendGameboxesToSupabase', selected?.value);
 }
 
-const headersGameBoxList = Object.getOwnPropertyNames(new GameBox({})).map((key: string) => {
+import columns from './gamebox-columns';
+
+const headersGameBoxList = columns.map((key: string) => {
     return {
         title: key,
         key: key,

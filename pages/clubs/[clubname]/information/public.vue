@@ -22,7 +22,7 @@ const currentClub: Ref<Club> = useState('club');
 
 async function getInfo() {
     // todo make fine handling
-    const data = await $fetch('/api/supabase/club-info', {
+    const data: { text_html: string } = await $fetch('/api/supabase/club-info', {
         query: {
             clubid: currentClub.value.id
         }

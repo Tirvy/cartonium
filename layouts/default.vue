@@ -10,7 +10,7 @@
       <v-app-bar-title>Ареночка</v-app-bar-title>
       <v-spacer></v-spacer>
       <div class="flex">
-        <v-switch label="isAdmin" v-model="permissionsOverride.active"></v-switch>
+        <v-switch label="isAdmin" v-model="permissionsOverride"></v-switch>
       </div>
       <div v-if="user">
         user: {{ user.email }}
@@ -36,10 +36,8 @@
 const route = useRoute();
 const clubName = route.params.clubname;
 const permissionsOverride = useState('permissionsOverride');
-permissionsOverride.value = {
-  value: false,
-  active: false
-}
+permissionsOverride.value = false;
+
 const pages = [
   {
     title: 'Коллекция',
