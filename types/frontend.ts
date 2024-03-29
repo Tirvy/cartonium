@@ -62,7 +62,7 @@ export interface GameBoxDataTesera {
 
 export interface GameBox {
     aliasTesera: string | null;
-    id?: number;
+    id: number;
     idBgg: number | null;
     idTesera: number | null;
     linkBgg: string | null;

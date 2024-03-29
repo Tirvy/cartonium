@@ -43,14 +43,14 @@
                             -
                         </td>
                         <td class="cell-game-thing">
-                            <PagesComponentsGetGamesTableItem :items="gameInfo.gameTeseraVariants" :source="'tesera'"
+                            <pages-add-games-table-item :items="gameInfo.gameTeseraVariants" :source="'tesera'"
                                 v-model="gameInfo.gameTesera">
-                            </PagesComponentsGetGamesTableItem>
+                            </pages-add-games-table-item>
                         </td>
                         <td class="cell-game-thing">
-                            <PagesComponentsGetGamesTableItem :items="gameInfo.gameBggVariants" :source="'bgg'"
+                            <pages-add-games-table-item :items="gameInfo.gameBggVariants" :source="'bgg'"
                                 v-model="gameInfo.gameBgg">
-                            </PagesComponentsGetGamesTableItem>
+                            </pages-add-games-table-item>
                         </td>
                         <td>
                             кнопки

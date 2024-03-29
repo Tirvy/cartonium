@@ -11,22 +11,20 @@
                     </v-breadcrumbs>
                 </v-col>
                 <v-col cols="12" v-if="stepNumber === 1">
-                    <pages-components-get-games-list :progress="getGamesAliasesProgress" @input="saveGamesList" />
+                    <pages-add-games-list :progress="getGamesAliasesProgress" @input="saveGamesList" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 2">
-                    <pages-components-get-games-add-existing :items="gameboxesListExisting"
+                    <pages-add-games-add-existing :items="gameboxesListExisting"
                         @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 3">
-                    <pages-components-get-games-add-gameboxes :items="gamesListSearched"
-                        @getGameBoxData="getGameBoxData" />
+                    <pages-add-games-add-gameboxes :items="gamesListSearched" @getGameBoxData="getGameBoxData" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 4">
-                    <pages-components-get-games-data-verify :items="saveData"
-                        @sendGameboxesToSupabase="sendGameboxesToSupabase" />
+                    <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase" />
                 </v-col>
             </v-row>
         </v-container>
@@ -105,41 +103,32 @@ function showSnackbar(text: string) {
 
 }
 
-async function saveGamesList(gamesList: string[]) {
-    gamesTitlesList.value = gamesList;
-    gameboxesListExistingHashed.value = await stepGetExistingGameboxes(gamesTitlesList.value);
+async function saveGamesList(value: {
+    titles: string[],
+    gameboxesFound: GameBox[],
+    gameboxesInClub: GameBox[]
+}) {
+    console.log(value);
+    gamesTitlesList.value = value.titles;
+    const gameboxesInClubHashed = listToHashed(value.gameboxesInClub);
+    const gameboxesOutOfClub = value.gameboxesFound.filter(gamebox => !gameboxesInClubHashed[gamebox.id]);
+    value.titles.forEach(title => {
+        const gameboxFound = gameboxesOutOfClub.find(gamebox => gamebox.titles?.includes(title));
+        if (gameboxFound) {
+            gameboxesListExistingHashed.value[title] = gameboxFound;
+        }
+    })
+
     if (!gameboxesListExisting.value.length) {
-        await getGamesBaseInfo(gamesTitlesList.value);
+        await getGamesBaseInfo(value.titles);
         showSnackbar('Не надено игр в базе, надо импортить из бгг');
         stepNumber.value++;
-    } else if (gamesTitlesList.value.length > gameboxesListExisting.value.length) {
+    } else if (value.titles.length > gameboxesListExisting.value.length) {
         showSnackbar('Часть игр найдена, сначала добавь их');
     } else {
         showSnackbar('Все игры найдены');
     }
     stepNumber.value++;
-}
-
-async function stepGetExistingGameboxes(gamesList: string[]) {
-    let existingGameboxesHashed: any = {};
-    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { query: { titles: gamesList.map(title => title) } });
-    const gameboxesInClub: GameBox[] = await $fetch('/api/supabase/check-games-exists',
-        {
-            query:
-            {
-                clubid: currentClub.value.id,
-                ids: gameboxesFound.map(gamebox => gamebox.id)
-            }
-        });
-    const gameboxesInClubHashed = listToHashed(gameboxesInClub);
-    const gameboxesOutOfClub = gameboxesFound.filter(gamebox => !gameboxesInClubHashed[gamebox.id || '']);
-    gamesList.forEach(title => {
-        const gameboxFound = gameboxesOutOfClub.find(gamebox => gamebox.titles?.includes(title));
-        if (gameboxFound) {
-            existingGameboxesHashed[title] = gameboxFound;
-        }
-    })
-    return existingGameboxesHashed;
 }
 
 async function addTheseExisting(selectedExisting: GameBox[]) {
@@ -209,6 +198,7 @@ async function getGameBoxData() {
             .forEach((gameInfo: any, index: number) => {
                 setTimeout(async () => {
                     let ret = {
+                        id: 0,
                         title: "",
                         titles: [] as string[],
                         aliasTesera: null,
@@ -268,16 +258,6 @@ function hashedListToSorted(toSort: any, sortSource: string[]) {
         }
     })
     return ret;
-}
-
-function listToHashed(sortSource: { id?: number | undefined }[]) {
-    return sortSource.reduce((total: any, item) => {
-        if (item.id) {
-
-            total[item.id] = item;
-        }
-        return total;
-    }, {})
 }
 
 </script>

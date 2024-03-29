@@ -31,9 +31,17 @@ const props = defineProps({
     },
 });
 
+interface emitedValue {
+    titles: string[],
+    gameboxesFound: GameBox[],
+    gameboxesInClub: GameBox[]
+}
+
 const emit = defineEmits<{
-    (e: 'input', value: string[]): void
-}>()
+    (e: 'input', value: emitedValue): void
+}>();
+
+const currentClub: Ref<Club> = useState('club');
 
 // making games list
 const gamesList = ref(data.data);
@@ -42,11 +50,32 @@ const isLoading = computed(() => {
     return props.progress > 0 && props.progress < 1;
 });
 
-function getGamesBaseInfo() {
+
+
+
+
+async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);
     const onlyGoodStrings: string[] = splitted.filter((q: string) => !!q).map((item: string) => item.trim());
 
-    emit('input', [...new Set(onlyGoodStrings)]);
+    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { query: { titles: onlyGoodStrings } });
+    const gameboxesInClub: number[] = await $fetch('/api/supabase/check-games-in-club',
+        {
+            query:
+            {
+                clubid: currentClub.value.id,
+                ids: gameboxesFound.map(gamebox => gamebox.id)
+            }
+        });
+
+    emit('input', {
+        titles: onlyGoodStrings,
+        gameboxesFound: gameboxesFound,
+        gameboxesInClub: gameboxesFound.filter(gamebox => gameboxesInClub.includes(gamebox.id)),
+    });
+
+    // emit('input', [...new Set(onlyGoodStrings)]);
 }
+
 
 </script>

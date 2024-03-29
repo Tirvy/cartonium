@@ -1,5 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
+import { gameBoxFromSupabase } from '~/server/transformers';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -15,5 +16,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusMessage: error.message })
   }
 
-  return data
+  return data.map(gameBoxFromSupabase);
 })
