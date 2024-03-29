@@ -10,21 +10,21 @@
                         </template>
                     </v-breadcrumbs>
                 </v-col>
-                <v-col cols="12">
+                <v-col cols="12" v-if="stepNumber === 1">
                     <pages-components-get-games-list :progress="getGamesAliasesProgress" @input="saveGamesList" />
                 </v-col>
                 <v-divider />
-                <v-col cols="12">
+                <v-col cols="12" v-if="stepNumber === 2">
                     <pages-components-get-games-add-existing :items="gameboxesListExisting"
                         @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
-                <v-col cols="12">
+                <v-col cols="12" v-if="stepNumber === 3">
                     <pages-components-get-games-add-gameboxes :items="gamesListSearched"
                         @getGameBoxData="getGameBoxData" />
                 </v-col>
                 <v-divider />
-                <v-col cols="12">
+                <v-col cols="12" v-if="stepNumber === 4">
                     <pages-components-get-games-data-verify :items="saveData"
                         @sendGameboxesToSupabase="sendGameboxesToSupabase" />
                 </v-col>
@@ -48,6 +48,10 @@ import type { GameBox, GameBoxDataTesera, GameBoxDataBgg } from '~/types/fronten
 import type { SearchedGameBox, GameBoxSearchResult } from "~/types/frontend.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'
+import { title } from 'process';
+
+
+const currentClub: Ref<Club> = useState('club');
 
 const saveData: Ref<GameBox[]> = ref([]);
 const snackbar = ref(false);
@@ -55,6 +59,8 @@ const snackbarText = ref('wow');
 
 const timeout = (ms: number) => new Promise(res => setTimeout(res, ms));
 const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
+
+const stepNumber = ref(1);
 
 const breadcrumbItemsSource = [
     {
@@ -66,21 +72,17 @@ const breadcrumbItemsSource = [
         disabled: true,
     },
     {
-        title: 'Добавляем новые игры в БД',
+        title: 'Подбираем данные с внешних бд',
         disabled: true,
     },
     {
-        title: 'Добавляем новые игры в клуб',
+        title: 'Добавляем новые игры в бд и клуб',
         disabled: true,
     },
 ];
 
 const breadcrumbItems = computed(() => {
-    let ret = [breadcrumbItemsSource[0]];
-    if (gameboxesListExisting) {
-        ret.push(breadcrumbItemsSource[1]);
-    }
-    return ret;
+    return breadcrumbItemsSource.slice(0, stepNumber.value);
 })
 
 // leech aliases from tesera
@@ -109,34 +111,51 @@ async function saveGamesList(gamesList: string[]) {
     if (!gameboxesListExisting.value.length) {
         await getGamesBaseInfo(gamesTitlesList.value);
         showSnackbar('Не надено игр в базе, надо импортить из бгг');
+        stepNumber.value++;
     } else if (gamesTitlesList.value.length > gameboxesListExisting.value.length) {
         showSnackbar('Часть игр найдена, сначала добавь их');
     } else {
         showSnackbar('Все игры найдены');
     }
+    stepNumber.value++;
 }
 
 async function stepGetExistingGameboxes(gamesList: string[]) {
     let existingGameboxesHashed: any = {};
-    const promisesList = gamesList.map(async (gameTitle) => {
-        const ret: GameBox[] = await $fetch('/api/supabase/check-game-exists', { query: { title: gameTitle } });
-        if (ret && ret.length > 0) {
-            existingGameboxesHashed[gameTitle] = ret[0];
+    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { query: { titles: gamesList.map(title => title) } });
+    const gameboxesInClub: GameBox[] = await $fetch('/api/supabase/check-games-exists',
+        {
+            query:
+            {
+                clubid: currentClub.value.id,
+                ids: gameboxesFound.map(gamebox => gamebox.id)
+            }
+        });
+    const gameboxesInClubHashed = listToHashed(gameboxesInClub);
+    const gameboxesOutOfClub = gameboxesFound.filter(gamebox => !gameboxesInClubHashed[gamebox.id || '']);
+    gamesList.forEach(title => {
+        const gameboxFound = gameboxesOutOfClub.find(gamebox => gamebox.titles?.includes(title));
+        if (gameboxFound) {
+            existingGameboxesHashed[title] = gameboxFound;
         }
     })
-    await Promise.all(promisesList);
     return existingGameboxesHashed;
 }
 
 async function addTheseExisting(selectedExisting: GameBox[]) {
-    console.log(selectedExisting);
-    const ret = await $fetch('/api/supabase/add-games-to-club', { method: 'post', body: { gameBoxIds: selectedExisting.map(gameBox => gameBox.id) } });
+    const ret = await $fetch('/api/supabase/add-games-to-club',
+        {
+            method: 'post',
+            query: { clubid: currentClub.value.id },
+            body: { gameBoxIds: selectedExisting.map(gameBox => gameBox.id) }
+        });
     await getGamesBaseInfo(gamesTitlesListMissing.value);
     if (gamesTitlesList.value.length > selectedExisting.length) {
         showSnackbar('Добавлены выбранные игры. Остальные надо импортить');
     } else {
         showSnackbar('Игры добавлены в клуб. Можно уходить');
     }
+    stepNumber.value++;
 }
 
 async function getGamesBaseInfo(gamesList: string[]) {
@@ -184,7 +203,7 @@ async function getGamesBaseInfo(gamesList: string[]) {
 // leech data from bgg and tesera
 
 async function getGameBoxData() {
-    const requestInterval = 200;
+    const requestInterval = 1000;
     if (gamesListSearched.value.length > 0) {
         gamesListSearched.value
             .forEach((gameInfo: any, index: number) => {
@@ -223,6 +242,8 @@ async function getGameBoxData() {
             });
         await timeout((gamesListSearched.value.length + 1) * 1000);
     }
+
+    stepNumber.value++;
 };
 
 
@@ -247,6 +268,16 @@ function hashedListToSorted(toSort: any, sortSource: string[]) {
         }
     })
     return ret;
+}
+
+function listToHashed(sortSource: { id?: number | undefined }[]) {
+    return sortSource.reduce((total: any, item) => {
+        if (item.id) {
+
+            total[item.id] = item;
+        }
+        return total;
+    }, {})
 }
 
 </script>

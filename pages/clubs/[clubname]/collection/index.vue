@@ -32,6 +32,10 @@
             </v-list-item>
         </v-list>
     </v-navigation-drawer>
+
+    <fast-action>
+        <v-btn icon="mdi-plus" size="large" elevation="8" :to="'./collection/add-games'" />
+    </fast-action>
 </template>
 
 
@@ -40,7 +44,6 @@ import { ref, computed } from 'vue';
 import type { Ref, ComputedRef } from 'vue'
 import type { GameBox } from '~/types/frontend.js';
 import { ruleIsNumber } from '@/utils/rules.js';
-import GameboxItem from '~/components/GameboxItem.vue';
 
 
 const dataSources = ref([{ name: 'bgg', apiName: 'bgg' }, { name: 'tesera', apiName: 'tesera' }]);
