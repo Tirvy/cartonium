@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Provider } from '~/node_modules/@supabase/gotrue-js/src/lib/types.js';
+import type { Provider } from '~/node_modules/@supabase/auth-js/src/lib/types.ts';
 definePageMeta({
   layout: "login",
 })
