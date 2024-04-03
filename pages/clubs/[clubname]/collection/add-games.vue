@@ -11,12 +11,11 @@
                     </v-breadcrumbs>
                 </v-col>
                 <v-col cols="12" v-if="stepNumber === 1">
-                    <pages-add-games-list :progress="getGamesAliasesProgress" @input="saveGamesList" />
+                    <pages-add-games-list @input="saveGamesList" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 2">
-                    <pages-add-games-add-existing :items="gameboxesFound"
-                        @sendGameboxesToSupabase="addTheseExisting" />
+                    <pages-add-games-add-existing :items="gameboxesFound" @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 3">
@@ -89,13 +88,7 @@ const getGamesAliasesProgress = ref(0);
 const requestInterval = 300;
 
 const gamesTitlesList = ref([]) as Ref<string[]>;
-const gameboxesListExistingHashed: Ref<any> = ref({});
-const gameboxesListExisting = computed(() => {
-    return hashedListToSorted(gameboxesListExistingHashed.value, gamesTitlesList.value);
-});
-const gamesTitlesListMissing = computed(() => {
-    return gamesTitlesList.value.filter(title => !gameboxesListExistingHashed.value[title]);
-});
+const gameboxesExistingAdded: Ref<GameBox[]> = ref([]);
 const gameboxesFound: Ref<GameBox[]> = ref([]);
 
 function showSnackbar(text: string) {
@@ -112,21 +105,15 @@ async function saveGamesList(value: {
     console.log(value);
     gameboxesFound.value = value.gameboxesFound;
     gamesTitlesList.value = value.titles;
+
     const gameboxesInClubHashed = listToHashed(value.gameboxesInClub);
     const gameboxesOutOfClub = value.gameboxesFound.filter(gamebox => !gameboxesInClubHashed[gamebox.id]);
-    console.log(value, gameboxesOutOfClub, gameboxesInClubHashed);
-    value.titles.forEach(title => {
-        const gameboxFound = gameboxesOutOfClub.find(gamebox => gamebox.titles?.includes(title));
-        if (gameboxFound) {
-            gameboxesListExistingHashed.value[title] = gameboxFound;
-        }
-    })
 
     if (!value.gameboxesFound.length) {
-        await getGamesBaseInfo(value.titles);
+        await getGamesBaseInfo(gamesTitlesList.value);
         showSnackbar('Не надено игр в базе, надо импортить из бгг');
         stepNumber.value++;
-    } else if (value.titles.length > value.gameboxesFound.length) {
+    } else if (gamesTitlesList.value.length > value.gameboxesFound.length) {
         showSnackbar('Часть игр найдена, сначала добавь их');
     } else {
         showSnackbar('Все игры найдены');
@@ -135,15 +122,15 @@ async function saveGamesList(value: {
 }
 
 async function addTheseExisting(selectedExisting: GameBox[]) {
-    const ret = await $fetch('/api/supabase/add-games-to-club',
-        {
-            method: 'post',
-            query: { clubid: currentClub.value.id },
-            body: { gameBoxIds: selectedExisting.map(gameBox => gameBox.id) }
-        });
-    await getGamesBaseInfo(gamesTitlesListMissing.value);
+    gameboxesExistingAdded.value = selectedExisting;
+
+    const titlesRemainToAdd = gamesTitlesList.value.filter(title => {
+        return !gameboxesExistingAdded.value.find(gamebox => gamebox.titles?.includes(title));
+    });
+
     if (gamesTitlesList.value.length > selectedExisting.length) {
         showSnackbar('Добавлены выбранные игры. Остальные надо импортить');
+        await getGamesBaseInfo(titlesRemainToAdd);
     } else {
         showSnackbar('Игры добавлены в клуб. Можно уходить');
     }
@@ -196,6 +183,7 @@ async function getGamesBaseInfo(gamesList: string[]) {
 
 async function getGameBoxData() {
     const requestInterval = 1000;
+    console.log(gamesListSearched);
     if (gamesListSearched.value.length > 0) {
         gamesListSearched.value
             .forEach((gameInfo: any, index: number) => {
@@ -221,14 +209,23 @@ async function getGameBoxData() {
                         year: null,
                     };
                     if (gameInfo.gameTesera) {
-                        let teseraRet: GameBoxDataTesera = await $fetch('/api/tesera/get-gamebox', { query: { alias: gameInfo.gameTesera.alias } });
+                        let teseraRet: GameBoxDataTesera = await $fetch('/api/tesera/get-gamebox', {
+                            query: { alias: gameInfo.gameTesera.alias },
+                        });
                         ret.titles.push(teseraRet.title);
-                        ret = { ...teseraRet, ...ret };
+                        console.log(teseraRet);
+                        Object.keys(ret).forEach((key) => {
+                            (ret as any)[key] = (ret as any)[key] || (teseraRet as any)[key];
+                        });
                     }
                     if (gameInfo.gameBgg) {
-                        let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', { query: { id: gameInfo.gameBgg.id } })
+                        let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', {
+                            query: { id: gameInfo.gameBgg.id },
+                        });
                         ret.titles.push(bggRet.title as string);
-                        ret = { ...bggRet, ...ret };
+                        Object.keys(ret).forEach((key) => {
+                            (ret as any)[key] = (ret as any)[key] || (bggRet as any)[key];
+                        });
                     }
                     saveData.value.push(ret);
                 }, index * requestInterval);
@@ -237,17 +234,26 @@ async function getGameBoxData() {
     }
 
     stepNumber.value++;
-};
+}
+
 
 
 // to supabase 
 
 async function sendGameboxesToSupabase() {
     if (saveData.value.length) {
-        let ret: any = await $fetch('/api/supabase/gamebox-add', {
+        let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
             method: "POST", body: saveData.value
         });
         showSnackbar('Все игры добавлены в бд');
+        await $fetch('/api/supabase/add-games-to-club',
+            {
+                method: 'post',
+                query: { clubid: currentClub.value.id },
+                body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
+            });
+
+        showSnackbar('Все игры добавлены в клуб');
     }
 }
 

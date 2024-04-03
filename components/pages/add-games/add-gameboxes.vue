@@ -12,17 +12,11 @@
             <v-table>
                 <thead>
                     <tr>
-                        <td rowspan="2">
+                        <td rowspan="2" class="name-column">
                             Введенное имя
-                        </td>
-                        <td rowspan="2">
-                            Есть в БД
                         </td>
                         <td colspan="2">
                             Нет в БД
-                        </td>
-                        <td rowspan="2">
-                            Действия
                         </td>
                     </tr>
                     <tr>
@@ -36,11 +30,10 @@
                 </thead>
                 <tbody>
                     <tr v-for="gameInfo in gamesListSearched" :key="gameInfo.baseTitle">
-                        <td>
-                            {{ gameInfo.baseTitle }}
-                        </td>
-                        <td>
-                            -
+                        <td class="name-column">
+                            <div style="max-width: 150px">
+                                {{ gameInfo.baseTitle }}
+                            </div>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameTeseraVariants" :source="'tesera'"
@@ -51,9 +44,6 @@
                             <pages-add-games-table-item :items="gameInfo.gameBggVariants" :source="'bgg'"
                                 v-model="gameInfo.gameBgg">
                             </pages-add-games-table-item>
-                        </td>
-                        <td>
-                            кнопки
                         </td>
                     </tr>
                 </tbody>
@@ -137,5 +127,10 @@ const gamesListFormattedFiltered = computed(() => {
     vertical-align: top;
     padding: 5px 0;
     width: 30%;
+}
+
+.name-column {
+    word-wrap: break-word;
+    max-width: 150px;
 }
 </style>

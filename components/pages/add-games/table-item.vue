@@ -51,8 +51,7 @@ function selectVariant(title: string) {
 }
 
 function getItemName(item: GameBoxSearchResult) {
-    if (item.title)
-        return `${item.title || item.titles?.join(', ') || 'unknown'} (${item.year})`;
+    return `${item.title || item.titles?.join(', ') || 'unknown'}${item.year ? '('+item.year+')' : ''}`;
 }
 
 const selectorVariants = computed(() => {

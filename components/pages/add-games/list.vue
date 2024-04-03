@@ -13,10 +13,9 @@
         <v-card-actions>
             <div>
 
-                <v-btn :loading="isLoading" :disabled="!gamesList" @click="getGamesBaseInfo">
+                <v-btn :disabled="!gamesList" @click="getGamesBaseInfo">
                     Разобрать список
                 </v-btn>
-                <v-progress-linear v-if="progress" :model-value="progress"></v-progress-linear>
             </div>
         </v-card-actions>
     </v-card>
@@ -24,12 +23,6 @@
 
 <script setup lang="ts">
 import data from './data.js';
-const props = defineProps({
-    progress: {
-        type: Number,
-        default: 0,
-    },
-});
 
 interface emitedValue {
     titles: string[],
@@ -45,14 +38,6 @@ const currentClub: Ref<Club> = useState('club');
 
 // making games list
 const gamesList = ref(data.data);
-
-const isLoading = computed(() => {
-    return props.progress > 0 && props.progress < 1;
-});
-
-
-
-
 
 async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);

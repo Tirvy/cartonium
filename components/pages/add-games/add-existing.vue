@@ -22,6 +22,8 @@
 <script setup lang="ts">
 import type { GameBox } from '~/types/frontend.js';
 
+const currentClub: Ref<Club> = useState('club');
+
 const props = defineProps({
     items: {
         type: Array<GameBox>,
@@ -33,9 +35,15 @@ const emit = defineEmits<{
     (e: 'sendGameboxesToSupabase', selected: Array<GameBox>): void
 }>()
 
-const selected: Ref<GameBox[]> = ref([]);
+const selected: Ref<GameBox[]> = ref([...props.items]);
 
-function sendGameboxesToSupabase() {
+async function sendGameboxesToSupabase() {
+    const ret = await $fetch('/api/supabase/add-games-to-club',
+        {
+            method: 'post',
+            query: { clubid: currentClub.value.id },
+            body: { gameBoxIds: selected.value.map(gameBox => gameBox.id) }
+        });
     emit('sendGameboxesToSupabase', selected?.value);
 }
 
