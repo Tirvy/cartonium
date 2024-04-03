@@ -15,7 +15,7 @@
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 2">
-                    <pages-add-games-add-existing :items="gameboxesListExisting"
+                    <pages-add-games-add-existing :items="gameboxesFound"
                         @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
@@ -96,6 +96,7 @@ const gameboxesListExisting = computed(() => {
 const gamesTitlesListMissing = computed(() => {
     return gamesTitlesList.value.filter(title => !gameboxesListExistingHashed.value[title]);
 });
+const gameboxesFound: Ref<GameBox[]> = ref([]);
 
 function showSnackbar(text: string) {
     snackbarText.value = text;
@@ -109,9 +110,11 @@ async function saveGamesList(value: {
     gameboxesInClub: GameBox[]
 }) {
     console.log(value);
+    gameboxesFound.value = value.gameboxesFound;
     gamesTitlesList.value = value.titles;
     const gameboxesInClubHashed = listToHashed(value.gameboxesInClub);
     const gameboxesOutOfClub = value.gameboxesFound.filter(gamebox => !gameboxesInClubHashed[gamebox.id]);
+    console.log(value, gameboxesOutOfClub, gameboxesInClubHashed);
     value.titles.forEach(title => {
         const gameboxFound = gameboxesOutOfClub.find(gamebox => gamebox.titles?.includes(title));
         if (gameboxFound) {
@@ -119,11 +122,11 @@ async function saveGamesList(value: {
         }
     })
 
-    if (!gameboxesListExisting.value.length) {
+    if (!value.gameboxesFound.length) {
         await getGamesBaseInfo(value.titles);
         showSnackbar('Не надено игр в базе, надо импортить из бгг');
         stepNumber.value++;
-    } else if (value.titles.length > gameboxesListExisting.value.length) {
+    } else if (value.titles.length > value.gameboxesFound.length) {
         showSnackbar('Часть игр найдена, сначала добавь их');
     } else {
         showSnackbar('Все игры найдены');

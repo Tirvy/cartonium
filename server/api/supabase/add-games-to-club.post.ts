@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  const { data, error } = await client.from('clubs_collections').insert(dataToSend);
+  const { data, error } = await client.from('clubs_collections').upsert(dataToSend, {onConflict: 'game_box_id, club_id', ignoreDuplicates: true});
   if (error) {
     throw createError({ statusMessage: error.message })
   }

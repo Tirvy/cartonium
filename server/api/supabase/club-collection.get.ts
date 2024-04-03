@@ -3,7 +3,7 @@ import type { Database } from '~/types/supabase.js'
 import type { GameBox } from "~/types/frontend.js";
 import { gameBoxFromSupabase } from '~/server/transformers.js';
 
-export default defineEventHandler(async (event): Promise<GameBox[]> => {
+export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const clubId = query.clubid as string;
 
@@ -14,9 +14,9 @@ export default defineEventHandler(async (event): Promise<GameBox[]> => {
     throw createError({ statusMessage: error.message })
   }
 
-  const ret_data = data.map(item => {
-    return gameBoxFromSupabase(item);
-  })
+  // const ret_data = data.map(item => {
+  //   return gameBoxFromSupabase(item);
+  // })
 
-  return ret_data
+  return data
 })
