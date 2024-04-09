@@ -6,8 +6,11 @@ export default defineEventHandler(async (event): Promise<number[]> => {
   const query = getQuery(event);
   const ids = (query.ids as string[]);
   const clubId = (query.clubid as string);
-  if (!ids?.length || !clubId) {
-    throw createError({ statusMessage: 'ids & clubId required' })
+  if (!clubId) {
+    throw createError({ statusMessage: 'clubId required' })
+  }
+  if (!ids || !ids.length) {
+    return []
   }
   const user = await serverSupabaseUser(event)
   const client = await serverSupabaseClient<Database>(event)

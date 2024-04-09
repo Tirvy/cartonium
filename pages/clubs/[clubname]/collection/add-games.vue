@@ -102,7 +102,6 @@ async function saveGamesList(value: {
     gameboxesFound: GameBox[],
     gameboxesInClub: GameBox[]
 }) {
-    console.log(value);
     gameboxesFound.value = value.gameboxesFound;
     gamesTitlesList.value = value.titles;
 
@@ -183,7 +182,6 @@ async function getGamesBaseInfo(gamesList: string[]) {
 
 async function getGameBoxData() {
     const requestInterval = 1000;
-    console.log(gamesListSearched);
     if (gamesListSearched.value.length > 0) {
         gamesListSearched.value
             .forEach((gameInfo: any, index: number) => {
@@ -213,7 +211,6 @@ async function getGameBoxData() {
                             query: { alias: gameInfo.gameTesera.alias },
                         });
                         ret.titles.push(teseraRet.title);
-                        console.log(teseraRet);
                         Object.keys(ret).forEach((key) => {
                             (ret as any)[key] = (ret as any)[key] || (teseraRet as any)[key];
                         });

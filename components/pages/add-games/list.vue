@@ -43,7 +43,7 @@ async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);
     const onlyGoodStrings: string[] = splitted.filter((q: string) => !!q).map((item: string) => item.trim());
 
-    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { query: { titles: onlyGoodStrings } });
+    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: onlyGoodStrings } });
     const gameboxesInClub: number[] = await $fetch('/api/supabase/check-games-in-club',
         {
             query:

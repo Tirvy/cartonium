@@ -4,7 +4,8 @@ import { gameBoxFromSupabase } from '~/server/transformers';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
-  const titles = (query.titles as string[]);
+  const body = await readBody(event);
+  const titles = (body.titles as string[]);
   if (!titles?.length) {
     throw createError({ statusMessage: 'title required' })
   }
