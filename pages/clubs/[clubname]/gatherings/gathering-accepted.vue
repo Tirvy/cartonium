@@ -4,7 +4,7 @@
         <v-col style="max-width: 600px;">
           <v-card>
             <v-card-title class="bg-surface">
-              Ваша бронть принята!
+              Ваша бронь принята и скоро будет обработана
             </v-card-title>
             <v-card-text>
               <v-list lines="three">
@@ -18,13 +18,13 @@
                     Дата и время
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    12:22, 25 июня 2023
+                    {{ lastGathering.startDate }}, {{ lastGathering.startTime }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
                     <template v-slot:prepend>
                       <v-avatar color="grey-lighten-1">
-                        #
+                        <v-icon color="white">mdi-pound</v-icon>
                       </v-avatar>
                     </template>
                   <v-list-item-title>
@@ -37,6 +37,19 @@
                 <v-list-item>
                     <template v-slot:prepend>
                       <v-avatar color="grey-lighten-1">
+                        <v-icon color="white">mdi-cellphone-message</v-icon>
+                      </v-avatar>
+                    </template>
+                  <v-list-item-title>
+                    Контакт обратной связи
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ lastGathering.contact }}
+                  </v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
+                    <template v-slot:prepend>
+                      <v-avatar color="grey-lighten-1">
                         <v-icon color="white">mdi-note</v-icon>
                       </v-avatar>
                     </template>
@@ -44,8 +57,7 @@
                     Комментарий
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    Вы самые лучшие в лорем ипсуме данной планеты с играми каак серп, алимики и тому подобные твари
-                    азаза азазат азазазазимовичовский 25 декабря 31 цикла моей любимой игры
+                    {{ lastGathering.commentOwner }}
                   </v-list-item-subtitle>
                 </v-list-item>
               </v-list>

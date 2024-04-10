@@ -201,8 +201,9 @@ export interface Gathering {
     commentClub: string
     commentOwner: string
     guestsMax: number
+    contact: string
     id: number
     owner: string
-    startDate: string | null
+    startDate: string
     startTime: string | null
 }

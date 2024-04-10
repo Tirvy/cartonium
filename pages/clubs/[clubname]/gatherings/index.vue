@@ -4,30 +4,34 @@
             <v-table>
                 <thead>
                     <tr>
+                        <th>
+                            Дата
+                        </th>
+                        <th>
+                            Время
+                        </th>
+                        <th>
+                            Планируется человек
+                        </th>
                         <th class="text-left">
-                            Owner
+                            Комментарий посетителя
                         </th>
                         <th class="text-left">
-                            comment_owner
+                            Комментарий админа
                         </th>
-                        <th>
-                            guests_max
-                        </th>
-                        <th>
-                            start_date
-                        </th>
-                        <th>
-                            start_time
-                        </th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="gathering in gatherings" :key="gathering.id">
-                        <td>{{ gathering.owner }}</td>
-                        <td>{{ gathering.commentOwner }}</td>
-                        <td>{{ gathering.guestsMax }}</td>
                         <td>{{ gathering.startDate }}</td>
                         <td>{{ gathering.startTime }}</td>
+                        <td>{{ gathering.guestsMax }}</td>
+                        <td>{{ gathering.commentOwner }}</td>
+                        <td>{{ gathering.commentClub }}</td>
+                        <td>
+                            <v-btn icon="mdi-pencil" @click="editGathering(gathering)"  variant="plain"></v-btn>    
+                        </td>
                     </tr>
                 </tbody>
             </v-table>
@@ -56,4 +60,8 @@ async function getBookings() {
     }
 }
 getBookings();
+
+function editGathering(gathering: Gathering) {
+    navigateTo('./gatherings/item' + gathering.id);
+}
 </script>

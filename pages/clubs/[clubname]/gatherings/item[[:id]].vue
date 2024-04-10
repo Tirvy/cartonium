@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import { start } from 'repl';
 import type { Gathering } from '~/types/frontend'
 
 const route = useRoute();
@@ -64,14 +65,30 @@ const currentClub: Ref<Club> = useState('club');
 
 const timeMaskOptions = { mask: '##:##' };
 
+
+async function getBookings(): Promise<Gathering[]> {
+    return await $fetch('/api/supabase/gatherings', {
+        query: {
+            clubid: currentClub.value.id,
+        }
+    });
+}
 async function getItem() {
     if (route.params.id && +route.params.id > 0) {
-        const res: { data: Gathering[] } = await $fetch('/api/supabase/gatherings');
-        const data: Gathering[] = res.data;
+        const data = await getBookings();
         const findingId = +route.params.id;
         const foundItem = data.find(item => item.id === findingId);
         if (!foundItem) {
             router.replace('./not-found');
+        } else {
+            startDate.value = new Date(foundItem.startDate);
+            startTime.value = foundItem.startTime || '';
+            guestsMax.value = foundItem.guestsMax + '';
+            commentOwner.value = foundItem.commentOwner;
+            contact.value = foundItem.contact;
+            commentClub.value = foundItem.commentClub;
+            gatheringId.value = foundItem.id;
+
         }
     }
 }
@@ -87,6 +104,7 @@ const commentOwner = ref('');
 const contact = ref('');
 
 const commentClub = ref('');
+const gatheringId = ref(0);
 
 
 function allowedDates(val: Date) {
