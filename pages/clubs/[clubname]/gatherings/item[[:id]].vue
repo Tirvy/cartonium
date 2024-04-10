@@ -23,6 +23,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
+                            <v-text-field label="Как с вами связаться" v-model="contact" placeholder="tg: @gamelover"></v-text-field>
+
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
                             <v-textarea label="Комментарий"
                                 placeholder="Игры, которые принесёте/хотите забронировать, пожелания админам итд"
                                 v-model="commentOwner"></v-textarea>
@@ -78,6 +84,7 @@ const startDate = ref(new Date());
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
+const contact = ref('');
 
 const commentClub = ref('');
 
@@ -94,7 +101,8 @@ async function saveGathering() {
             start_time: startTime.value,
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
-
+            contact: contact,
+            
             comment_club: commentClub.value,
 
             club_id: currentClub.value.id,
