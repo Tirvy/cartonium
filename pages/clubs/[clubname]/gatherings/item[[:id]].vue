@@ -101,13 +101,16 @@ async function saveGathering() {
             start_time: startTime.value,
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
-            contact: contact,
-            
+            contact: contact.value,
+
             comment_club: commentClub.value,
 
             club_id: currentClub.value.id,
         }
     })
+    const lastGathering = useState('lastGathering');
+    lastGathering.value = data;
+    navigateTo('./gathering-accepted');
     console.log(data);
 }
 </script>
