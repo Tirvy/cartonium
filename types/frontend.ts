@@ -207,3 +207,7 @@ export interface Gathering {
     startDate: string
     startTime: string | null
 }
+
+export interface Loaders {
+    [key: string]: boolean
+}

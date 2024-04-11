@@ -42,7 +42,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-btn type="submit">сохранить</v-btn>
+                            <v-btn type="submit" :loading="loaders.save">сохранить</v-btn>
                         </v-col>
                     </v-row>
 
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { start } from 'repl';
-import type { Gathering } from '~/types/frontend'
+import type { Gathering, Loaders } from '~/types/frontend'
 import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
@@ -68,6 +68,11 @@ const currentClub: Ref<Club> = useState('club');
 
 const timeMaskOptions = { mask: '##:##' };
 
+const loaders: Ref<Loaders> = ref({
+    save: false,
+    initial: false,
+});
+
 
 async function getBookings(): Promise<Gathering[]> {
     return await $fetch('/api/supabase/gatherings', {
@@ -78,6 +83,7 @@ async function getBookings(): Promise<Gathering[]> {
 }
 async function getItem() {
     if (route.params.id && +route.params.id > 0) {
+        loaders.value.initial = true;
         const data = await getBookings();
         const findingId = +route.params.id;
         const foundItem = data.find(item => item.id === findingId);
@@ -91,8 +97,8 @@ async function getItem() {
             contact.value = foundItem.contact;
             commentClub.value = foundItem.commentClub;
             gatheringId.value = foundItem.id;
-
         }
+        loaders.value.initial = false;
     }
 }
 
@@ -115,9 +121,11 @@ function allowedDates(val: Date) {
 };
 
 async function saveGathering() {
+    loaders.value.save = true;
     const data: any = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
+            id: gatheringId.value || undefined,
             start_date: startDate.value,
             start_time: startTime.value,
             comment_owner: commentOwner.value,
@@ -132,5 +140,6 @@ async function saveGathering() {
     const lastGathering = useState('lastGathering');
     lastGathering.value = data;
     navigateTo('./gathering-accepted');
+    loaders.value.save = false;
 }
 </script>
