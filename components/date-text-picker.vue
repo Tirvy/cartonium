@@ -15,19 +15,21 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
+import { useDate } from 'vuetify';
+const dateAdapter = useDate()
 
 const { label, color, modelValue } = defineProps([
   "label",
   "color",
   "modelValue",
 ]);
-const emit = defineEmits("update:modelValue");
+const emit = defineEmits(["update:modelValue"]);
 
 const isMenuOpen = ref(false);
 const selectedDate = ref(modelValue);
 
 const formattedDate = computed(() => {
-  return selectedDate.value ? selectedDate.value.toLocaleDateString("en") : "";
+  return selectedDate.value ? dateAdapter.format(selectedDate.value, 'normalDateWithWeekday') : "";
 });
 
 watch(() => modelValue, (newDate) => {

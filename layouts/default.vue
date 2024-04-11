@@ -4,17 +4,13 @@
     <v-app-bar dense>
 
       <template v-slot:prepend>
-        <v-avatar color="yellow">A</v-avatar>
+        <nuxt-link :to="pages[1].path">
+          <v-avatar color="yellow">A</v-avatar>
+        </nuxt-link>
       </template>
 
       <v-app-bar-title>Ареночка</v-app-bar-title>
       <v-spacer></v-spacer>
-      <div class="flex">
-        <v-switch label="isAdmin" v-model="permissionsOverride"></v-switch>
-      </div>
-      <div v-if="user">
-        user: {{ user.email }}
-      </div>
       <v-btn @click="switchTheme">
         <v-icon icon="mdi-theme-light-dark"></v-icon>
       </v-btn>

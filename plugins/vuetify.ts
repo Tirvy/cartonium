@@ -6,6 +6,10 @@ import type { ThemeDefinition } from 'vuetify';
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+import DayJsAdapter  from '@date-io/dayjs'
+import ruDayjs from 'dayjs/locale/ru'
+import enDayjs from 'dayjs/locale/en'
+
 import { ru } from 'vuetify/locale'
 
 const myCustomDarkTheme: ThemeDefinition = {
@@ -14,6 +18,8 @@ const myCustomDarkTheme: ThemeDefinition = {
     primary: '#009688',
   },
 }
+
+const dayjs = new DayJsAdapter();
 
 const myCustomWarnTheme: ThemeDefinition = {
   dark: false,
@@ -44,6 +50,13 @@ export default defineNuxtPlugin(nuxtApp => {
         myCustomDarkTheme,
         myCustomWarnTheme
       }
+    },
+    date: {
+      adapter: DayJsAdapter,
+      locale: {
+        ru: ruDayjs,
+        en: enDayjs,
+      },
     },
     defaults: {
       VBtn: {

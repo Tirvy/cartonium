@@ -5,8 +5,7 @@
                 <v-form @submit.prevent="saveGathering">
                     <v-row>
                         <v-col>
-                            <date-text-picker label="Дата" v-model="startDate" :allowed-dates="allowedDates"
-                                color="primary"></date-text-picker>
+                            <date-text-picker label="Дата" v-model="startDate" color="primary"></date-text-picker>
 
                         </v-col>
                         <v-col>
@@ -23,7 +22,8 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Как с вами связаться" v-model="contact" placeholder="tg: @gamelover"></v-text-field>
+                            <v-text-field label="Как с вами связаться" v-model="contact"
+                                placeholder="tg: @gamelover"></v-text-field>
 
                         </v-col>
                     </v-row>
@@ -55,6 +55,9 @@
 <script setup lang="ts">
 import { start } from 'repl';
 import type { Gathering } from '~/types/frontend'
+import { DateIOFormats } from "@date-io/core/IUtils";
+import { useDate } from 'vuetify';
+const dateAdapter = useDate()
 
 const route = useRoute();
 const router = useRouter();
@@ -81,7 +84,7 @@ async function getItem() {
         if (!foundItem) {
             router.replace('./not-found');
         } else {
-            startDate.value = new Date(foundItem.startDate);
+            startDate.value = dateAdapter.date(foundItem.startDate) as DateIOFormats;
             startTime.value = foundItem.startTime || '';
             guestsMax.value = foundItem.guestsMax + '';
             commentOwner.value = foundItem.commentOwner;
@@ -97,7 +100,7 @@ if (route.params.id) {
     getItem();
 }
 
-const startDate = ref(new Date());
+const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
@@ -129,6 +132,5 @@ async function saveGathering() {
     const lastGathering = useState('lastGathering');
     lastGathering.value = data;
     navigateTo('./gathering-accepted');
-    console.log(data);
 }
 </script>
