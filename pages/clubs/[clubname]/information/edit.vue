@@ -12,7 +12,7 @@
             </v-row>
             <v-row>
                 <v-col>
-                    <v-btn @click="saveToDatabase">
+                    <v-btn :loading="loaders.save" @click="saveToDatabase">
                         Сохранить
                     </v-btn>
                 </v-col>
@@ -20,19 +20,34 @@
             </v-row>
         </v-container>
     </v-main>
+
+    <v-snackbar v-model="snackbar" multi-line>
+        {{ snackbarText }}
+
+        <template v-slot:actions>
+            <v-btn color="red" variant="text" @click="snackbar = false">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
 </template>
 
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue';
-import type { Club } from '~/types/frontend.js';
+import type { Club, Loaders } from '~/types/frontend.js';
 
 const quillHtml = ref('');
 const currentClub: Ref<Club> = useState('club');
+const loaders: Ref<Loaders> = ref({
+    save: false
+});
+const snackbar = ref(false);
+const snackbarText = ref('');
 getInitialValues();
 
 
 async function getInitialValues() {
-    const data: {text_html: string} = await $fetch('/api/supabase/club-info', {
+    const data: { text_html: string } = await $fetch('/api/supabase/club-info', {
         query: {
             clubid: currentClub.value.id,
         }
@@ -41,7 +56,7 @@ async function getInitialValues() {
 }
 
 async function saveToDatabase() {
-
+    loaders.value.save = true;
     let ret: any = await $fetch('/api/supabase/club-info', {
         method: "POST",
         body: {
@@ -49,6 +64,10 @@ async function saveToDatabase() {
             text_html: quillHtml.value,
         }
     });
+    loaders.value.save = false;
+
+    snackbarText.value = 'Изменения сохранены';
+    snackbar.value = true;
 }
 
 </script>
