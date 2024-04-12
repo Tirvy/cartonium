@@ -7,10 +7,17 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const clubid = query.clubid as string;
 
-  const startDate = new Date();
-  startDate.setHours(0,0,0,0);
+  let startDate = '';
+  if (query['date-from']) {
+    startDate = query['date-from'] as string;
+  } else {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    startDate = today.toISOString();
+  }
+
   
-  const { data, error } = await client.from('gatherings').select('*').gte('start_date', startDate.toISOString()).eq('club_id', clubid);
+  const { data, error } = await client.from('gatherings').select('*').gte('start_date', startDate).eq('club_id', clubid);
 
   if (error) {
     throw createError({ statusMessage: error.message })
