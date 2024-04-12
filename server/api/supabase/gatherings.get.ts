@@ -12,12 +12,13 @@ export default defineEventHandler(async (event) => {
     startDate = query['date-from'] as string;
   } else {
     const today = new Date();
-    today.setHours(0,0,0,0);
+    today.setHours(0, 0, 0, 0);
     startDate = today.toISOString();
   }
 
-  
-  const { data, error } = await client.from('gatherings').select('*').gte('start_date', startDate).eq('club_id', clubid);
+
+  const { data, error } = await client.from('gatherings').select('*').gte('start_date', startDate).eq('club_id', clubid)
+    .order('start_date', { ascending: true });
 
   if (error) {
     throw createError({ statusMessage: error.message })
