@@ -205,7 +205,6 @@ export interface Gathering {
     id: number
     owner: string
     startDate: string
-    startTime: string | null
 }
 
 export interface Loaders {

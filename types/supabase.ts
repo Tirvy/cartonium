@@ -175,7 +175,6 @@ export type Database = {
           id: number
           owner: string
           start_date: string | null
-          start_time: string | null
         }
         Insert: {
           club_id: string
@@ -186,7 +185,6 @@ export type Database = {
           id?: number
           owner?: string
           start_date?: string | null
-          start_time?: string | null
         }
         Update: {
           club_id?: string
@@ -197,7 +195,6 @@ export type Database = {
           id?: number
           owner?: string
           start_date?: string | null
-          start_time?: string | null
         }
         Relationships: [
           {

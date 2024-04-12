@@ -10,7 +10,7 @@
                         </v-col>
                         <v-col>
                             <v-text-field v-maska:[timeMaskOptions] placeholder="12:30" label="Время"
-                                v-model="startTime"></v-text-field>
+                                v-model="startTime" :rules="[ruleIsTime]"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -66,7 +66,7 @@ const item = ref('');
 const clubPermissions = useClubPermissions();
 const currentClub: Ref<Club> = useState('club');
 
-const timeMaskOptions = { mask: '##:##' };
+const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
 
 const loaders: Ref<Loaders> = ref({
     save: false,
@@ -74,24 +74,22 @@ const loaders: Ref<Loaders> = ref({
 });
 
 
-async function getBookings(): Promise<Gathering[]> {
-    return await $fetch('/api/supabase/gatherings', {
-        query: {
-            clubid: currentClub.value.id,
-        }
-    });
-}
 async function getItem() {
     if (route.params.id && +route.params.id > 0) {
         loaders.value.initial = true;
-        const data = await getBookings();
         const findingId = +route.params.id;
-        const foundItem = data.find(item => item.id === findingId);
+        const foundItem: Gathering = await await $fetch('/api/supabase/gathering-find', {
+            query: {
+                clubid: currentClub.value.id,
+                gatheringid: findingId,
+            }
+        });
+
         if (!foundItem) {
             router.replace('./not-found');
         } else {
             startDate.value = dateAdapter.date(foundItem.startDate) as DateIOFormats;
-            startTime.value = foundItem.startTime || '';
+            startTime.value = dateAdapter.format(startDate.value, 'fullTime24h');
             guestsMax.value = foundItem.guestsMax + '';
             commentOwner.value = foundItem.commentOwner;
             contact.value = foundItem.contact;
@@ -122,12 +120,16 @@ function allowedDates(val: Date) {
 
 async function saveGathering() {
     loaders.value.save = true;
+
+    let dateToSend = dateAdapter.date(startDate.value);
+    const hoursMinutes = startTime.value.split(":");
+    dateToSend = dateAdapter.setHours(dateToSend, +hoursMinutes[0]);
+    dateToSend = dateAdapter.setMinutes(dateToSend, +hoursMinutes[1]);
     const data: any = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
             id: gatheringId.value || undefined,
-            start_date: startDate.value,
-            start_time: startTime.value,
+            start_date: dateAdapter.toISO(dateToSend),
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
             contact: contact.value,

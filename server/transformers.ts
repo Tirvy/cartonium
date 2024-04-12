@@ -61,6 +61,5 @@ export function gatheringFromSupabase(data: any): Gathering {
         id: data.id,
         owner: data.owner,
         startDate: data.start_date,
-        startTime: data.start_time
     };
 }

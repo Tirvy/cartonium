@@ -9,24 +9,25 @@
             <v-card-text>
               <v-list lines="three">
                 <v-list-item>
-                    <template v-slot:prepend>
-                      <v-avatar color="grey-lighten-1">
-                        <v-icon color="white">mdi-calendar</v-icon>
-                      </v-avatar>
-                    </template>
+                  <template v-slot:prepend>
+                    <v-avatar color="grey-lighten-1">
+                      <v-icon color="white">mdi-calendar</v-icon>
+                    </v-avatar>
+                  </template>
                   <v-list-item-title>
                     Дата и время
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    {{ lastGathering.startDate }}, {{ lastGathering.startTime }}
+                    {{ dateAdapter.format(lastGathering.startDate, 'fullDateTime') }}
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                    <template v-slot:prepend>
-                      <v-avatar color="grey-lighten-1">
-                        <v-icon color="white">mdi-pound</v-icon>
-                      </v-avatar>
-                    </template>
+
+                  <template v-slot:prepend>
+                    <v-avatar color="grey-lighten-1">
+                      <v-icon color="white">mdi-pound</v-icon>
+                    </v-avatar>
+                  </template>
                   <v-list-item-title>
                     Сколько вас будет?
                   </v-list-item-title>
@@ -35,11 +36,12 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                    <template v-slot:prepend>
-                      <v-avatar color="grey-lighten-1">
-                        <v-icon color="white">mdi-cellphone-message</v-icon>
-                      </v-avatar>
-                    </template>
+
+                  <template v-slot:prepend>
+                    <v-avatar color="grey-lighten-1">
+                      <v-icon color="white">mdi-cellphone-message</v-icon>
+                    </v-avatar>
+                  </template>
                   <v-list-item-title>
                     Контакт обратной связи
                   </v-list-item-title>
@@ -48,11 +50,12 @@
                   </v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
-                    <template v-slot:prepend>
-                      <v-avatar color="grey-lighten-1">
-                        <v-icon color="white">mdi-note</v-icon>
-                      </v-avatar>
-                    </template>
+
+                  <template v-slot:prepend>
+                    <v-avatar color="grey-lighten-1">
+                      <v-icon color="white">mdi-note</v-icon>
+                    </v-avatar>
+                  </template>
                   <v-list-item-title>
                     Комментарий
                   </v-list-item-title>
@@ -71,6 +74,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useDate } from 'vuetify';
+const dateAdapter = useDate()
 
 const lastGathering = useState('lastGathering') as Ref<Gathering>;
 

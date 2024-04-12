@@ -19,9 +19,6 @@
                             Дата
                         </th>
                         <th>
-                            Время
-                        </th>
-                        <th>
                             Планируется человек
                         </th>
                         <th class="text-left">
@@ -35,8 +32,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="gathering in gatherings" :key="gathering.id">
-                        <td>{{ dateAdapter.format(gathering.startDate, 'fullDate') }}</td>
-                        <td>{{ gathering.startTime }}</td>
+                        <td>{{ dateAdapter.format(gathering.startDate, 'fullDateTime') }}</td>
                         <td>{{ gathering.guestsMax }}</td>
                         <td>{{ gathering.commentOwner }}</td>
                         <td>{{ gathering.commentClub }}</td>
