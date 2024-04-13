@@ -13,11 +13,8 @@ function shouldStopEvent(event: H3Event) {
 export default defineNitroPlugin((nitroApp) => {
     nitroApp.hooks.hook("request", async (event) => {
         if (shouldStopEvent(event)) {
-            console.log(getRequestURL(event).pathname);
-
             if (bggResolveQueue.length > 0) {
                 await new Promise(resolve => bggResolveQueue.push(resolve));
-                console.log((new Date()).getTime());
             } else {
                 new Promise(resolve => bggResolveQueue.push(resolve));
             }
