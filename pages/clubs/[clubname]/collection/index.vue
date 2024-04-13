@@ -67,7 +67,7 @@ const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
     const rating = title.filter(item => (item.ratingTesera && item.ratingTesera > filter.value.minRating) || (item.ratingBgg && item.ratingBgg > filter.value.minRating));
     const players = rating.filter(item => !filter.value.playerCount || item.playersGood?.includes(+filter.value.playerCount))
     const playtimeMax = +filter.value.maxPlaytime.trim();
-    const playtime = rating.filter(item => !playtimeMax || (item.playtimeMax && item.playtimeMax < +playtimeMax * 60))
+    const playtime = players.filter(item => !playtimeMax || (item.playtimeMax && item.playtimeMax < +playtimeMax * 60))
     return playtime;
 });
 
