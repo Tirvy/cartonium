@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { title } from 'process';
 import data from './data.js';
 
 interface emitedValue {
@@ -42,13 +43,17 @@ const gamesList = ref(data.data);
 async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);
     const onlyGoodStrings: string[] = splitted.filter((q: string) => !!q).map((item: string) => item.trim());
+    const stringsHashed = onlyGoodStrings.reduce((total, title) => ({...total, [title]: true }), {});
 
-    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: onlyGoodStrings } });
+    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: Object.keys(stringsHashed) } });
     const gameboxesInClub: number[] = await $fetch('/api/supabase/check-games-in-club',
         {
+            method: 'POST',
             query:
             {
                 clubid: currentClub.value.id,
+            },
+            body: {
                 ids: gameboxesFound.map(gamebox => gamebox.id)
             }
         });

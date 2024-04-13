@@ -2,7 +2,7 @@ type promiseResolve = (value: unknown) => void;
 import { H3Event } from 'h3';
 
 const bggResolveQueue: promiseResolve[] = [];
-const bggTimeout = 500;
+const bggTimeout = 2000;
 
 const apiToTimeout = ['/api/bgg/'];
 

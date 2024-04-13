@@ -9,8 +9,8 @@ const parser = new XMLParser({
 function parseGameData(item: any): GameBoxSearchResult {
   return {
     id: item['@_id'],
-    title: item.name["@_value"],
-    year: item.yearpublished["@_value"],
+    title: item.name?.["@_value"],
+    year: item.yearpublished?.["@_value"],
   }
 }
 

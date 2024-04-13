@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titles);
   if (error) {
-    throw createError({ statusMessage: error.message })
+    throw createError({ message: error.message })
   }
 
   return data;

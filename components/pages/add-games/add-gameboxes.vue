@@ -29,10 +29,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="gameInfo in gamesListSearched" :key="gameInfo.baseTitle">
+                    <tr v-for="gameInfo in gamesListSearched" :key="gameInfo.name">
                         <td class="name-column">
                             <div style="max-width: 150px">
-                                {{ gameInfo.baseTitle }}
+                                {{ gameInfo.name }}
                             </div>
                         </td>
                         <td class="cell-game-thing">
@@ -62,22 +62,23 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchedGameBox } from "~/types/frontend.ts";
+import type { GameboxAddData } from "~/types/frontend.ts";
 
 const props = defineProps({
     items: {
-        type: Array<SearchedGameBox>,
+        type: Array<GameboxAddData>,
         default: [],
     },
 });
 
-const gamesListSearched: Ref<SearchedGameBox[]> = ref([]);
+const gamesListSearched: Ref<GameboxAddData[]> = ref([]);
 
 watch((() => props.items),
-    (value: Array<any>) => {
+    (value: GameboxAddData[]) => {
         gamesListSearched.value = value.map(item => {
             return { ...item };
         });
+        console.log('recounted');
     },
     { immediate: true }
 );

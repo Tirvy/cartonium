@@ -4,8 +4,9 @@ import { gameBoxFromSupabase } from '~/server/transformers';
 
 export default defineEventHandler(async (event): Promise<number[]> => {
   const query = getQuery(event);
-  const ids = (query.ids as string[]);
   const clubId = (query.clubid as string);
+  const body = await readBody(event);
+  const ids = (body.ids as string[]);
   if (!clubId) {
     throw createError({ statusMessage: 'clubId required' })
   }

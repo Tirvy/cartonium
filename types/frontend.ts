@@ -1,3 +1,12 @@
+export interface GameboxAddData{
+    name: string
+    foundGamebox: GameBox | null,
+    indaclub: boolean,
+    gameTeseraVariants: GameBoxSearchResult[],
+    gameBggVariants: GameBoxSearchResult[],
+    gameTesera: any,
+    gameBgg: any,
+}
 export interface GameBoxSearchResult {
     id?: number
     title?: string
