@@ -14,7 +14,15 @@ export interface GameBoxSearchResult {
     alias?: string,
     titles?: string[],
     photoUrl?: string,
+}
+export interface SyncTeseraBggItem {
+    selected: boolean;
+    gameTesera: any;
+    gameBgg: any;
+}
 
+export interface SyncTeseraBggMap {
+    [key: string]: SyncTeseraBggItem
 }
 
 export interface SearchResultBgg {

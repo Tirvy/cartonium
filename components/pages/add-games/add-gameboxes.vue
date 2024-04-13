@@ -12,6 +12,9 @@
             <v-table>
                 <thead>
                     <tr>
+                        <td rowspan="2">
+
+                        </td>
                         <td rowspan="2" class="name-column">
                             Введенное имя
                         </td>
@@ -29,7 +32,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="gameInfo in gamesListSearched" :key="gameInfo.name">
+                    <tr v-for="gameInfo in props.items" :key="gameInfo.name">
+                        <td>
+                            <v-checkbox v-model="localData[gameInfo.name].selected"></v-checkbox>
+                        </td>
                         <td class="name-column">
                             <div style="max-width: 150px">
                                 {{ gameInfo.name }}
@@ -37,12 +43,12 @@
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameTeseraVariants" :source="'tesera'"
-                                v-model="gameInfo.gameTesera">
+                                v-model="localData[gameInfo.name].gameTesera">
                             </pages-add-games-table-item>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameBggVariants" :source="'bgg'"
-                                v-model="gameInfo.gameBgg">
+                                v-model="localData[gameInfo.name].gameBgg">
                             </pages-add-games-table-item>
                         </td>
                     </tr>
@@ -62,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import type { GameboxAddData } from "~/types/frontend.ts";
+import type { GameboxAddData, SyncTeseraBggMap } from "~/types/frontend";
 
 const props = defineProps({
     items: {
@@ -71,24 +77,34 @@ const props = defineProps({
     },
 });
 
-const gamesListSearched: Ref<GameboxAddData[]> = ref([]);
+const localData: Ref<SyncTeseraBggMap> = ref(calcSelectedValue(props.items));
+
+function calcSelectedValue(list: GameboxAddData[]) {
+    return list.reduce((total, item) => {
+        return {
+            ...total,
+            [item.name]: {
+                selected: true,
+                gameTesera: item.gameTesera,
+                gameBgg: item.gameBgg,
+            }
+        }
+    }, {})
+}
 
 watch((() => props.items),
     (value: GameboxAddData[]) => {
-        gamesListSearched.value = value.map(item => {
-            return { ...item };
-        });
-        console.log('recounted');
+        localData.value = calcSelectedValue(value);
     },
     { immediate: true }
 );
 
 const emit = defineEmits<{
-    (e: 'getGameBoxData'): void
+    (e: 'getGameBoxData', selected: SyncTeseraBggMap): void
 }>()
 
 function getGameBoxData() {
-    emit('getGameBoxData')
+    emit('getGameBoxData', localData.value)
 }
 
 
@@ -112,9 +128,9 @@ const tableSourceChosen = ref(dataSources.value[0]);
 
 const gamesListFormattedFilteredHashed: any = computed(() => {
     return {
-        all: gamesListSearched.value,
-        ok: gamesListSearched.value.filter((item: any) => item.alias),
-        error: gamesListSearched.value.filter((item: any) => item.error),
+        all: props.items,
+        ok: props.items.filter((item: any) => item.alias),
+        error: props.items.filter((item: any) => item.error),
     }
 })
 

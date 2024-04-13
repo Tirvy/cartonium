@@ -1,4 +1,6 @@
 export default [
+    'title',
+    'titles',
     'aliasTesera',
     'id', 
     'idBgg',
@@ -14,7 +16,5 @@ export default [
     'playtimeMin',
     'ratingBgg',
     'ratingTesera',
-    'title',
-    'titles',
     'year'
   ];

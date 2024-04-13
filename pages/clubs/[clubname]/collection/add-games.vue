@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import type { GameBox, GameBoxDataTesera, GameBoxDataBgg } from '~/types/frontend.js';
-import type { SearchedGameBox, GameBoxSearchResult, GameboxAddData } from "~/types/frontend.ts";
+import type { SearchedGameBox, SyncTeseraBggMap, GameboxAddData } from "~/types/frontend.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'
 
@@ -192,14 +192,15 @@ async function getGamesBaseInfo() {
 
 // leech data from bgg and tesera
 
-async function getGameBoxData() {
+async function getGameBoxData(syncData: SyncTeseraBggMap) {
     const requestInterval = 1000;
-    const cdataToProgress = controlData.value.filter(item => !item.indaclub);
+    const cdataToProgress = controlData.value.filter(item => syncData[item.name]?.selected);
 
     if (cdataToProgress.length > 0) {
         cdataToProgress
-            .forEach((gameInfo: any, index: number) => {
+            .forEach((cdataItem: any, index: number) => {
                 setTimeout(async () => {
+                    const gameInfo = syncData[cdataItem.name];
                     let ret = {
                         id: 0,
                         title: "",
@@ -238,7 +239,7 @@ async function getGameBoxData() {
                             (ret as any)[key] = (ret as any)[key] || (bggRet as any)[key];
                         });
                     }
-                    ret.titles.push(gameInfo.name);
+                    ret.titles.push(cdataItem.name);
                     saveData.value.push(ret);
                 }, index * requestInterval);
             });
