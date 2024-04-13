@@ -18,7 +18,10 @@ export default defineNuxtConfig({
       login: '/',
       callback: '/confirm',
       exclude: ['users/*'],
-    },
+    }, 
+    cookieOptions: {
+      secure: false
+    }
   },
   runtimeConfig: {
     clubId: 2,
