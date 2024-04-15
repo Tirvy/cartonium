@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import type { Provider } from '~/node_modules/@supabase/auth-js/src/lib/types';
+import type { Loaders } from '#imports';
 definePageMeta({
   layout: "login",
 })
+
+const snackbar = ref({
+  show: false,
+  text: ''
+});
+
+const loaders: Ref<Loaders> = ref({
+  loginEmail: false
+});
 
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
@@ -22,11 +32,25 @@ async function signInWithProvider(provider: string) {
 
 const loginEmail = ref('');
 const loginPassword = ref('');
+const show = ref({ passwordLogin: false });
+const loginFormIsValid: Ref<null | boolean> = ref(null);
+
 async function signInWithEmail() {
+  if (!loginFormIsValid.value) {
+    loginFormIsValid.value = false;
+    return;
+  }
+  loaders.value.loginEmail = true;
   const { data, error } = await auth.signInWithPassword({
     email: loginEmail.value,
     password: loginPassword.value,
   })
+  loaders.value.loginEmail = false;
+  if (error) {
+    snackbar.value.text = error.message;
+    snackbar.value.show = true;
+  }
+
 }
 
 const signupEmail = ref('');
@@ -41,6 +65,9 @@ async function signUpNewUser() {
   })
 }
 
+function required(v: string) {
+  return !!v || 'Field is required'
+}
 
 </script>
 
@@ -48,18 +75,22 @@ async function signUpNewUser() {
   <v-container fluid class="fill-height">
     <v-row>
       <v-col class="d-flex justify-center">
-        <v-card>
+        <v-card class="login-card">
           <v-card-title>
             login with email
           </v-card-title>
           <v-card-actions>
-            <v-form class="w-100">
-              <v-text-field v-model="loginEmail" label="email"></v-text-field>
-              <v-text-field v-model="loginPassword" label="email"></v-text-field>
-              <v-btn @click="signInWithEmail">login</v-btn>
+            <v-form class="w-100" @submit.prevent="signInWithEmail" v-model="loginFormIsValid">
+              <v-text-field v-model="loginEmail" :rules="[required]" label="email"
+                autocomplete="login email"></v-text-field>
+              <v-text-field v-model="loginPassword" :rules="[required]" label="password" autocomplete="current-password"
+                :append-inner-icon="show.passwordLogin ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="show.passwordLogin ? 'text' : 'password'"
+                @click:append-inner="show.passwordLogin = !show.passwordLogin"></v-text-field>
+              <v-btn :loading="loaders.loginEmail" type="submit">login</v-btn>
             </v-form>
           </v-card-actions>
-          <v-card-title>
+          <!-- <v-card-title>
             login with providers
           </v-card-title>
           <v-card-actions>
@@ -78,11 +109,19 @@ async function signUpNewUser() {
               <v-text-field v-model="signupPassword" label="email"></v-text-field>
               <v-btn @click="signUpNewUser">sign up</v-btn>
             </v-form>
-          </v-card-actions>
+          </v-card-actions> -->
         </v-card>
       </v-col>
     </v-row>
   </v-container>
+
+  <v-snackbar v-model="snackbar.show">
+    {{ snackbar.text }}
+  </v-snackbar>
 </template>
 
-<style></style>
+<style scoped>
+.login-card {
+  width: 400px;
+}
+</style>
