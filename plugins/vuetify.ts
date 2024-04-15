@@ -19,8 +19,6 @@ const myCustomDarkTheme: ThemeDefinition = {
   },
 }
 
-const dayjs = new DayJsAdapter();
-
 const myCustomWarnTheme: ThemeDefinition = {
   dark: false,
   colors: {

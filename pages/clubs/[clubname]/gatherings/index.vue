@@ -21,6 +21,9 @@
                         <th>
                             Планируется человек
                         </th>
+                        <th>
+                            Контакт
+                        </th>
                         <th class="text-left">
                             Комментарий посетителя
                         </th>
@@ -34,6 +37,7 @@
                     <tr v-for="gathering in gatherings" :key="gathering.id">
                         <td>{{ dateAdapter.format(gathering.startDate, 'fullDateTime') }}</td>
                         <td>{{ gathering.guestsMax }}</td>
+                        <td>{{ gathering.contact }}</td>
                         <td>{{ gathering.commentOwner }}</td>
                         <td>{{ gathering.commentClub }}</td>
                         <td>
@@ -77,4 +81,17 @@ updateFilters();
 function editGathering(gathering: Gathering) {
     navigateTo('./gatherings/item' + gathering.id);
 }
+
+
+definePageMeta({
+    middleware: [
+        async function (to, from) {
+            const clubPermissions = useClubPermissions();
+
+            if (!clubPermissions) {
+                return navigateTo(to.path + '/item');
+            }
+        },
+    ],
+});
 </script>

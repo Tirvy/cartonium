@@ -31,8 +31,6 @@
 <script setup lang="ts">
 const route = useRoute();
 const clubName = route.params.clubname;
-const permissionsOverride = useState('permissionsOverride');
-permissionsOverride.value = false;
 
 const pages = [
   {

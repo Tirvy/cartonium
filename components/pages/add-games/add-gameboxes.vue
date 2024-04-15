@@ -143,11 +143,12 @@ const gamesListFormattedFiltered = computed(() => {
 .cell-game-thing {
     vertical-align: top;
     padding: 5px 0;
-    width: 30%;
+    width: 350px;
 }
 
 .name-column {
     word-wrap: break-word;
     max-width: 150px;
+    width: 150px;
 }
 </style>

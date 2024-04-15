@@ -33,7 +33,7 @@
         </v-list>
     </v-navigation-drawer>
 
-    <fast-action>
+    <fast-action v-if="clubPermissions?.relation_type === 'tech'">
         <v-btn icon="mdi-plus" size="large" elevation="8" :to="'./collection/add-games'" />
     </fast-action>
 </template>
@@ -44,6 +44,8 @@ import { ref, computed } from 'vue';
 import type { Ref, ComputedRef } from 'vue'
 import type { GameBox } from '~/types/frontend.js';
 import { ruleIsNumber } from '@/utils/rules.js';
+
+const clubPermissions = useClubPermissions();
 
 
 const dataSources = ref([{ name: 'bgg', apiName: 'bgg' }, { name: 'tesera', apiName: 'tesera' }]);
