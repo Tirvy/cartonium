@@ -2,7 +2,7 @@
     <v-main>
         <v-container class="d-flex justify-center">
             <v-sheet max-width="600px" width="600px">
-                <v-form @submit.prevent="saveGathering">
+                <v-form @submit.prevent="saveGathering" v-model="formIsValid">
                     <v-row>
                         <v-col>
                             <date-text-picker label="Дата" v-model="startDate" color="primary"></date-text-picker>
@@ -65,6 +65,7 @@ const item = ref('');
 
 const clubPermissions = useClubPermissions();
 const currentClub: Ref<Club> = useState('club');
+const formIsValid: Ref<boolean | null> = ref(null);
 
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
 
@@ -119,12 +120,17 @@ function allowedDates(val: Date) {
 };
 
 async function saveGathering() {
-    loaders.value.save = true;
+    if (!formIsValid.value) {
+        formIsValid.value = false;
+        return;
+    }
 
     let dateToSend = dateAdapter.date(startDate.value);
     const hoursMinutes = startTime.value.split(":");
     dateToSend = dateAdapter.setHours(dateToSend, +hoursMinutes[0]);
     dateToSend = dateAdapter.setMinutes(dateToSend, +hoursMinutes[1]);
+
+    loaders.value.save = true;
     const data: any = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
