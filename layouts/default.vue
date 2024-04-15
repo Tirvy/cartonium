@@ -60,8 +60,16 @@ const pages = [
 import { useTheme } from 'vuetify'
 const theme = useTheme()
 
+
+const storedTheme = localStorage.getItem('theme');
+if (storedTheme) {
+  theme.global.name.value = storedTheme;
+}
+
 function switchTheme() {
-  theme.global.name.value = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme'
+  const newTheme = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
+  theme.global.name.value = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
+  localStorage.setItem('theme', newTheme);
 }
 
 const user = useSupabaseUser()
