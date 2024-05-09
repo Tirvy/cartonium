@@ -318,25 +318,25 @@ export type Database = {
     Views: {
       gameboxes_with_club_id: {
         Row: {
-          aliasTesera: string | null
-          club_id: string[] | null
-          id: number | null
-          idBgg: number | null
-          idTesera: number | null
-          linkBgg: string | null
-          linkTesera: string | null
-          photoUrl: string | null
-          playersGood: number[] | null
-          playersMax: number | null
-          playersMin: number | null
-          playtimeAvg: number | null
-          playtimeMax: number | null
-          playtimeMin: number | null
-          ratingBgg: number | null
-          ratingTesera: number | null
-          title: string | null
-          titles: string[] | null
-          year: number | null
+          aliasTesera: string 
+          club_id: string[] 
+          id: number
+          idBgg: number 
+          idTesera: number 
+          linkBgg: string 
+          linkTesera: string 
+          photoUrl: string 
+          playersGood: number[] 
+          playersMax: number 
+          playersMin: number 
+          playtimeAvg: number 
+          playtimeMax: number 
+          playtimeMin: number 
+          ratingBgg: number 
+          ratingTesera: number
+          title: string
+          titles: string[] 
+          year: number 
         }
         Relationships: []
       }

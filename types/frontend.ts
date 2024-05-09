@@ -98,6 +98,10 @@ export interface GameBox {
     year: number | null;
 }
 
+export interface GameBoxWithClub extends GameBox {
+    club_id: string[] | null;
+}
+
 /*
 {
     "relationId": 93947420,

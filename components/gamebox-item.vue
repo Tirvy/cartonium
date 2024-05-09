@@ -2,7 +2,7 @@
     <v-card>
         <div class="d-flex flex-no-wrap justify-start ">
             <v-avatar class="ma-3" size="100" rounded="0">
-                <v-img height="100" :src="value.photoUrl || ''"></v-img>
+                <v-img :cover="false" height="100" :src="imageURL"></v-img>
             </v-avatar>
             <v-card-item class="flex-0-1" style="min-width: 0;">
                 <v-card-title>
@@ -40,4 +40,10 @@ import type { GameBox } from '~/types/frontend.js';
 const props = defineProps<{
     value: GameBox
 }>(); 
+
+const imageURL = computed(() => {
+    
+    // todo: fix asap!
+    return `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;
+})
 </script>
