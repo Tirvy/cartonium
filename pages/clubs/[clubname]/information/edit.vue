@@ -4,9 +4,7 @@
             <v-row>
                 <v-col>
                     <div>
-                        <client-only fallback-tag="div" fallback="Loading editor...">
-                            <QuillEditor theme="snow" contentType="html" v-model:content="quillHtml" />
-                        </client-only>
+                        <div ref="quillElem">oh wow</div>
                     </div>
                 </v-col>
             </v-row>
@@ -33,10 +31,39 @@
 </template>
 
 <script setup lang="ts">
+import Quill from 'quill';
 import { defineAsyncComponent } from 'vue';
 import type { Club, Loaders } from '~/types/frontend.js';
 
-const quillHtml = ref('');
+
+const quillElem = ref<HTMLInputElement | null>(null);
+
+//todo: set real type
+let quill: any = null;
+
+let quillInitialValue: any = false;
+
+
+onMounted(() => {
+    console.log('mounted', quillElem, quillElem.value)
+    if (quillElem.value) {
+        quill = new Quill(quillElem.value, {
+
+            modules: {
+                toolbar: true,
+            },
+        });
+        quill.setContents(quillInitialValue);
+        console.log('with quill')
+    }
+})
+
+const quillHtml = computed(() => {
+    if (quill.value) {
+        return quill.value.getSemanticHTML()
+    }
+    return '';
+});
 const currentClub: Ref<Club> = useState('club');
 const loaders: Ref<Loaders> = ref({
     save: false
@@ -45,23 +72,29 @@ const snackbar = ref(false);
 const snackbarText = ref('');
 getInitialValues();
 
-
 async function getInitialValues() {
     const data: { text_html: string } = await $fetch('/api/supabase/club-info', {
         query: {
             clubid: currentClub.value.id,
         }
     });
-    quillHtml.value = data.text_html;
+    quillInitialValue = data.text_html;
+    if (quill) {
+        quill.setContents(quillInitialValue);
+    }
 }
 
 async function saveToDatabase() {
+    if (!quill) {
+        return;
+    }
     loaders.value.save = true;
     let ret: any = await $fetch('/api/supabase/club-info', {
         method: "POST",
         body: {
             club_id: currentClub.value.id,
-            text_html: quillHtml.value,
+            text_html: '',
+            text_delta: quill.getContents(),
         }
     });
     loaders.value.save = false;
