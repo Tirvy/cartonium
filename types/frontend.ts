@@ -223,6 +223,7 @@ export interface Gathering {
     commentOwner: string
     guestsMax: number
     contact: string
+    gameboxesIds: number[]
     id: number
     owner: string
     startDate: string

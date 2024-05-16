@@ -175,6 +175,7 @@ export type Database = {
           id: number
           owner: string
           start_date: string | null
+          gameboxes_ids: number[]
         }
         Insert: {
           club_id: string
@@ -185,6 +186,7 @@ export type Database = {
           id?: number
           owner?: string
           start_date?: string | null
+          gameboxes_ids: number[]
         }
         Update: {
           club_id?: string
@@ -195,6 +197,7 @@ export type Database = {
           id?: number
           owner?: string
           start_date?: string | null
+          gameboxes_ids: number[]
         }
         Relationships: [
           {

@@ -74,6 +74,7 @@
 import type { Gathering, Loaders } from '~/types/frontend'
 import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
+import { it } from 'node:test';
 const dateAdapter = useDate()
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +98,7 @@ const commentOwner = ref('');
 const contact = ref('');
 const commentClub = ref('');
 const gatheringId = ref(0);
-const gameboxesToBook = ref([]);
+const gameboxesToBook = ref<number[]>([]);
 
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
@@ -152,6 +153,7 @@ async function getItem() {
             contact.value = foundItem.contact;
             commentClub.value = foundItem.commentClub;
             gatheringId.value = foundItem.id;
+            gameboxesToBook.value = foundItem.gameboxesIds;
         }
         loaders.value.initial = false;
     }
@@ -186,6 +188,7 @@ async function saveGathering() {
             start_date: dateAdapter.toISO(dateToSend),
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
+            gameboxes_ids: gameboxesToBook.value,
             contact: contact.value,
 
             comment_club: commentClub.value,
