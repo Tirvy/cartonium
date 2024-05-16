@@ -29,24 +29,24 @@ export function clubInfoFromSupabase(data: any): ClubInfo {
 // gameBox
 export function gameBoxFromSupabase(data: any): GameBox {
     return {
-        aliasTesera: data.alias_tesera,
+        aliasTesera: data.alias_tesera || undefined,
         id: data.id,
-        idBgg: data.id_bgg,
-        idTesera: data.id_tesera,
-        linkBgg: data.link_bgg,
-        linkTesera: data.link_tesera,
+        idBgg: data.id_bgg || undefined,
+        idTesera: data.id_tesera || undefined,
+        linkBgg: data.link_bgg || undefined,
+        linkTesera: data.link_tesera || undefined,
         photoUrl: data.photo_url,
-        playersGood: data.players_good,
-        playersMax: data.players_max,
-        playersMin: data.players_min,
-        playtimeAvg: data.playtime_avg,
-        playtimeMax: data.playtime_max,
-        playtimeMin: data.playtime_min,
-        ratingBgg: data.rating_bgg,
-        ratingTesera: data.rating_tesera,
+        playersGood: data.players_good || undefined,
+        playersMax: data.players_max || undefined,
+        playersMin: data.players_min || undefined,
+        playtimeAvg: data.playtime_avg || undefined,
+        playtimeMax: data.playtime_max || undefined,
+        playtimeMin: data.playtime_min || undefined,
+        ratingBgg: data.rating_bgg || undefined,
+        ratingTesera: data.rating_tesera || undefined,
         title: data.title,
         titles: data.titles,
-        year: data.year
+        year: data.year || undefined
     };
 }
 

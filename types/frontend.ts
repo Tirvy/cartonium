@@ -78,24 +78,24 @@ export interface GameBoxDataTesera {
 
 
 export interface GameBox {
-    aliasTesera: string | null;
+    aliasTesera: string | undefined;
     id: number;
-    idBgg: number | null;
-    idTesera: number | null;
-    linkBgg: string | null;
-    linkTesera: string | null;
-    photoUrl: string | null;
-    playersGood: number[] | null;
-    playersMax: number | null;
-    playersMin: number | null;
-    playtimeAvg: number | null;
-    playtimeMax: number | null;
-    playtimeMin: number | null;
-    ratingBgg: number | null;
-    ratingTesera: number | null;
+    idBgg: number | undefined;
+    idTesera: number | undefined;
+    linkBgg: string | undefined;
+    linkTesera: string | undefined;
+    photoUrl: string | undefined;
+    playersGood: number[] | undefined;
+    playersMax: number | undefined;
+    playersMin: number | undefined;
+    playtimeAvg: number | undefined;
+    playtimeMax: number | undefined;
+    playtimeMin: number | undefined;
+    ratingBgg: number | undefined;
+    ratingTesera: number | undefined;
     title: string;
-    titles: Array<string> | null;
-    year: number | null;
+    titles: Array<string> | undefined;
+    year: number | undefined;
 }
 
 export interface GameBoxWithClub extends GameBox {
