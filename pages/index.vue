@@ -8,6 +8,7 @@ definePageMeta({
 const registrationAvailable = false;
 const loginWithEmailAvailable = true;
 const loginWithProviderAvailable = false;
+const guestAvailable = true;
 
 const snackbar = ref({
   show: false,
@@ -54,6 +55,12 @@ async function signInWithEmail() {
     snackbar.value.text = error.message;
     snackbar.value.show = true;
   }
+
+}
+
+async function singInAsGuest() {
+  const { data, error } = await auth.signInAnonymously()
+  console.log(data, error);
 
 }
 
@@ -107,10 +114,19 @@ function required(v: string) {
               <v-btn icon="mdi-facebook" @click="signInWithProvider('facebook')"></v-btn>
               <v-btn icon="mdi-discord" @click="signInWithProvider('discord')">d</v-btn>
             </v-card-actions>
-            <v-divider />
           </template>
 
+          <template v-if="guestAvailable">
+            <v-card-actions>
+              <v-btn @click="singInAsGuest" block variant="outlined">
+                Войти как гость
+              </v-btn>
+            </v-card-actions>
+          </template>
+
+
           <template v-if="registrationAvailable">
+            <v-divider />
             <v-card-title>
               signup with email
             </v-card-title>
