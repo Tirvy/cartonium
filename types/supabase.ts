@@ -293,24 +293,24 @@ export type Database = {
           created_at: string
           description: string
           id: number
-          max_people: number
-          table_name: string
+          people_max: number
+          title: string
         }
         Insert: {
           club_id: string
           created_at?: string
           description?: string
           id?: number
-          max_people?: number
-          table_name?: string
+          people_max?: number
+          title?: string
         }
         Update: {
           club_id?: string
           created_at?: string
           description?: string
           id?: number
-          max_people?: number
-          table_name?: string
+          people_max?: number
+          title?: string
         }
         Relationships: [
           {

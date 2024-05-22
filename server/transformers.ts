@@ -65,3 +65,13 @@ export function gatheringFromSupabase(data: any): Gathering {
         startDate: data.start_date,
     };
 }
+
+export function tablesFromSupabase(data: any): Table {
+    return {
+        id: data.id,
+        clubId: data.club_id,
+        title: data.title,
+        description: data.description,
+        peopleMax: data.people_max,
+    };
+}

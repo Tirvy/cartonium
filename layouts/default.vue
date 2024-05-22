@@ -19,7 +19,7 @@
     <slot />
 
     <v-bottom-navigation grow color="grey" height="44">
-      <v-btn v-for="page in pages" :to="page.path">
+      <v-btn v-for="page in pagesList" :to="page.path">
         <v-icon :icon="page.icon"></v-icon>
         <span>{{ page.title }}</span>
       </v-btn>
@@ -32,7 +32,7 @@
 const route = useRoute();
 const clubName = route.params.clubname;
 
-const pages = [
+let pages = [
   {
     title: 'Коллекция',
     path: `/clubs/${clubName}/collection`,
@@ -49,11 +49,22 @@ const pages = [
     icon: 'mdi-table-furniture',
   },
   {
+    title: 'Настройки клуба',
+    path: `/clubs/${clubName}/settings`,
+    icon: 'mdi-cog-outline',
+    permissions: true,
+  },
+  {
     title: 'Профиль',
     path: `/profile`,
     icon: 'mdi-account',
   }
 ];
+
+const clubPermissions = useClubPermissions();
+const pagesList = computed(() => {
+  return pages.filter(item => !item.permissions || clubPermissions )
+})
 
 
 

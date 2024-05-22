@@ -232,3 +232,11 @@ export interface Gathering {
 export interface Loaders {
     [key: string]: boolean
 }
+
+export interface Table {
+    id: number | undefined;
+    clubId: string;
+    title: string;
+    description: string;
+    peopleMax: number;
+}

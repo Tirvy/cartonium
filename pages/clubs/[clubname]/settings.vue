@@ -7,7 +7,6 @@
 definePageMeta({
   middleware: [
     async function (to, from) {
-      console.log('ahahahnt mthfka', to.path);
       const currentClub: Ref<Club> = useState('club');
       const clubPermissions = useClubPermissions();
 
