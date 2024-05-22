@@ -34,15 +34,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="gathering in gatherings" :key="gathering.id">
-                        <td>{{ dateAdapter.format(gathering.startDate, 'fullDateTime') }}</td>
-                        <td>{{ gathering.guestsMax }}</td>
-                        <td>{{ gathering.contact }}</td>
-                        <td>{{ gathering.commentOwner }}</td>
-                        <td>{{ gathering.commentClub }}</td>
-                        <td>
-                            <v-btn icon="mdi-pencil" @click="editGathering(gathering)" variant="plain"></v-btn>
-                        </td>
+                    <tr v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
+                        <template v-if="gathwd.type === 'date'">
+                            <td colspan="6">
+                                {{ gathwd.date }}
+                            </td>
+                        </template>
+
+                        <template v-else-if="gathwd.gathering">
+                            <td>{{ gathwd.date }}</td>
+                            <td>{{ gathwd.gathering.guestsMax }}</td>
+                            <td>{{ gathwd.gathering.contact }}</td>
+                            <td>{{ gathwd.gathering.commentOwner }}</td>
+                            <td>{{ gathwd.gathering.commentClub }}</td>
+                            <td>
+                                <v-btn icon="mdi-pencil" @click="editGathering(gathwd.gathering)" variant="plain"></v-btn>
+                            </td>
+                        </template>
                     </tr>
                 </tbody>
             </v-table>
@@ -63,6 +71,7 @@ const dateAdapter = useDate()
 const gatherings: Ref<Gathering[]> = ref([]);
 
 const dateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats);
+const lastDateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats);
 
 const currentClub: Ref<Club> = useState('club');
 async function updateFilters() {
@@ -72,11 +81,56 @@ async function updateFilters() {
             ['date-from']: dateAdapter.toISO(dateFrom.value)
         }
     });
+    lastDateFrom.value = dateAdapter.date(dateFrom.value) as DateIOFormats;
     if (Array.isArray(data)) {
         gatherings.value = data;
     }
 }
 updateFilters();
+
+interface gatheringsHash {
+    [key: string]: Gathering[]
+}
+const gatheringsHashedByDate = computed<gatheringsHash>(() => {
+    if (gatherings.value.length > 0) {
+        let hashedByDate: gatheringsHash = {};
+        gatherings.value.forEach(gathering => {
+            const key = dateAdapter.toISO(dateAdapter.startOfDay(dateAdapter.date(gathering.startDate)));
+            if (!hashedByDate[key]) {
+                hashedByDate[key] = [];
+            }
+            hashedByDate[key].push(gathering);
+        })
+        return hashedByDate
+    }
+    return {};
+})
+
+interface gatheringsWithDates {
+    type: 'date' | 'gathering'
+    date: string
+    gathering: Gathering | undefined
+}
+const gatheringsWithDates = computed<gatheringsWithDates[]>(() => {
+    const keys = Object.keys(gatheringsHashedByDate.value);
+    const ret: gatheringsWithDates[] = [];
+    keys.forEach(key => {
+        ret.push({
+            type: 'date',
+            date: dateAdapter.format(dateAdapter.date(key), 'normalDateWithWeekday'),
+            gathering: undefined,
+        });
+
+        gatheringsHashedByDate.value[key].forEach(gathering => {
+            ret.push({
+                type: 'gathering',
+                date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime'),
+                gathering: gathering
+            });
+        })
+    })
+    return ret;
+});
 
 function editGathering(gathering: Gathering) {
     navigateTo('./gatherings/item' + gathering.id);
