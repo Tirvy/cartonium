@@ -23,7 +23,7 @@ definePageMeta({
           return abortNavigation();
         }
         currentClub.value = newClubData;
-        updatePermissions();
+        await updatePermissions();
       }
 
       async function updatePermissions() {

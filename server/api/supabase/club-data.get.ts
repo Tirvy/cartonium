@@ -1,6 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server';
 import type { Database } from '~/types/supabase.js'
 
+import { clubFromSupabase } from '@/server/transformers';
+
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event);
   const query = getQuery(event);
@@ -13,5 +15,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusMessage: error.message })
   }
 
-  return data;
+  return clubFromSupabase(data);
 })
