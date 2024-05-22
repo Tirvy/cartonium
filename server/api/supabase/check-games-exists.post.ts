@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ message: error.message })
   }
 
-  return data;
+  return data.map(gameBoxFromSupabase);
   // return data.map(gameBoxFromSupabase);
 })

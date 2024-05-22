@@ -1,6 +1,3 @@
-
-// let movie: Tables<'clubs_collections'>;
-
 export type Json =
   | string
   | number
@@ -38,19 +35,16 @@ export type Database = {
           club_id: string
           created_at: string
           game_box_id: number
-          id: number
         }
         Insert: {
           club_id: string
           created_at?: string
           game_box_id: number
-          id?: number
         }
         Update: {
           club_id?: string
           created_at?: string
           game_box_id?: number
-          id?: number
         }
         Relationships: [
           {
@@ -80,16 +74,19 @@ export type Database = {
         Row: {
           club_id: string
           created_at: string
+          text_delta: Json
           text_html: string
         }
         Insert: {
           club_id?: string
           created_at?: string
+          text_delta?: Json
           text_html: string
         }
         Update: {
           club_id?: string
           created_at?: string
+          text_delta?: Json
           text_html?: string
         }
         Relationships: [
@@ -104,61 +101,61 @@ export type Database = {
       }
       gameboxes: {
         Row: {
-          aliasTesera: string | null
+          alias_tesera: string | null
           id: number
-          idBgg: number | null
-          idTesera: number | null
-          linkBgg: string | null
-          linkTesera: string | null
-          photoUrl: string | null
-          playersGood: number[] | null
-          playersMax: number | null
-          playersMin: number | null
-          playtimeAvg: number | null
-          playtimeMax: number | null
-          playtimeMin: number | null
-          ratingBgg: number | null
-          ratingTesera: number | null
+          id_bgg: number | null
+          id_tesera: number | null
+          link_bgg: string | null
+          link_tesera: string | null
+          photo_url: string | null
+          players_good: number[] | null
+          players_max: number | null
+          players_min: number | null
+          playtime_avg: number | null
+          playtime_max: number | null
+          playtime_min: number | null
+          rating_bgg: number | null
+          rating_tesera: number | null
           title: string
           titles: string[] | null
           year: number | null
         }
         Insert: {
-          aliasTesera?: string | null
+          alias_tesera?: string | null
           id?: number
-          idBgg?: number | null
-          idTesera?: number | null
-          linkBgg?: string | null
-          linkTesera?: string | null
-          photoUrl?: string | null
-          playersGood?: number[] | null
-          playersMax?: number | null
-          playersMin?: number | null
-          playtimeAvg?: number | null
-          playtimeMax?: number | null
-          playtimeMin?: number | null
-          ratingBgg?: number | null
-          ratingTesera?: number | null
+          id_bgg?: number | null
+          id_tesera?: number | null
+          link_bgg?: string | null
+          link_tesera?: string | null
+          photo_url?: string | null
+          players_good?: number[] | null
+          players_max?: number | null
+          players_min?: number | null
+          playtime_avg?: number | null
+          playtime_max?: number | null
+          playtime_min?: number | null
+          rating_bgg?: number | null
+          rating_tesera?: number | null
           title: string
           titles?: string[] | null
           year?: number | null
         }
         Update: {
-          aliasTesera?: string | null
+          alias_tesera?: string | null
           id?: number
-          idBgg?: number | null
-          idTesera?: number | null
-          linkBgg?: string | null
-          linkTesera?: string | null
-          photoUrl?: string | null
-          playersGood?: number[] | null
-          playersMax?: number | null
-          playersMin?: number | null
-          playtimeAvg?: number | null
-          playtimeMax?: number | null
-          playtimeMin?: number | null
-          ratingBgg?: number | null
-          ratingTesera?: number | null
+          id_bgg?: number | null
+          id_tesera?: number | null
+          link_bgg?: string | null
+          link_tesera?: string | null
+          photo_url?: string | null
+          players_good?: number[] | null
+          players_max?: number | null
+          players_min?: number | null
+          playtime_avg?: number | null
+          playtime_max?: number | null
+          playtime_min?: number | null
+          rating_bgg?: number | null
+          rating_tesera?: number | null
           title?: string
           titles?: string[] | null
           year?: number | null
@@ -170,34 +167,37 @@ export type Database = {
           club_id: string
           comment_club: string
           comment_owner: string
+          contact: string | null
           created_at: string
+          gameboxes_ids: number[]
           guests_max: number
           id: number
           owner: string
           start_date: string | null
-          gameboxes_ids: number[]
         }
         Insert: {
           club_id: string
           comment_club?: string
           comment_owner?: string
+          contact?: string | null
           created_at?: string
+          gameboxes_ids?: number[]
           guests_max: number
           id?: number
           owner?: string
           start_date?: string | null
-          gameboxes_ids: number[]
         }
         Update: {
           club_id?: string
           comment_club?: string
           comment_owner?: string
+          contact?: string | null
           created_at?: string
+          gameboxes_ids?: number[]
           guests_max?: number
           id?: number
           owner?: string
           start_date?: string | null
-          gameboxes_ids: number[]
         }
         Relationships: [
           {
@@ -287,6 +287,41 @@ export type Database = {
           },
         ]
       }
+      tables: {
+        Row: {
+          club_id: string
+          created_at: string
+          description: string
+          id: number
+          max_people: number
+          table_name: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          description?: string
+          id?: number
+          max_people?: number
+          table_name?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          description?: string
+          id?: number
+          max_people?: number
+          table_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tables_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visits: {
         Row: {
           checkSum: number | null
@@ -321,25 +356,25 @@ export type Database = {
     Views: {
       gameboxes_with_club_id: {
         Row: {
-          aliasTesera: string 
-          club_id: string[] 
-          id: number
-          idBgg: number 
-          idTesera: number 
-          linkBgg: string 
-          linkTesera: string 
-          photoUrl: string 
-          playersGood: number[] 
-          playersMax: number 
-          playersMin: number 
-          playtimeAvg: number 
-          playtimeMax: number 
-          playtimeMin: number 
-          ratingBgg: number 
-          ratingTesera: number
-          title: string
-          titles: string[] 
-          year: number 
+          alias_tesera: string | null
+          club_id: string[] | null
+          id: number | null
+          id_bgg: number | null
+          id_tesera: number | null
+          link_bgg: string | null
+          link_tesera: string | null
+          photo_url: string | null
+          players_good: number[] | null
+          players_max: number | null
+          players_min: number | null
+          playtime_avg: number | null
+          playtime_max: number | null
+          playtime_min: number | null
+          rating_bgg: number | null
+          rating_tesera: number | null
+          title: string | null
+          titles: string[] | null
+          year: number | null
         }
         Relationships: []
       }

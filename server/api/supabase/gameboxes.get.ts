@@ -19,5 +19,5 @@ export default defineEventHandler(async (event): Promise<GameBoxWithClub[]> => {
   //   return gameBoxFromSupabase(item);
   // })
 
-  return data
+  return data.map(gameBoxFromSupabase);
 })

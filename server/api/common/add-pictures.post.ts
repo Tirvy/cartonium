@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await client.from('gameboxes_with_club_id').select('*').in('id', gameBoxIds);
 
-  const res = await $fetch(`${apiURL}/thing`, { query: { id: data?.map(item => item.idBgg).join(',') } });
+  const res = await $fetch(`${apiURL}/thing`, { query: { id: data?.map(item => item.id_bgg).join(',') } });
   const ret = parser.parse(res as string);
 
   function getThumbnails() {

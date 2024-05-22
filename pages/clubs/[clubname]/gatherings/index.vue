@@ -135,17 +135,4 @@ const gatheringsWithDates = computed<gatheringsWithDates[]>(() => {
 function editGathering(gathering: Gathering) {
     navigateTo('./gatherings/item' + gathering.id);
 }
-
-
-definePageMeta({
-    middleware: [
-        async function (to, from) {
-            const clubPermissions = useClubPermissions();
-
-            if (!clubPermissions) {
-                return navigateTo(to.path + '/item');
-            }
-        },
-    ],
-});
 </script>

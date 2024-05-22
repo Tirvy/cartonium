@@ -99,7 +99,7 @@ export interface GameBox {
 }
 
 export interface GameBoxWithClub extends GameBox {
-    club_id: string[] | null;
+    clubId: string[] | null;
 }
 
 /*

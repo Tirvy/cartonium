@@ -12,7 +12,7 @@ export default defineEventHandler(async (event): Promise<GameBox[]> => {
 
   const client = await serverSupabaseClient<Database>(event)
 
-  const { data, error } = await client.from('gameboxes_with_club_id').select('*').contains('club_id', [clubId]).ilike('title', `%${search}%`).order('ratingBgg', {ascending: false}).limit(limit);
+  const { data, error } = await client.from('gameboxes_with_club_id').select('*').contains('club_id', [clubId]).ilike('title', `%${search}%`).order('rating_bgg', {ascending: false}).limit(limit);
   if (error) {
     throw createError({ statusMessage: error.message })
   }
@@ -21,5 +21,5 @@ export default defineEventHandler(async (event): Promise<GameBox[]> => {
   //   return gameBoxFromSupabase(item);
   // })
 
-  return data
+  return data.map(gameBoxFromSupabase);
 })

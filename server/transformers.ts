@@ -27,7 +27,7 @@ export function clubInfoFromSupabase(data: any): ClubInfo {
 }
 
 // gameBox
-export function gameBoxFromSupabase(data: any): GameBox {
+export function gameBoxFromSupabase(data: any): GameBoxWithClub {
     return {
         aliasTesera: data.alias_tesera || undefined,
         id: data.id,
@@ -46,7 +46,8 @@ export function gameBoxFromSupabase(data: any): GameBox {
         ratingTesera: data.rating_tesera || undefined,
         title: data.title,
         titles: data.titles,
-        year: data.year || undefined
+        year: data.year || undefined,
+        clubId: data.club_id || undefined,
     };
 }
 
