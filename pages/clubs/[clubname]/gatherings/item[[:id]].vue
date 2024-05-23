@@ -29,10 +29,9 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-autocomplete v-model="gameboxesToBook"
-                                :items="gameboxesSearchList" color="blue-grey-lighten-2" item-title="title"
-                                item-value="id" label="Что вам забронировать из нашей коллекции" chips closable-chips
-                                multiple>
+                            <v-autocomplete v-model="gameboxesToBook" :items="gameboxesSearchList"
+                                color="blue-grey-lighten-2" item-title="title" item-value="id"
+                                label="Что вам забронировать из нашей коллекции" chips closable-chips multiple>
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -53,11 +52,25 @@
 
                         </v-col>
                     </v-row>
-                    <v-row v-if="clubPermissions">
-                        <v-col>
-                            <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
-                        </v-col>
-                    </v-row>
+
+                    <template v-if="clubPermissions">
+                        <v-row>
+                            <v-col>
+                                <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">
+
+                                    <template v-slot:item="{ props, item }">
+                                        <v-list-item v-bind="props" :subtitle="item.raw.description"
+                                            :title="item.raw.title"></v-list-item>
+                                    </template></v-autocomplete>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
+                            </v-col>
+                        </v-row>
+
+                    </template>
                     <v-row>
                         <v-col>
                             <v-btn type="submit" :loading="loaders.save">сохранить</v-btn>
@@ -99,6 +112,7 @@ const contact = ref('');
 const commentClub = ref('');
 const gatheringId = ref(0);
 const gameboxesToBook = ref<number[]>([]);
+const table = ref<number | null>(null);
 
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
@@ -106,6 +120,7 @@ function allowedDates(val: Date) {
     return val > new Date();
 };
 const gameboxesSearchList = ref<GameBox[]>([]);
+const tables = ref<Table[]>([])
 
 /* in case it needs optimization
 //
@@ -128,6 +143,18 @@ async function getClubGameboxes(search?: string) {
     gameboxesSearchList.value = foundBoxes;
 }
 getClubGameboxes();
+
+async function getClubTables(search?: string) {
+    const foundTables: Table[] = await $fetch('/api/supabase/club-tables', {
+        query: {
+            clubid: currentClub.value.id,
+        }
+    });
+    tables.value = foundTables;
+}
+if (clubPermissions) {
+    getClubTables();
+}
 
 // ---- Checking if we should load previously saved gathering
 // ---- getting this previously saved gathering
@@ -189,6 +216,7 @@ async function saveGathering() {
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
             gameboxes_ids: gameboxesToBook.value,
+            table_id: table.value,
             contact: contact.value,
 
             comment_club: commentClub.value,

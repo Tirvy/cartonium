@@ -28,6 +28,9 @@
                             Комментарий посетителя
                         </th>
                         <th class="text-left">
+                            Стол
+                        </th>
+                        <th class="text-left">
                             Комментарий админа
                         </th>
                         <th></th>
@@ -36,7 +39,7 @@
                 <tbody>
                     <tr v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
                         <template v-if="gathwd.type === 'date'">
-                            <td colspan="6">
+                            <td colspan="7">
                                 {{ gathwd.date }}
                             </td>
                         </template>
@@ -46,9 +49,11 @@
                             <td>{{ gathwd.gathering.guestsMax }}</td>
                             <td>{{ gathwd.gathering.contact }}</td>
                             <td>{{ gathwd.gathering.commentOwner }}</td>
+                            <td>{{ getTable(gathwd.gathering.tableId)?.title }}</td>
                             <td>{{ gathwd.gathering.commentClub }}</td>
                             <td>
-                                <v-btn icon="mdi-pencil" @click="editGathering(gathwd.gathering)" variant="plain"></v-btn>
+                                <v-btn icon="mdi-pencil" @click="editGathering(gathwd.gathering)"
+                                    variant="plain"></v-btn>
                             </td>
                         </template>
                     </tr>
@@ -69,11 +74,17 @@ import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
 const gatherings: Ref<Gathering[]> = ref([]);
+const currentClub: Ref<Club> = useState('club');
+
+const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {
+    query: {
+        clubid: currentClub.value.id,
+    }
+});
 
 const dateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats);
 const lastDateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats);
 
-const currentClub: Ref<Club> = useState('club');
 async function updateFilters() {
     const data = await $fetch('/api/supabase/gatherings', {
         query: {
@@ -131,6 +142,10 @@ const gatheringsWithDates = computed<gatheringsWithDates[]>(() => {
     })
     return ret;
 });
+
+function getTable(tableId: number | null) {
+    return tables.value?.find(item => item.id === tableId);
+}
 
 function editGathering(gathering: Gathering) {
     navigateTo('./gatherings/item' + gathering.id);

@@ -224,6 +224,7 @@ export interface Gathering {
     guestsMax: number
     contact: string
     gameboxesIds: number[]
+    tableId: number | null
     id: number
     owner: string
     startDate: string

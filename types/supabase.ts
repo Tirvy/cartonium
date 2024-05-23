@@ -170,6 +170,7 @@ export type Database = {
           contact: string | null
           created_at: string
           gameboxes_ids: number[]
+          table_id: number | null
           guests_max: number
           id: number
           owner: string
@@ -182,6 +183,7 @@ export type Database = {
           contact?: string | null
           created_at?: string
           gameboxes_ids?: number[]
+          table_id?: number
           guests_max: number
           id?: number
           owner?: string
@@ -194,6 +196,7 @@ export type Database = {
           contact?: string | null
           created_at?: string
           gameboxes_ids?: number[]
+          table_id?: number
           guests_max?: number
           id?: number
           owner?: string
