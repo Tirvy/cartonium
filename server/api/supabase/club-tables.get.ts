@@ -6,6 +6,10 @@ export default defineEventHandler(async (event): Promise<Table[]> => {
   const query = getQuery(event);
   const clubId = query.clubid as string;
 
+  if (!clubId) {
+    throw createError({ statusMessage: 'Missing clubid' })
+  }
+
   const client = await serverSupabaseClient<Database>(event)
 
   const { data, error } = await client.from('tables').select('*').eq('club_id', clubId);

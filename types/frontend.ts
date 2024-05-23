@@ -238,5 +238,5 @@ export interface Table {
     clubId: string;
     title: string;
     description: string;
-    peopleMax: number;
+    peopleMax: number | string;
 }
