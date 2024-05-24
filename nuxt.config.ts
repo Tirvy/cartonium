@@ -14,10 +14,13 @@ export default defineNuxtConfig({
     dirs: ['types/*.ts'],
   },
   supabase: {
+    redirect: true,
     redirectOptions: {
       login: '/',
       callback: '/confirm',
+      include: ['/clubs(/*)/gatherings(/*)?','/clubs/*/information/edit','/clubs(/*)/settings(/*)?','/admin(/*)?'],
       exclude: ['users/*'],
+      cookieRedirect: true,
     }, 
     cookieOptions: {
       secure: false

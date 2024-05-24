@@ -7,7 +7,7 @@
         </v-container>
     </v-main>
 
-    <fast-action>
+    <fast-action v-if="clubPermissions">
         <v-btn icon="mdi-pencil-outline" size="large" elevation="8" :to="editPath" />
     </fast-action>
 </template>
@@ -19,6 +19,7 @@ const editPath = `/clubs/${clubName}/information/edit`;
 
 const infoData = ref('');
 const currentClub: Ref<Club> = useState('club');
+const clubPermissions = useClubPermissions();
 
 async function getInfo() {
     // todo make fine handling

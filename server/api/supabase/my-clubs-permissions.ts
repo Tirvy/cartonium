@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const userid = query.userid as string;
     if (!userid) {
-        return null;
+        return [];
     }
 
     let profile = await client.from('profiles').select('*')
@@ -21,5 +21,5 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusMessage: clubs.error.message })
     }
 
-    return clubs.data
+    return clubs.data;
 })

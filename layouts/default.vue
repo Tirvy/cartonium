@@ -29,28 +29,41 @@
 </template>
 
 <script setup lang="ts">
+
+const redirectPath = useCookie('sb-redirect-path');
+const lastClub = computed(() => {
+  const path = redirectPath.value || "";
+  const splitted = path.split('/');
+  if (splitted.length > 2) {
+    return splitted[2];
+  }
+  return ''
+});
+
 const route = useRoute();
-const clubName = route.params.clubname;
+const clubName = computed(() => {
+  return route.params.clubname || lastClub.value;
+});
 
 let pages = [
   {
     title: 'Коллекция',
-    path: `/clubs/${clubName}/collection`,
+    path: `/clubs/${clubName.value}/collection`,
     icon: 'mdi-list-box',
   },
   {
     title: 'О клубе',
-    path: `/clubs/${clubName}/information/public`,
+    path: `/clubs/${clubName.value}/information/public`,
     icon: 'mdi-information',
   },
   {
     title: 'Брони',
-    path: `/clubs/${clubName}/gatherings`,
+    path: `/clubs/${clubName.value}/gatherings`,
     icon: 'mdi-table-furniture',
   },
   {
     title: 'Настройки клуба',
-    path: `/clubs/${clubName}/settings`,
+    path: `/clubs/${clubName.value}/settings`,
     icon: 'mdi-cog-outline',
     permissions: true,
   },
@@ -66,11 +79,8 @@ const pagesList = computed(() => {
   return pages.filter(item => !item.permissions || clubPermissions )
 })
 
-
-
 import { useTheme } from 'vuetify'
 const theme = useTheme()
-
 
 const storedTheme = localStorage.getItem('theme');
 if (storedTheme) {
