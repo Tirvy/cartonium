@@ -65,7 +65,7 @@ import type { Loaders } from '#imports';
 const registrationAvailable = false;
 const loginWithEmailAvailable = true;
 const loginWithProviderAvailable = false;
-const guestAvailable = true;
+const guestAvailable = false;
 
 const snackbar = ref({
   show: false,
@@ -79,10 +79,15 @@ const loaders: Ref<Loaders> = ref({
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
 
-
+const redirectPath = useCookie('sb-redirect-path');
+const defaultRedirectPath = '/clubs/emarena/collection';
 watchEffect(() => {
   if (user.value) {
-    navigateTo('/clubs/emarena/collection')
+    if (redirectPath.value) {
+      navigateTo(redirectPath.value)
+    } else {
+      navigateTo(defaultRedirectPath)
+    }
   }
 })
 
