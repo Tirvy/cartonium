@@ -8,12 +8,18 @@
         <v-form class="w-100" @submit.prevent="signInWithEmail" v-model="loginFormIsValid">
           <v-text-field v-model="loginEmail" :rules="[required]" label="email"
             autocomplete="login email"></v-text-field>
-          <v-text-field v-model="loginPassword" :rules="[required]" label="password"
-            autocomplete="current-password" :append-inner-icon="show.passwordLogin ? 'mdi-eye' : 'mdi-eye-off'"
+          <v-text-field v-model="loginPassword" :rules="[required]" label="password" autocomplete="current-password"
+            :append-inner-icon="show.passwordLogin ? 'mdi-eye' : 'mdi-eye-off'"
             :type="show.passwordLogin ? 'text' : 'password'"
             @click:append-inner="show.passwordLogin = !show.passwordLogin"></v-text-field>
           <v-btn :loading="loaders.loginEmail" type="submit">login</v-btn>
         </v-form>
+      </v-card-actions>
+    </template>
+
+    <template v-if="loginWithTelegramAvailable">
+      <v-card-actions>
+        <commonTelegramLoginButton @auth="authByTelegram" />
       </v-card-actions>
     </template>
 
@@ -50,6 +56,7 @@
           <v-btn @click="signUpNewUser">sign up</v-btn>
         </v-form>
       </v-card-actions>
+
     </template>
   </v-card>
 
@@ -65,6 +72,7 @@ import type { Loaders } from '#imports';
 const registrationAvailable = false;
 const loginWithEmailAvailable = true;
 const loginWithProviderAvailable = false;
+const loginWithTelegramAvailable = true;
 const guestAvailable = false;
 
 const snackbar = ref({
@@ -90,6 +98,10 @@ watchEffect(() => {
     }
   }
 })
+
+async function authByTelegram(user: any) {
+  console.log(user, 'hehe');
+}
 
 async function signInWithProvider(provider: string) {
   const { data, error } = await auth.signInWithOAuth({

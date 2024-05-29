@@ -69,7 +69,7 @@ let pages = [
   },
   {
     title: 'Профиль',
-    path: `/profile`,
+    path: `/clubs/${clubName.value}/profile`,
     icon: 'mdi-account',
   }
 ];
