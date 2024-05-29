@@ -54,6 +54,10 @@
                     </v-row>
 
                     <template v-if="clubPermissions">
+
+                        <v-row>
+                            <v-divider />
+                        </v-row>
                         <v-row>
                             <v-col>
                                 <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">

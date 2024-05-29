@@ -1,7 +1,7 @@
 <template>
   <v-main>
     <v-container class="d-flex justify-center">
-      <v-sheet max-width="600px" width="600px">
+      <v-card max-width="600px" width="600px">
         <v-card-title>
           Список столов
         </v-card-title>
@@ -48,7 +48,7 @@
             Добавить
           </v-btn>
         </v-card-actions>
-      </v-sheet>
+      </v-card>
 
     </v-container>
   </v-main>
@@ -121,13 +121,12 @@ function getDefaultTableValues() {
 
 
 async function getTables() {
-  const { data, error } = useFetch('/api/supabase/club-tables', {
+  const { data, error } = await useFetch('/api/supabase/club-tables', {
     query: {
       clubid: currentClub.value.id,
     }
   });
   tables.value = data.value;
-  console.log(tables.value = data.value);
 }
 getTables();
 
@@ -151,13 +150,13 @@ const dialogTitle = computed(() => {
   return editingTable.value?.id ? 'Редактирование стола' : 'Новый стол';
 })
 
-function saveTable() {
+async function saveTable() {
   const table = editingTable.value;
   if (!table) {
     return;
   }
 
-  const { data, error } = useFetch('/api/supabase/club-tables', {
+  const { data, error } = await useFetch('/api/supabase/club-tables', {
     method: 'POST',
     query: {
       clubid: currentClub.value.id,
