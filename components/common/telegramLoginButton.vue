@@ -15,13 +15,19 @@ const emit = defineEmits(['auth']);
 
 onMounted(() => {
   if (telegramLoginButton.value) {
+    const useCallback = false;
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.setAttribute('data-telegram-login', 'emarena_bot');
     script.setAttribute('data-size', 'large');
     script.setAttribute('data-userpic', 'true');
-    script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+    if (useCallback) {
+      script.setAttribute('data-onauth', 'onTelegramAuth(user)');
+    }
+    else {
+      script.setAttribute('data-auth-url', '/auth/callback');
+    }
     script.setAttribute('data-request-access', 'write');
     telegramLoginButton.value.appendChild(script);
   }

@@ -42,7 +42,7 @@ const lastClub = computed(() => {
 
 const route = useRoute();
 const clubName = computed(() => {
-  return route.params.clubname || lastClub.value;
+  return route.params.clubname || lastClub.value || 'emarena';
 });
 
 let pages = [

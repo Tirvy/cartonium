@@ -23,6 +23,12 @@
       </v-card-actions>
     </template>
 
+    <template v-if="loginWithKeycloakAvailable">
+      <v-card-actions>
+        <v-btn @click="signInWithKeycloak">keycloak</v-btn>
+      </v-card-actions>
+    </template>
+
     <template v-if="loginWithProviderAvailable">
       <v-card-title>
         login with providers
@@ -73,6 +79,7 @@ const registrationAvailable = false;
 const loginWithEmailAvailable = true;
 const loginWithProviderAvailable = false;
 const loginWithTelegramAvailable = true;
+const loginWithKeycloakAvailable = true;
 const guestAvailable = false;
 
 const snackbar = ref({
@@ -107,6 +114,17 @@ async function signInWithProvider(provider: string) {
   const { data, error } = await auth.signInWithOAuth({
     provider: provider as Provider,
   })
+}
+
+async function signInWithKeycloak() {
+  console.log(1);
+  const { data, error } = await auth.signInWithOAuth({
+    provider: 'keycloak',
+    options: {
+      scopes: 'openid',
+    },
+  })
+  console.log(data, error);
 }
 
 const loginEmail = ref('');
