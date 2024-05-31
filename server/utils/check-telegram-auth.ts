@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import telegramLoginButton from '~/components/common/telegramLoginButton.vue';
 
+// TODO: check auth_date to be not more than 6 month ago
+
 export default function (tgData: TelegramLoginPayload): boolean {
     const checkString = hashedKeys
         .filter(key => (tgData as any)[key])
@@ -10,6 +12,18 @@ export default function (tgData: TelegramLoginPayload): boolean {
     const secretKey = crypto.createHash('sha256').update(botToken).digest();
     const hash = crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
     const checkHash = tgData.hash as string;
+
+    // debug let it be here
+    // if (true) {
+    //     console.log('botToken', botToken);
+    //     console.log('secretKey', secretKey);
+    //     console.log('');
+    //     console.log('checkString', checkString);
+    //     console.log('hash', hash);
+    //     console.log('');
+    //     console.log('checkHash', checkHash);
+    //     console.log(checkHash === hash);
+    // }
     return hash === checkHash;
 }
 
@@ -24,5 +38,5 @@ export interface TelegramLoginPayload {
     photo_url?: string;
 }
 
-const telegramKeys = ['id', 'auth_date', 'first_name', 'last_name', 'username', 'photo_url', 'hash'];
+const telegramKeys = ['id', 'auth_date', 'first_name', 'last_name', 'username', 'photo_url', 'hash'].sort();
 const hashedKeys = telegramKeys.filter(key => key !== 'hash');

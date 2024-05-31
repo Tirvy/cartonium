@@ -23,7 +23,7 @@ onMounted(() => {
       script.setAttribute('data-onauth', 'onTelegramAuth(user)');
     }
     else {
-      const nextRoute = props.next || '/clubs/emarena/collection';
+      const nextRoute = props.next || 'clubs/emarena/collection';
       script.setAttribute('data-auth-url', '/auth/telegramCallback?next=' + nextRoute);
     }
     script.setAttribute('data-request-access', 'write');
