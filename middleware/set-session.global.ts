@@ -10,6 +10,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             refresh_token: tokens.refresh_token
         })
 
+        if (error) {
+            console.error('session error', error);
+            return;
+        }
+
         return navigateTo(
             {
                 ...to, 

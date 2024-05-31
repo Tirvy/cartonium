@@ -10,8 +10,12 @@ definePageMeta({
     async function (to, from) {
       const clubPermissions = useClubPermissions();
 
-      if (!clubPermissions) {
-        return navigateTo(to.path + '/item');
+      // todo: fix kostil'
+      const routeSplitted = to.path.split('/');
+      const lastOnPath = routeSplitted[routeSplitted.length - 1];
+
+      if (!clubPermissions && lastOnPath === 'gatherings') {
+        return navigateTo(to.path + '/item', { replace: true });
       }
     },
   ],
