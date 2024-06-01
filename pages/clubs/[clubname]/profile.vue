@@ -1,11 +1,16 @@
 <template>
   <v-main>
     <v-container class="h-100">
-      <v-row class="h-100 align-center justify-center">
-        <v-col v-if="!user" class="d-flex justify-center">
-          <common-login></common-login>
+      <v-row>
+        <v-col>
+          Переключить тему: 
+          <v-btn @click="switchTheme">
+            <v-icon icon="mdi-theme-light-dark"></v-icon>
+          </v-btn>
         </v-col>
-        <v-col v-else class="text-center">
+      </v-row>
+      <v-row>
+        <v-col>
           <v-btn @click="logout">
             Logout
           </v-btn>
@@ -24,4 +29,12 @@ const logout = async () => {
   navigateTo('/')
 }
 
+import { useTheme } from 'vuetify'
+const theme = useTheme()
+
+function switchTheme() {
+  const newTheme = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
+  theme.global.name.value = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
+  localStorage.setItem('theme', newTheme);
+}
 </script>

@@ -5,7 +5,7 @@
   <v-container fluid class="fill-height">
     <v-row>
       <v-col class="d-flex justify-center">
-        <common-login></common-login>
+        You should not be here
       </v-col>
     </v-row>
   </v-container>

@@ -78,8 +78,8 @@ import type { Loaders } from '#imports';
 const registrationAvailable = false;
 const loginWithEmailAvailable = true;
 const loginWithProviderAvailable = false;
-const loginWithTelegramAvailable = true;
-const loginWithKeycloakAvailable = true;
+const loginWithTelegramAvailable = false;
+const loginWithKeycloakAvailable = false;
 const guestAvailable = false;
 
 const snackbar = ref({
