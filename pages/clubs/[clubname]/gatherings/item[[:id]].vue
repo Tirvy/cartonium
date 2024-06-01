@@ -15,14 +15,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Сколько человек планируется (максимум)"
+                            <v-text-field label="Сколько человек"
                                 v-model="guestsMax"></v-text-field>
 
                         </v-col>
-                    </v-row>
-                    <v-row>
                         <v-col>
-                            <v-text-field label="Как с вами связаться" v-model="contact"
+                            <v-text-field label="Как с вами связаться" v-model="contact" :disabled="!clubPermissions"
                                 placeholder="tg: @gamelover"></v-text-field>
 
                         </v-col>
@@ -31,7 +29,7 @@
                         <v-col>
                             <v-autocomplete v-model="gameboxesToBook" :items="gameboxesSearchList"
                                 color="blue-grey-lighten-2" item-title="title" item-value="id"
-                                label="Что вам забронировать из нашей коллекции" chips closable-chips multiple>
+                                label="Какие игры забронировать?" chips closable-chips multiple>
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -97,6 +95,7 @@ const route = useRoute();
 const router = useRouter();
 const item = ref('');
 const clubPermissions = useClubPermissions();
+const user = useSupabaseUser();
 const currentClub: Ref<Club> = useState('club');
 const formIsValid: Ref<boolean | null> = ref(null);
 
@@ -117,6 +116,12 @@ const commentClub = ref('');
 const gatheringId = ref(0);
 const gameboxesToBook = ref<number[]>([]);
 const table = ref<number | null>(null);
+
+// ---- values from preferences
+if (!clubPermissions) {
+    contact.value = "telegram: @" + user.value?.user_metadata.telegram_username;
+}
+
 
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };

@@ -9,7 +9,7 @@
           </v-btn>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="user">
         <v-col>
           <v-btn @click="logout">
             Logout
@@ -26,7 +26,6 @@ const user = useSupabaseUser()
 
 const logout = async () => {
   await client.auth.signOut()
-  navigateTo('/')
 }
 
 import { useTheme } from 'vuetify'

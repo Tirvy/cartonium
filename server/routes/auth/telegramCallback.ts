@@ -22,13 +22,7 @@ export default defineEventHandler(async (event) => {
         email: `${tgData.id}@tgauth-happens.com`,
         password: imagineryPassword,
         options: {
-          data: {
-            full_name: [tgData.first_name, tgData.last_name].filter(Boolean).join(' '),
-            first_name: tgData.first_name,
-            avatar_url: tgData.photo_url,
-            picture: tgData.photo_url,
-            is_imaginery: true,
-          }
+          data: getMetadataObject(tgData),
         }
       }
     );
@@ -37,6 +31,11 @@ export default defineEventHandler(async (event) => {
         email: `${tgData.id}@tgauth-happens.com`,
         password: imagineryPassword,
       });
+      if (!singInRes.error) {
+        const updateRes = await client.auth.updateUser({
+          data: getMetadataObject(tgData),
+        })
+      }
     }
 
 
@@ -67,4 +66,16 @@ function getNextRoute(next: string, queryParams: any): string {
   }
   ret += Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&');
   return ret;
+}
+
+function getMetadataObject(tgData: TelegramLoginPayload) {
+  return {
+    telegram_id: tgData.id,
+    full_name: [tgData.first_name, tgData.last_name].filter(Boolean).join(' '),
+    first_name: tgData.first_name,
+    avatar_url: tgData.photo_url,
+    picture: tgData.photo_url,
+    telegram_username: tgData.username,
+    is_imaginery: true,
+  }
 }

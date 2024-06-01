@@ -70,7 +70,7 @@ let pages = [
     icon: 'mdi-information',
   },
   {
-    title: 'Брони',
+    title: 'Сборы',
     path: `/clubs/${clubName.value}/gatherings`,
     icon: 'mdi-table-furniture',
   },
