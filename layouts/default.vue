@@ -4,13 +4,12 @@
     <v-app-bar dense>
 
       <template v-slot:prepend>
-        <nuxt-link :to="adminLoginLink">
+        <nuxt-link :to="clubSettings">
           <v-avatar color="yellow">A</v-avatar>
         </nuxt-link>
       </template>
 
       <v-app-bar-title>Ареночка</v-app-bar-title>
-      <v-spacer></v-spacer>
 
       <template v-slot:append>
         <NuxtLink v-if="avatar.show" :to="profileLink">
@@ -57,6 +56,7 @@ const clubName = computed(() => {
 
 const profileLink = `/clubs/${clubName.value}/profile`;
 const adminLoginLink = `/clubs/${clubName.value}/admin-login`;
+const clubSettings = `/clubs/${clubName.value}/settings`;
 
 let pages = [
   {
@@ -97,10 +97,10 @@ import { useTheme } from 'vuetify'
 const theme = useTheme()
 
 const storedTheme = localStorage.getItem('theme');
-if (storedTheme) {
+if (storedTheme && theme.themes.value[storedTheme]) {
   theme.global.name.value = storedTheme;
 } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  theme.global.name.value = 'myCustomDarkTheme';
+  theme.global.name.value = 'themeInitialDark';
 }
 
 // setting up user avatar

@@ -32,8 +32,8 @@ import { useTheme } from 'vuetify'
 const theme = useTheme()
 
 function switchTheme() {
-  const newTheme = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
-  theme.global.name.value = theme.global.current.value.dark ? 'myCustomWarnTheme' : 'myCustomDarkTheme';
+  const newTheme = theme.global.current.value.dark ? 'themeInitialLight' : 'themeInitialDark';
+  theme.global.name.value = theme.global.current.value.dark ? 'themeInitialLight' : 'themeInitialDark';
   localStorage.setItem('theme', newTheme);
 }
 </script>

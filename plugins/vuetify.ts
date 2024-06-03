@@ -12,14 +12,14 @@ import enDayjs from 'dayjs/locale/en'
 
 import { ru } from 'vuetify/locale'
 
-const myCustomDarkTheme: ThemeDefinition = {
+const themeInitialDark: ThemeDefinition = {
   dark: true,
   colors: {
     primary: '#009688',
   },
 }
 
-const myCustomWarnTheme: ThemeDefinition = {
+const themeInitialLight: ThemeDefinition = {
   dark: false,
   colors: {
     primary: '#944a00',
@@ -43,10 +43,10 @@ export default defineNuxtPlugin(nuxtApp => {
     },
     directives,
     theme: {
-      defaultTheme: 'myCustomWarnTheme',
+      defaultTheme: 'themeInitialLight',
       themes: {
-        myCustomDarkTheme,
-        myCustomWarnTheme
+        themeInitialDark,
+        themeInitialLight
       }
     },
     date: {

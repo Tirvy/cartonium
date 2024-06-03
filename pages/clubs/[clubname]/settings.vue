@@ -13,10 +13,6 @@ definePageMeta({
       if (!clubPermissions) {
         return navigateTo('/clubs/' + currentClub.value.urlName + '/collection');
       }
-      const newpath = '/clubs/' + currentClub.value.urlName + '/settings/tables';
-      if (to.path !== newpath) {
-        return navigateTo(newpath);
-      }
     },
   ],
 });
