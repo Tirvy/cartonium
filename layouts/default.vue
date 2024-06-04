@@ -5,7 +5,9 @@
 
       <template v-slot:prepend>
         <nuxt-link :to="clubSettings">
-          <v-avatar color="yellow">A</v-avatar>
+          <v-avatar color="yellow">
+            <v-img :src="clubAvatar.pictureUrl"></v-img>
+          </v-avatar>
         </nuxt-link>
       </template>
 
@@ -102,6 +104,13 @@ if (storedTheme && theme.themes.value[storedTheme]) {
 } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
   theme.global.name.value = 'themeInitialDark';
 }
+
+// club avatar
+const clubAvatar = computed(() => {
+  return {
+    pictureUrl: `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/club-avatars/${clubName.value}.png`,
+  }
+});
 
 // setting up user avatar
 const user = useSupabaseUser();
