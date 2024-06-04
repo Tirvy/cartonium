@@ -3,10 +3,12 @@
     <v-container class="h-100">
       <v-row>
         <v-col>
-          Переключить тему: 
-          <v-btn @click="switchTheme">
-            <v-icon icon="mdi-theme-light-dark"></v-icon>
-          </v-btn>
+          <v-switch v-model="isDarkTheme" label="Включить ночную тему"></v-switch>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-switch v-model="forcePermissionsAdmin" label="force admin"></v-switch>
         </v-col>
       </v-row>
       <v-row v-if="user">
@@ -31,9 +33,30 @@ const logout = async () => {
 import { useTheme } from 'vuetify'
 const theme = useTheme()
 
-function switchTheme() {
-  const newTheme = theme.global.current.value.dark ? 'themeInitialLight' : 'themeInitialDark';
-  theme.global.name.value = theme.global.current.value.dark ? 'themeInitialLight' : 'themeInitialDark';
-  localStorage.setItem('theme', newTheme);
+const isDarkTheme = computed({
+  get() {
+    return theme.global.current.value.dark
+  },
+  set(value) {
+    const newTheme = !value ? 'themeInitialLight' : 'themeInitialDark'
+    theme.global.name.value = newTheme;
+    localStorage.setItem('theme', newTheme);
+  }
+})
+
+const localIsAdminValue = ref(localStorage.getItem('forcePermissions'));
+if (!localIsAdminValue) {
+  localIsAdminValue.value = useClubPermissions();
 }
+const forcePermissionsAdmin = computed({
+  get() {
+    return localIsAdminValue.value != 'guest';
+  },
+  set(value) {
+    const newValue = value ? 'admin' : 'guest';
+    console.log(value, newValue);
+    localStorage.setItem('forcePermissions', newValue);
+    localIsAdminValue.value = newValue;
+  }
+})
 </script>
