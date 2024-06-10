@@ -15,21 +15,9 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Сколько человек"
-                                v-model="guestsMax"></v-text-field>
-
-                        </v-col>
-                        <v-col>
-                            <v-text-field label="Как с вами связаться" v-model="contact" :disabled="!clubPermissions"
-                                placeholder="tg: @gamelover"></v-text-field>
-
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
                             <v-autocomplete v-model="gameboxesToBook" :items="gameboxesSearchList"
-                                color="blue-grey-lighten-2" item-title="title" item-value="id"
-                                label="Какие игры забронировать?" chips closable-chips multiple>
+                                color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
+                                :eager="true">
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -41,29 +29,53 @@
                                 </template>
                             </v-autocomplete>
                         </v-col>
+                        <v-col v-if="ownGatheringNameAvailable">
+
+                            <v-btn :active="!isClubGamebox" @click="isClubGamebox = !isClubGamebox">
+                                Нет в списке?
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row v-if="!isClubGamebox">
+                        <p>
+                            Если в списке выше нет нужной игры, то вы можете сами указать название игры/встречи здесь.
+                        </p>
+                        <v-text-field v-model="ownGatheringName"></v-text-field>
+                    </v-row>
+                    <v-row v-if="reservingAvailable">
+                        <v-col>
+                            <v-checkbox label="Поискать еще игроков?" v-model="publicGathering"></v-checkbox>
+                        </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-textarea label="Комментарий"
-                                placeholder="Игры, которые принесёте/хотите забронировать, пожелания админам итд"
-                                v-model="commentOwner"></v-textarea>
-
+                            <v-text-field label="Сколько человек надо на игру (в сумме)"
+                                v-model="guestsMax"></v-text-field>
+                        </v-col>
+                        <v-col v-if="!gatheringId">
+                            <v-text-field label="Сколько гостей приведете с собой"
+                                v-model="hostGuestsNumber"></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-textarea label="Комментарий к встречи" v-model="commentOwner"
+                                :disabled="!publicGathering"></v-textarea>
                         </v-col>
                     </v-row>
 
                     <template v-if="clubPermissions">
-
                         <v-row>
                             <v-divider />
                         </v-row>
                         <v-row>
                             <v-col>
                                 <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">
-
                                     <template v-slot:item="{ props, item }">
                                         <v-list-item v-bind="props" :subtitle="item.raw.description"
                                             :title="item.raw.title"></v-list-item>
-                                    </template></v-autocomplete>
+                                    </template>
+                                </v-autocomplete>
                             </v-col>
                         </v-row>
                         <v-row>
@@ -71,7 +83,6 @@
                                 <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
                             </v-col>
                         </v-row>
-
                     </template>
                     <v-row>
                         <v-col>
@@ -98,6 +109,8 @@ const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
 const currentClub: Ref<Club> = useState('club');
 const formIsValid: Ref<boolean | null> = ref(null);
+const reservingAvailable = true;
+const ownGatheringNameAvailable = false;
 
 
 const loaders: Ref<Loaders> = ref({
@@ -116,6 +129,10 @@ const commentClub = ref('');
 const gatheringId = ref(0);
 const gameboxesToBook = ref<number[]>([]);
 const table = ref<number | null>(null);
+const hostGuestsNumber = ref(0);
+const publicGathering = ref(true);
+const isClubGamebox = ref(true);
+const ownGatheringName = ref('');
 
 // ---- values from preferences
 if (!clubPermissions) {
