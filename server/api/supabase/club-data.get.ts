@@ -10,10 +10,23 @@ export default defineEventHandler(async (event) => {
   const clubname = query.clubname as string;
 
 
-  const { data, error } = await client.from('clubs').select('*').eq('url_name', clubname).single();
-  if (error) {
-    throw createError({ statusMessage: error.message })
+  const clubData = await client.from('clubs').select('*').eq('url_name', clubname).single();
+  if (clubData.error) {
+    throw createError({ statusMessage: clubData.error.message })
+  }
+  const clubSettings = await client.from('clubs_settings').select('*').eq('club_id', clubData.data.id).single();
+  if (clubSettings.error) {
+    if (clubSettings.error.message !== 'JSON object requested, multiple (or no) rows returned') {
+      throw createError({ statusMessage: clubSettings.error.message })
+    } 
   }
 
-  return clubFromSupabase(data);
+  return clubFromSupabase(clubData.data, clubSettings.data || baseSettings);
 })
+
+const baseSettings = {
+  themes: {},
+  avatar_url: '',
+  guest_can_gather_own: false,
+  guest_can_reserve: false,
+}

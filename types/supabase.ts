@@ -99,6 +99,41 @@ export type Database = {
           },
         ]
       }
+      clubs_settings: {
+        Row: {
+          avatar_url: string | null
+          club_id: string
+          created_at: string
+          guest_can_gather_own: boolean
+          guest_can_reserve: boolean
+          themes: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          club_id: string
+          created_at?: string
+          guest_can_gather_own?: boolean
+          guest_can_reserve?: boolean
+          themes?: Json | null
+        }
+        Update: {
+          avatar_url?: string | null
+          club_id?: string
+          created_at?: string
+          guest_can_gather_own?: boolean
+          guest_can_reserve?: boolean
+          themes?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clubs_settings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gameboxes: {
         Row: {
           alias_tesera: string | null
@@ -162,45 +197,75 @@ export type Database = {
         }
         Relationships: []
       }
+      gathering_guests: {
+        Row: {
+          created_at: string
+          gathering_id: number | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          gathering_id?: number | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          gathering_id?: number | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gathering_guests_gathering_id_fkey"
+            columns: ["gathering_id"]
+            isOneToOne: false
+            referencedRelation: "gatherings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gathering_guests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gatherings: {
         Row: {
           club_id: string
           comment_club: string
           comment_owner: string
-          contact: string | null
           created_at: string
-          gameboxes_ids: number[]
-          table_id: number | null
           guests_max: number
           id: number
           owner: string
           start_date: string | null
+          table_id: number | null
         }
         Insert: {
           club_id: string
           comment_club?: string
           comment_owner?: string
-          contact?: string | null
           created_at?: string
-          gameboxes_ids?: number[]
-          table_id?: number
           guests_max: number
           id?: number
           owner?: string
           start_date?: string | null
+          table_id?: number | null
         }
         Update: {
           club_id?: string
           comment_club?: string
           comment_owner?: string
-          contact?: string | null
           created_at?: string
-          gameboxes_ids?: number[]
-          table_id?: number
           guests_max?: number
           id?: number
           owner?: string
           start_date?: string | null
+          table_id?: number | null
         }
         Relationships: [
           {
@@ -211,10 +276,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gatherings_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "public_gatherings_owner_fkey"
             columns: ["owner"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gatherings_gameboxes: {
+        Row: {
+          gamebox_id: number
+          gathering_id: number
+        }
+        Insert: {
+          gamebox_id: number
+          gathering_id: number
+        }
+        Update: {
+          gamebox_id?: number
+          gathering_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gatherings_gameboxes_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gameboxes_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes_with_club_id"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gameboxes_gathering_id_fkey"
+            columns: ["gathering_id"]
+            isOneToOne: false
+            referencedRelation: "gatherings"
             referencedColumns: ["id"]
           },
         ]

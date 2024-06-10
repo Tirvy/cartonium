@@ -204,6 +204,10 @@ export interface Club {
     id: string;
     title: string;
     urlName: string;
+    themes: any;
+    avatarUrl: string;
+    guestCanGatherOwn: boolean;
+    guestCanReserve: boolean;
 }
 
 export interface ClubCollection {

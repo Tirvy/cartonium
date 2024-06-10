@@ -1,11 +1,15 @@
 import type { ClubCollection, ClubInfo, Club, GameBox, Gathering } from '~/types/frontend.js';
 
 // clubs
-export function clubFromSupabase(data: any): Club {
+export function clubFromSupabase(data: any, clubSettingsData: any): Club {
     return {
         id: data.id,
         title: data.title,
-        urlName: data.url_name
+        urlName: data.url_name,
+        themes: clubSettingsData.themes,
+        avatarUrl: clubSettingsData.avatar_url,
+        guestCanGatherOwn: clubSettingsData.guest_can_gather_own,
+        guestCanReserve: clubSettingsData.guest_can_reserve,
     };
 }
 
