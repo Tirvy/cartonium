@@ -197,50 +197,16 @@ export type Database = {
         }
         Relationships: []
       }
-      gathering_guests: {
-        Row: {
-          created_at: string
-          gathering_id: number | null
-          id: number
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          gathering_id?: number | null
-          id?: number
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          gathering_id?: number | null
-          id?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gathering_guests_gathering_id_fkey"
-            columns: ["gathering_id"]
-            isOneToOne: false
-            referencedRelation: "gatherings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gathering_guests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       gatherings: {
         Row: {
           club_id: string
           comment_club: string
           comment_owner: string
           created_at: string
+          gamebox_id: number | null
           guests_max: number
           id: number
+          own_name: string | null
           owner: string
           start_date: string | null
           table_id: number | null
@@ -250,8 +216,10 @@ export type Database = {
           comment_club?: string
           comment_owner?: string
           created_at?: string
+          gamebox_id?: number | null
           guests_max: number
           id?: number
+          own_name?: string | null
           owner?: string
           start_date?: string | null
           table_id?: number | null
@@ -261,8 +229,10 @@ export type Database = {
           comment_club?: string
           comment_owner?: string
           created_at?: string
+          gamebox_id?: number | null
           guests_max?: number
           id?: number
+          own_name?: string | null
           owner?: string
           start_date?: string | null
           table_id?: number | null
@@ -273,6 +243,20 @@ export type Database = {
             columns: ["club_id"]
             isOneToOne: false
             referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes_with_club_id"
             referencedColumns: ["id"]
           },
           {
@@ -324,6 +308,45 @@ export type Database = {
             columns: ["gathering_id"]
             isOneToOne: false
             referencedRelation: "gatherings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gatherings_guests: {
+        Row: {
+          created_at: string
+          gathering_id: number | null
+          guests_number: number
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          gathering_id?: number | null
+          guests_number: number
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          gathering_id?: number | null
+          guests_number?: number
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gathering_guests_gathering_id_fkey"
+            columns: ["gathering_id"]
+            isOneToOne: false
+            referencedRelation: "gatherings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gathering_guests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

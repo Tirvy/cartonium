@@ -21,7 +21,7 @@
                     {{ dateAdapter.format(lastGathering.startDate, 'fullDateTime') }}
                   </v-list-item-subtitle>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item v-if="lastGathering.guestsMax">
 
                   <template v-slot:prepend>
                     <v-avatar color="grey-lighten-1">
@@ -35,7 +35,7 @@
                     {{ lastGathering.guestsMax }}
                   </v-list-item-subtitle>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item v-if="lastGathering.contact">
 
                   <template v-slot:prepend>
                     <v-avatar color="grey-lighten-1">

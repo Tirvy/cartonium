@@ -15,7 +15,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-autocomplete v-model="gameboxesToBook" :items="gameboxesSearchList"
+                            <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
                                 color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
                                 :eager="true">
                                 <template v-slot:chip="{ props, item }">
@@ -29,7 +29,7 @@
                                 </template>
                             </v-autocomplete>
                         </v-col>
-                        <v-col v-if="ownGatheringNameAvailable">
+                        <v-col v-if="ownGatheringNameAvailable" cols="4">
 
                             <v-btn :active="!isClubGamebox" @click="isClubGamebox = !isClubGamebox">
                                 Нет в списке?
@@ -50,11 +50,11 @@
                     <v-row>
                         <v-col>
                             <v-text-field label="Сколько человек надо на игру (в сумме)"
-                                v-model="guestsMax"></v-text-field>
+                                v-model="guestsMax" :rules="[ruleIsNumber]"></v-text-field>
                         </v-col>
                         <v-col v-if="!gatheringId">
                             <v-text-field label="Сколько гостей приведете с собой"
-                                v-model="hostGuestsNumber"></v-text-field>
+                                v-model="hostGuestsNumber" :rules="[ruleIsNumber]"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -67,6 +67,11 @@
                     <template v-if="clubPermissions">
                         <v-row>
                             <v-divider />
+                        </v-row>
+                        <v-row>
+                            <v-card-title>
+                                Админская часть (не видно гостям)
+                            </v-card-title>
                         </v-row>
                         <v-row>
                             <v-col>
@@ -109,8 +114,8 @@ const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
 const currentClub: Ref<Club> = useState('club');
 const formIsValid: Ref<boolean | null> = ref(null);
-const reservingAvailable = true;
-const ownGatheringNameAvailable = false;
+const reservingAvailable = currentClub.value.guestCanReserve;
+const ownGatheringNameAvailable = currentClub.value.guestCanGatherOwn;
 
 
 const loaders: Ref<Loaders> = ref({
@@ -124,21 +129,14 @@ const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
-const contact = ref('');
 const commentClub = ref('');
 const gatheringId = ref(0);
-const gameboxesToBook = ref<number[]>([]);
+const gameboxForGathering = ref<number | undefined>(undefined);
 const table = ref<number | null>(null);
 const hostGuestsNumber = ref(0);
 const publicGathering = ref(true);
 const isClubGamebox = ref(true);
 const ownGatheringName = ref('');
-
-// ---- values from preferences
-if (!clubPermissions) {
-    contact.value = "telegram: @" + user.value?.user_metadata.telegram_username;
-}
-
 
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
@@ -203,10 +201,9 @@ async function getItem() {
             startTime.value = dateAdapter.format(startDate.value, 'fullTime24h');
             guestsMax.value = foundItem.guestsMax + '';
             commentOwner.value = foundItem.commentOwner;
-            contact.value = foundItem.contact;
             commentClub.value = foundItem.commentClub;
             gatheringId.value = foundItem.id;
-            gameboxesToBook.value = foundItem.gameboxesIds;
+            gameboxForGathering.value = foundItem.gameboxId;
         }
         loaders.value.initial = false;
     }
@@ -237,17 +234,17 @@ async function saveGathering() {
     const data: any = await $fetch('/api/supabase/gathering', {
         method: 'post',
         body: {
-            id: gatheringId.value || undefined,
+            club_id: currentClub.value.id,
+            id: gatheringId.value || undefined, // only used if admin/owner edits
             start_date: dateAdapter.toISO(dateToSend),
+            gamebox_id: gameboxForGathering.value,
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,
-            gameboxes_ids: gameboxesToBook.value,
             table_id: table.value,
-            contact: contact.value,
-
             comment_club: commentClub.value,
+            own_name: !isClubGamebox.value ? ownGatheringName.value : undefined,
 
-            club_id: currentClub.value.id,
+            with_host: +hostGuestsNumber.value,
         }
     })
     const lastGathering = useState('lastGathering');

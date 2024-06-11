@@ -61,7 +61,7 @@ export function gatheringFromSupabase(data: any): Gathering {
         clubId: data.club_id,
         commentClub: data.comment_club,
         commentOwner: data.comment_owner,
-        gameboxesIds: data.gameboxes_ids,
+        gameboxId: data.gameboxes_ids,
         tableId: data.table_id,
         contact: data.contact,
         guestsMax: data.guests_max,
