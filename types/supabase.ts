@@ -275,50 +275,6 @@ export type Database = {
           },
         ]
       }
-      gatherings_gameboxes: {
-        Row: {
-          gamebox_id: number
-          gathering_id: number
-        }
-        Insert: {
-          gamebox_id: number
-          gathering_id: number
-        }
-        Update: {
-          gamebox_id?: number
-          gathering_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gatherings_gameboxes_gamebox_id_fkey"
-            columns: ["gamebox_id"]
-            isOneToOne: false
-            referencedRelation: "gameboxes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gatherings_gameboxes_gamebox_id_fkey"
-            columns: ["gamebox_id"]
-            isOneToOne: false
-            referencedRelation: "gameboxes_with_club_id"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gatherings_gameboxes_gathering_id_fkey"
-            columns: ["gathering_id"]
-            isOneToOne: false
-            referencedRelation: "gatherings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gatherings_gameboxes_gathering_id_fkey"
-            columns: ["gathering_id"]
-            isOneToOne: false
-            referencedRelation: "gatherings_with_guests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       gatherings_guests: {
         Row: {
           created_at: string
@@ -370,6 +326,7 @@ export type Database = {
           avatar_url: string | null
           full_name: string | null
           id: string
+          telegram_username: string | null
           updated_at: string | null
           username: string | null
         }
@@ -377,6 +334,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id: string
+          telegram_username?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -384,6 +342,7 @@ export type Database = {
           avatar_url?: string | null
           full_name?: string | null
           id?: string
+          telegram_username?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -393,6 +352,13 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users_raw_data"
             referencedColumns: ["id"]
           },
         ]
@@ -535,6 +501,7 @@ export type Database = {
           comment_owner: string | null
           created_at: string | null
           full_name: string | null
+          gamebox: Json | null
           gamebox_id: number | null
           guest_id: number | null
           guests_max: number | null
@@ -542,6 +509,7 @@ export type Database = {
           id: number | null
           own_name: string | null
           owner: string | null
+          raw_user_meta_data: Json | null
           start_date: string | null
           table_id: number | null
           user_id: string | null
@@ -591,6 +559,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      users_raw_data: {
+        Row: {
+          id: string | null
+          raw_user_meta_data: Json | null
+        }
+        Relationships: []
       }
     }
     Functions: {

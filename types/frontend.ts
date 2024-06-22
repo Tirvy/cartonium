@@ -234,6 +234,25 @@ export interface Gathering {
     startDate: string
 }
 
+export interface GatheringGuest {
+    title: string
+    messageUrl: string
+    imageUrl: string
+    additionalGuests: number
+}
+
+export interface GatheringWithGuests extends Gathering {
+    guests: GatheringGuest[]
+    gamebox: GameBox
+    ownTitle: string
+}
+
+export interface GatheringsWithDates {
+    type: 'date' | 'gathering'
+    date: string
+    gathering?: GatheringWithGuests
+}
+
 export interface Loaders {
     [key: string]: boolean
 }

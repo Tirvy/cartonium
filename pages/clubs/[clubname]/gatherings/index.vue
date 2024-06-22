@@ -21,9 +21,6 @@
                         <th>
                             Планируется человек
                         </th>
-                        <th>
-                            Контакт
-                        </th>
                         <th class="text-left">
                             Комментарий посетителя
                         </th>
@@ -46,8 +43,8 @@
 
                         <template v-else-if="gathwd.gathering">
                             <td>{{ gathwd.date }}</td>
+                            <td>{{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}</td>
                             <td>{{ gathwd.gathering.guestsMax }}</td>
-                            <td>{{ gathwd.gathering.contact }}</td>
                             <td>{{ gathwd.gathering.commentOwner }}</td>
                             <td>{{ getTable(gathwd.gathering.tableId)?.title }}</td>
                             <td>{{ gathwd.gathering.commentClub }}</td>
@@ -70,10 +67,11 @@
 </template>
 
 <script setup lang="ts">
+import type { GatheringWithGuests, GatheringsWithDates } from '~/types/frontend'
 import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
-const gatherings: Ref<Gathering[]> = ref([]);
+const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 
 const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {
@@ -100,7 +98,7 @@ async function updateFilters() {
 updateFilters();
 
 interface gatheringsHash {
-    [key: string]: Gathering[]
+    [key: string]: GatheringWithGuests[]
 }
 const gatheringsHashedByDate = computed<gatheringsHash>(() => {
     if (gatherings.value.length > 0) {
@@ -116,15 +114,9 @@ const gatheringsHashedByDate = computed<gatheringsHash>(() => {
     }
     return {};
 })
-
-interface gatheringsWithDates {
-    type: 'date' | 'gathering'
-    date: string
-    gathering: Gathering | undefined
-}
-const gatheringsWithDates = computed<gatheringsWithDates[]>(() => {
+const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
     const keys = Object.keys(gatheringsHashedByDate.value);
-    const ret: gatheringsWithDates[] = [];
+    const ret: GatheringsWithDates[] = [];
     keys.forEach(key => {
         ret.push({
             type: 'date',

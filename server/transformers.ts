@@ -1,4 +1,4 @@
-import type { ClubCollection, ClubInfo, Club, GameBox, Gathering } from '~/types/frontend.js';
+import type { ClubCollection, ClubInfo, Club, GameBox, Gathering, GatheringWithGuests } from '~/types/frontend.js';
 
 // clubs
 export function clubFromSupabase(data: any, clubSettingsData: any): Club {
@@ -69,6 +69,32 @@ export function gatheringFromSupabase(data: any): Gathering {
         owner: data.owner,
         startDate: data.start_date,
     };
+}
+
+export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
+    const userDataSource = data.rawUserMetaData;
+    const userData = userDataSource && {
+        title: userDataSource.first_name,
+        imageUrl: userDataSource.picture,
+        messageUrl: '',
+        additionalGuests: data.guests_number
+    }
+    return {
+        clubId: data.club_id,
+        commentClub: data.comment_club,
+        commentOwner: data.comment_owner,
+        gameboxId: data.gamebox.id,
+        gamebox: gameBoxFromSupabase(data.gamebox),
+        ownTitle: data.own_name,
+        tableId: data.table_id,
+        contact: data.contact,
+        guestsMax: data.guests_max,
+        id: data.id,
+        owner: data.owner,
+        startDate: data.start_date,
+        guests: data.rawUserMetaData ? [userData] : [],
+    };
+
 }
 
 export function tablesFromSupabase(data: any): Table {
