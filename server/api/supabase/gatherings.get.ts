@@ -16,8 +16,7 @@ export default defineEventHandler(async (event) => {
     startDate = today.toISOString();
   }
 
-
-  const { data, error } = await client.from('gatherings').select('*').gte('start_date', startDate).eq('club_id', clubid)
+  const { data, error } = await client.from('gatherings_with_guests').select('*').gte('start_date', startDate).eq('club_id', clubid)
     .order('start_date', { ascending: true });
 
   if (error) {
@@ -25,5 +24,5 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  return data.map(gatheringFromSupabase);
+  return data;
 })

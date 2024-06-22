@@ -1,23 +1,28 @@
 <template>
   <v-main>
     <v-container class="h-100">
-      <v-row>
-        <v-col>
-          <v-switch v-model="isDarkTheme" label="Включить ночную тему"></v-switch>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-switch v-model="forcePermissionsAdmin" label="force admin"></v-switch>
-        </v-col>
-      </v-row>
-      <v-row v-if="user">
-        <v-col>
-          <v-btn @click="logout">
-            Logout
-          </v-btn>
-        </v-col>
-      </v-row>
+      <template v-if="user">
+        <v-row>
+          <v-col>
+            <v-switch v-model="isDarkTheme" label="Включить ночную тему"></v-switch>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-switch v-model="forcePermissionsAdmin" label="force admin"></v-switch>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn @click="logout">
+              Logout
+            </v-btn>
+          </v-col>
+        </v-row>
+      </template>
+      <v-col v-else-if="!user" class="d-flex justify-center">
+        <common-login></common-login>
+      </v-col>
     </v-container>
   </v-main>
 </template>

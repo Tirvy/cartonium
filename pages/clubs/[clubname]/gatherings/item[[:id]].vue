@@ -133,7 +133,7 @@ const commentClub = ref('');
 const gatheringId = ref(0);
 const gameboxForGathering = ref<number | undefined>(undefined);
 const table = ref<number | null>(null);
-const hostGuestsNumber = ref(0);
+const hostGuestsNumber = ref("0");
 const publicGathering = ref(true);
 const isClubGamebox = ref(true);
 const ownGatheringName = ref('');
@@ -244,7 +244,7 @@ async function saveGathering() {
             comment_club: commentClub.value,
             own_name: !isClubGamebox.value ? ownGatheringName.value : undefined,
 
-            with_host: +hostGuestsNumber.value,
+            with_host: +(hostGuestsNumber.value.trim()) || 0,
         }
     })
     const lastGathering = useState('lastGathering');

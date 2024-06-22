@@ -82,11 +82,11 @@ let pages = [
     icon: 'mdi-cog-outline',
     permissions: true,
   },
-  // {
-  //   title: 'Профиль',
-  //   path: `/clubs/${clubName.value}/profile`,
-  //   icon: 'mdi-account',
-  // }
+  {
+    title: 'Профиль',
+    path: `/clubs/${clubName.value}/profile`,
+    icon: 'mdi-account',
+  }
 ];
 
 const clubPermissions = useClubPermissions();

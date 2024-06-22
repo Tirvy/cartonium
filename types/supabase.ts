@@ -310,6 +310,13 @@ export type Database = {
             referencedRelation: "gatherings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "gatherings_gameboxes_gathering_id_fkey"
+            columns: ["gathering_id"]
+            isOneToOne: false
+            referencedRelation: "gatherings_with_guests"
+            referencedColumns: ["id"]
+          },
         ]
       }
       gatherings_guests: {
@@ -340,6 +347,13 @@ export type Database = {
             columns: ["gathering_id"]
             isOneToOne: false
             referencedRelation: "gatherings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gathering_guests_gathering_id_fkey"
+            columns: ["gathering_id"]
+            isOneToOne: false
+            referencedRelation: "gatherings_with_guests"
             referencedColumns: ["id"]
           },
           {
@@ -513,9 +527,79 @@ export type Database = {
         }
         Relationships: []
       }
+      gatherings_with_guests: {
+        Row: {
+          avatar_url: string | null
+          club_id: string | null
+          comment_club: string | null
+          comment_owner: string | null
+          created_at: string | null
+          full_name: string | null
+          gamebox_id: number | null
+          guest_id: number | null
+          guests_max: number | null
+          guests_number: number | null
+          id: number | null
+          own_name: string | null
+          owner: string | null
+          start_date: string | null
+          table_id: number | null
+          user_id: string | null
+          username: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gathering_guests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_gamebox_id_fkey"
+            columns: ["gamebox_id"]
+            isOneToOne: false
+            referencedRelation: "gameboxes_with_club_id"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gatherings_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_gatherings_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      refresh_materialized_view: {
+        Args: {
+          view_name: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

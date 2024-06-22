@@ -24,7 +24,7 @@ onMounted(() => {
     }
     else {
       const nextRoute = props.next || 'clubs/emarena/collection';
-      script.setAttribute('data-auth-url', '/auth/telegramCallback?next=' + nextRoute);
+      script.setAttribute('data-auth-url', '/auth/telegram-callback?next=' + nextRoute);
     }
     script.setAttribute('data-request-access', 'write');
     telegramLoginButton.value.appendChild(script);
