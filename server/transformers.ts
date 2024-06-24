@@ -77,7 +77,7 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         title: userDataSource.first_name,
         imageUrl: userDataSource.picture,
         messageUrl: '',
-        additionalGuests: data.guests_number - 1
+        totalGuests: data.guests_number
     }
     return {
         clubId: data.club_id,

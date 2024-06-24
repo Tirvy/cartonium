@@ -3,59 +3,64 @@
     <v-container>
       <v-row class="justify-space-between">
         <v-col>
-          <v-card-title>
-            Сборы на игры
-          </v-card-title>
         </v-col>
+        <v-spacer />
         <v-col>
-          <NuxtLink to="./gatherings" v-if="clubPermissions">
-            К виду для админов
+          <NuxtLink to="./table-admin" v-if="clubPermissions">
+            <v-list-item :link="true">
+              К виду для админов
+
+            </v-list-item>
           </NuxtLink>
         </v-col>
       </v-row>
-      <v-list>
-        <template v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
-          <template v-if="gathwd.type === 'date'">
-            <v-list-subheader>
-              {{ gathwd.date }}
-            </v-list-subheader>
-          </template>
+      <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
+        <v-col v-if="gathwd.type === 'date'">
+          <v-list-subheader>
+            {{ gathwd.date }}
+          </v-list-subheader>
+        </v-col>
 
-          <template v-else-if="gathwd.gathering">
-            <v-card>
-              <v-card-subtitle>
-                [{{ gathwd.date }}]
-              </v-card-subtitle>
-              <v-card-title>
-                {{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}
-              </v-card-title>
-              <v-card-text>
-                ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
-                <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
-                  {{ guest.title }}
-                  <span v-if="guest.additionalGuests">+ {{ guest.additionalGuests }}</span>
-                </p>
-              </v-card-text>
-              <v-card-text>
-                <td>{{ gathwd.gathering.commentOwner }}</td>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn>
-                  Присоедениться
-                </v-btn>
-                <v-btn>
-                  Покинуть сбор
-                </v-btn>
-                <v-btn>
-                  Добавить гостей
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
-        </template>
-      </v-list>
+        <v-col v-else-if="gathwd.gathering">
+          <v-card>
+            <v-card-title>
+              {{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}
+            </v-card-title>
+            <v-card-subtitle>
+              [{{ gathwd.date }}]
+            </v-card-subtitle>
+            <v-card-text>
+              ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
+              <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
+                {{ guest.title }}
+                <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
+              </p>
+            </v-card-text>
+            <v-card-text>
+              <td>{{ gathwd.gathering.commentOwner }}</td>
+            </v-card-text>
+            <v-card-actions v-if="user?.id">
+              <v-btn @click="guestSet(gathwd.gathering.id, 1)">
+                Присоедениться
+              </v-btn>
+              <v-btn @click="guestSet(gathwd.gathering.id, 0)">
+                Покинуть сбор
+              </v-btn>
+              <v-btn>
+                Добавить гостей
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-main>
+
+  <fast-action>
+    <NuxtLink to="./item">
+      <v-btn icon="mdi-plus" size="large" elevation="8" />
+    </NuxtLink>
+  </fast-action>
 </template>
 
 <script lang="ts" setup>
@@ -65,6 +70,7 @@ const dateAdapter = useDate()
 const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 const clubPermissions = useClubPermissions();
+const user = useSupabaseUser();
 
 async function updateFilters() {
   const data = await $fetch('/api/supabase/gatherings', {
@@ -115,6 +121,18 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
   })
   return ret;
 });
+
+async function guestSet(gatheringId: number, number: number) {
+  const data = await $fetch('/api/supabase/gatherings-set-guest', {
+    method: 'POST',
+    body: {
+      gathering_id: gatheringId,
+      guest_id: user.value?.id,
+      number,
+    }
+  });
+  //todo: update list
+}
 </script>
 
 <style scoped></style>

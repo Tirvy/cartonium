@@ -238,7 +238,7 @@ export interface GatheringGuest {
     title: string
     messageUrl: string
     imageUrl: string
-    additionalGuests: number
+    totalGuests: number
 }
 
 export interface GatheringWithGuests extends Gathering {
