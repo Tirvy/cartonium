@@ -7,7 +7,8 @@
 
 
 <template>
-    <v-layout-item model-value class="text-end pointer-events-none" position="bottom" size="88">
+    <v-layout-item model-value class="text-end pointer-events-none" position="bottom" size="88"
+        order="1">
         <div class="ma-4 pointer-events-initial">
             <slot></slot>
         </div>
