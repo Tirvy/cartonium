@@ -6,6 +6,7 @@
 
 
 definePageMeta({
+  name: 'gatherings-root',
   middleware: [
     async function (to, from) {
       const clubPermissions = useClubPermissions();
@@ -13,10 +14,14 @@ definePageMeta({
       // todo: fix kostil'
       const routeSplitted = to.path.split('/');
       const lastOnPath = routeSplitted[routeSplitted.length - 1];
-
-      if (!clubPermissions && lastOnPath === 'gatherings') {
-        return navigateTo(to.path + '/item', { replace: true });
+      if (to.name === 'gatherings-root') {
+        if (!clubPermissions) {
+          return navigateTo(to.path + '/table', { replace: true });
+        } else {
+          return navigateTo(to.path + '/table-admin', { replace: true });
+        }
       }
+
     },
   ],
 });

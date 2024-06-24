@@ -105,11 +105,9 @@
 import type { Gathering, Loaders } from '~/types/frontend'
 import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
-import { it } from 'node:test';
 const dateAdapter = useDate()
 const route = useRoute();
 const router = useRouter();
-const item = ref('');
 const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
 const currentClub: Ref<Club> = useState('club');

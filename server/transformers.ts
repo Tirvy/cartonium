@@ -72,12 +72,12 @@ export function gatheringFromSupabase(data: any): Gathering {
 }
 
 export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
-    const userDataSource = data.rawUserMetaData;
+    const userDataSource = data.raw_user_meta_data;
     const userData = userDataSource && {
         title: userDataSource.first_name,
         imageUrl: userDataSource.picture,
         messageUrl: '',
-        additionalGuests: data.guests_number
+        additionalGuests: data.guests_number - 1
     }
     return {
         clubId: data.club_id,
@@ -92,7 +92,8 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         id: data.id,
         owner: data.owner,
         startDate: data.start_date,
-        guests: data.rawUserMetaData ? [userData] : [],
+        guests: userDataSource ? [userData] : [],
+        slotsFilled: data.guests_number || 0,
     };
 
 }

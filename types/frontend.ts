@@ -245,6 +245,7 @@ export interface GatheringWithGuests extends Gathering {
     guests: GatheringGuest[]
     gamebox: GameBox
     ownTitle: string
+    slotsFilled: number
 }
 
 export interface GatheringsWithDates {

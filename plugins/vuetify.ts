@@ -5,6 +5,7 @@ import { createVuetify } from 'vuetify'
 import type { ThemeDefinition } from 'vuetify';
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { VDateInput } from 'vuetify/labs/VDateInput'
 
 import DayJsAdapter  from '@date-io/dayjs'
 import ruDayjs from 'dayjs/locale/ru'
@@ -40,6 +41,7 @@ export default defineNuxtPlugin(nuxtApp => {
     ssr: true,
     components: {
       ...components,
+      VDateInput,
     },
     directives,
     theme: {
