@@ -66,7 +66,7 @@ export function gatheringFromSupabase(data: any): Gathering {
         contact: data.contact,
         guestsMax: data.guests_max,
         id: data.id,
-        owner: data.owner,
+        ownerId: data.owner_id,
         startDate: data.start_date,
     };
 }
@@ -77,7 +77,8 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         title: userDataSource.first_name,
         imageUrl: userDataSource.picture,
         messageUrl: '',
-        totalGuests: data.guests_number
+        totalGuests: data.guests_number,
+        id: data.user_id,
     }
     return {
         clubId: data.club_id,
@@ -90,7 +91,8 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         contact: data.contact,
         guestsMax: data.guests_max,
         id: data.id,
-        owner: data.owner,
+        ownerId: data.owner_id,
+        ownerUser: data.owneruser,
         startDate: data.start_date,
         guests: userDataSource ? [userData] : [],
         slotsFilled: data.guests_number || 0,

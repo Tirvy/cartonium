@@ -46,7 +46,7 @@
               <v-btn @click="guestSet(gathwd.gathering.id, 0)">
                 Покинуть сбор
               </v-btn>
-              <v-btn>
+              <v-btn @click="showDialogGuests(gathwd.gathering)">
                 Добавить гостей
               </v-btn>
             </v-card-actions>
@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GatheringWithGuests, GatheringsWithDates } from '~/types/frontend'
+import type { Gathering, GatheringWithGuests, GatheringsWithDates } from '~/types/frontend'
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
 const gatherings: Ref<GatheringWithGuests[]> = ref([]);
@@ -123,7 +123,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
 });
 
 async function guestSet(gatheringId: number, number: number) {
-  const data = await $fetch('/api/supabase/gatherings-set-guest', {
+  const data: any = await $fetch('/api/supabase/gatherings-set-guest', {
     method: 'POST',
     body: {
       gathering_id: gatheringId,
@@ -131,7 +131,22 @@ async function guestSet(gatheringId: number, number: number) {
       number,
     }
   });
-  //todo: update list
+
+  if (!data.error) {
+    const gatheringWithUser = gatherings.value.find(gathering => gathering.id === gatheringId);
+    const currentUserAsGuest = useCurrentUserAsGuest();
+    let guestUseritem = gatheringWithUser?.guests.find(item => item.id === currentUserAsGuest.id);
+    if (guestUseritem) {
+      guestUseritem.totalGuests = number
+    } else {
+      currentUserAsGuest.totalGuests = number;
+      gatheringWithUser?.guests.push(currentUserAsGuest)
+    }
+  }
+}
+
+function showDialogGuests(gathering: Gathering) {
+
 }
 </script>
 

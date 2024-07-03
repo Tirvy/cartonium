@@ -230,7 +230,7 @@ export interface Gathering {
     gameboxId: number
     tableId: number | null
     id: number
-    owner: string
+    ownerId: string
     startDate: string
 }
 
@@ -239,6 +239,7 @@ export interface GatheringGuest {
     messageUrl: string
     imageUrl: string
     totalGuests: number
+    id: string
 }
 
 export interface GatheringWithGuests extends Gathering {
@@ -246,6 +247,10 @@ export interface GatheringWithGuests extends Gathering {
     gamebox: GameBox
     ownTitle: string
     slotsFilled: number
+    ownerUser: {
+        id: string
+        metadata: any
+    },
 }
 
 export interface GatheringsWithDates {

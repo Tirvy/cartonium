@@ -207,7 +207,7 @@ export type Database = {
           guests_max: number
           id: number
           own_name: string | null
-          owner: string
+          owner_id: string
           start_date: string | null
           table_id: number | null
         }
@@ -220,7 +220,7 @@ export type Database = {
           guests_max: number
           id?: number
           own_name?: string | null
-          owner?: string
+          owner_id?: string
           start_date?: string | null
           table_id?: number | null
         }
@@ -233,7 +233,7 @@ export type Database = {
           guests_max?: number
           id?: number
           own_name?: string | null
-          owner?: string
+          owner_id?: string
           start_date?: string | null
           table_id?: number | null
         }
@@ -260,66 +260,38 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gatherings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "gatherings_table_id_fkey"
             columns: ["table_id"]
             isOneToOne: false
             referencedRelation: "tables"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "public_gatherings_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       gatherings_guests: {
         Row: {
-          created_at: string
-          gathering_id: number | null
+          gathering_id: number
           guests_number: number
-          id: number
-          user_id: string | null
+          user_id: string
         }
         Insert: {
-          created_at?: string
-          gathering_id?: number | null
+          gathering_id: number
           guests_number: number
-          id?: number
-          user_id?: string | null
+          user_id: string
         }
         Update: {
-          created_at?: string
-          gathering_id?: number | null
+          gathering_id?: number
           guests_number?: number
-          id?: number
-          user_id?: string | null
+          user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "gathering_guests_gathering_id_fkey"
-            columns: ["gathering_id"]
-            isOneToOne: false
-            referencedRelation: "gatherings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gathering_guests_gathering_id_fkey"
-            columns: ["gathering_id"]
-            isOneToOne: false
-            referencedRelation: "gatherings_with_guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gathering_guests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -503,12 +475,12 @@ export type Database = {
           full_name: string | null
           gamebox: Json | null
           gamebox_id: number | null
-          guest_id: number | null
           guests_max: number | null
           guests_number: number | null
           id: number | null
           own_name: string | null
-          owner: string | null
+          owner_id: string | null
+          owneruser: Json | null
           raw_user_meta_data: Json | null
           start_date: string | null
           table_id: number | null
@@ -516,13 +488,6 @@ export type Database = {
           username: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "gathering_guests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "gatherings_club_id_fkey"
             columns: ["club_id"]
@@ -545,17 +510,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "gatherings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "gatherings_table_id_fkey"
             columns: ["table_id"]
             isOneToOne: false
             referencedRelation: "tables"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_gatherings_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
