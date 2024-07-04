@@ -4,10 +4,8 @@
             <v-form class="d-flex flex-row">
                 <v-row class="justify-space-between">
                     <v-col cols="4">
-                        <v-date-input prepend-icon="" prepend-inner-icon="$calendar" v-model="dateFrom"></v-date-input>
-                    </v-col>
-                    <v-col>
-                        <v-btn @click="updateFilters">Обновить</v-btn>
+                        <v-date-input prepend-icon="" prepend-inner-icon="$calendar" v-model="dateFrom"
+                            @update:modelValue="updateFilters" :loading="loaders.dateRange"></v-date-input>
                     </v-col>
                     <v-spacer />
                     <v-col>
@@ -83,6 +81,10 @@ const dateAdapter = useDate()
 const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 
+const loaders: Ref<Loaders> = ref({
+  dateRange: false
+});
+
 const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {
     query: {
         clubid: currentClub.value.id,
@@ -93,6 +95,7 @@ const dateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats
 const lastDateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFormats);
 
 async function updateFilters() {
+    loaders.value.dateRange = true;
     const data = await $fetch('/api/supabase/gatherings', {
         query: {
             clubid: currentClub.value.id,
@@ -103,6 +106,7 @@ async function updateFilters() {
     if (Array.isArray(data)) {
         gatherings.value = data;
     }
+    loaders.value.dateRange = false;
 }
 updateFilters();
 
