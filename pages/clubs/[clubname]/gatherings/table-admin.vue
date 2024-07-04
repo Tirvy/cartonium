@@ -4,7 +4,7 @@
             <v-form class="d-flex flex-row">
                 <v-row class="justify-space-between">
                     <v-col cols="4">
-                        <v-date-input v-model="dateFrom"></v-date-input>
+                        <v-date-input prepend-icon="" prepend-inner-icon="$calendar" v-model="dateFrom"></v-date-input>
                     </v-col>
                     <v-col>
                         <v-btn @click="updateFilters">Обновить</v-btn>

@@ -5,8 +5,8 @@
                 <v-form @submit.prevent="saveGathering" v-model="formIsValid">
                     <v-row>
                         <v-col>
-                            <date-text-picker label="Дата" v-model="startDate" color="primary"></date-text-picker>
-
+                            <v-date-input label="Дата" prepend-icon="" prepend-inner-icon="$calendar"
+                                v-model="startDate" :allowed-dates="dateIsTodayOnward"></v-date-input>
                         </v-col>
                         <v-col>
                             <v-text-field v-maska:[timeMaskOptions] placeholder="12:30" label="Время"
@@ -49,12 +49,12 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Сколько человек надо на игру (в сумме)"
-                                v-model="guestsMax" :rules="[ruleIsNumber]"></v-text-field>
+                            <v-text-field label="Сколько человек надо на игру (в сумме)" v-model="guestsMax"
+                                :rules="[ruleIsNumber]"></v-text-field>
                         </v-col>
                         <v-col v-if="!gatheringId">
-                            <v-text-field label="Сколько гостей приведете с собой"
-                                v-model="hostGuestsNumber" :rules="[ruleIsNumber]"></v-text-field>
+                            <v-text-field label="Сколько гостей приведете с собой" v-model="hostGuestsNumber"
+                                :rules="[ruleIsNumber]"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -124,6 +124,8 @@ const loaders: Ref<Loaders> = ref({
 
 // ---- default form values
 const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
+const date = dateAdapter.date();
+console.log(date);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
@@ -143,6 +145,13 @@ function allowedDates(val: Date) {
 };
 const gameboxesSearchList = ref<GameBox[]>([]);
 const tables = ref<Table[]>([])
+
+const today = new Date();
+const yesterday = new Date();
+yesterday.setDate(today.getDate() - 1);
+function dateIsTodayOnward (date: unknown) {
+    return date as Date > yesterday;
+}
 
 /* in case it needs optimization
 //

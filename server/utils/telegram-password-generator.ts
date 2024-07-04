@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { TelegramLoginPayload } from '@/server/utils/check-telegram-auth.js'
 
 
 export default function (tgData: TelegramLoginPayload): string {

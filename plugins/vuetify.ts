@@ -51,13 +51,14 @@ export default defineNuxtPlugin(nuxtApp => {
         themeInitialLight
       }
     },
-    date: {
-      adapter: DayJsAdapter,
-      locale: {
-        ru: ruDayjs,
-        en: enDayjs,
-      },
-    },
+    // todo: вернуть dayjs?
+    // date: {
+    //   adapter: DayJsAdapter,
+    //   locale: {
+    //     ru: ruDayjs,
+    //     en: enDayjs,
+    //   },
+    // },
     defaults: {
       VBtn: {
         color: 'primary',
