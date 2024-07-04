@@ -54,13 +54,10 @@
         </v-col>
       </v-row>
     </v-container>
+  <v-fab location="bottom end" icon="mdi-plus"  to="./item" app size="large" variant="outlined" order="1">
+  </v-fab>
   </v-main>
 
-  <fast-action>
-    <NuxtLink to="./item">
-      <v-btn icon="mdi-plus" size="large" elevation="8" />
-    </NuxtLink>
-  </fast-action>
 </template>
 
 <script lang="ts" setup>

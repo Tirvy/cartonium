@@ -66,11 +66,8 @@
         </v-container>
     </v-main>
 
-    <fast-action>
-        <NuxtLink to="./item">
-            <v-btn icon="mdi-plus" size="large" elevation="8" />
-        </NuxtLink>
-    </fast-action>
+    <v-fab location="bottom end" icon="mdi-plus" to="./item" app size="large" variant="outlined" order="1">
+    </v-fab>
 </template>
 
 <script setup lang="ts">
@@ -82,7 +79,7 @@ const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 
 const loaders: Ref<Loaders> = ref({
-  dateRange: false
+    dateRange: false
 });
 
 const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {

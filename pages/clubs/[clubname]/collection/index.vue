@@ -33,9 +33,9 @@
         </v-list>
     </v-navigation-drawer>
 
-    <fast-action v-if="clubPermissions?.relation_type === 'tech'">
-        <v-btn icon="mdi-plus" size="large" elevation="8" :to="'./collection/add-games'" />
-    </fast-action>
+    <v-fab v-if="clubPermissions?.relation_type === 'tech'" location="bottom end" icon="mdi-plus"
+        to="./collection/add-games" app size="large" variant="outlined" order="1">
+    </v-fab>
 </template>
 
 
