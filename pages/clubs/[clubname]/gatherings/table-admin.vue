@@ -15,7 +15,7 @@
                     </v-col>
                 </v-row>
             </v-form>
-            <v-table>
+            <v-table v-if="gatheringsWithDates.length">
                 <thead>
                     <tr>
                         <th>
@@ -63,6 +63,9 @@
                     </tr>
                 </tbody>
             </v-table>
+            <v-empty-state v-else
+                text="Измените стартовую дату для поиска вверху или создайте новый сбор кнопкой '+' снизу-справа"
+                title="Не найдено сборов на эти даты" />
         </v-container>
     </v-main>
 
