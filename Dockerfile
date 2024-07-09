@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Build the Next.js application for production
-RUN npm run build
+RUN npm run generate
 
 EXPOSE 80
 EXPOSE 443
