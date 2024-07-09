@@ -1,5 +1,10 @@
 # Dockerfile
 
+ARG SUPABASE_URL
+ARG SUPABASE_KEY
+ARG NUXT_BOT_TOKEN
+ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
+
 # Use an official Node.js runtime as the base image
 FROM node:18-alpine
 
