@@ -4,7 +4,7 @@
 FROM node:18-alpine
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json to the container
 COPY package.json package-lock.json ./
@@ -18,6 +18,7 @@ COPY . .
 # Build the Next.js application for production
 RUN npm run generate
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 3000
+#EXPOSE 80
+#EXPOSE 443
 CMD ["node", ".output/server/index.mjs"]

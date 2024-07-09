@@ -47,4 +47,9 @@ export default defineNuxtConfig({
       },
     },
   },
+  webpack: {
+    optimization: {
+      minimize: false,
+    }
+  }
 })
