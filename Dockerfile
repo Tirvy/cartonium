@@ -16,9 +16,9 @@ RUN npm install
 COPY . .
 
 # Build the Next.js application for production
-RUN npm run generate
+RUN npm run build
 
-EXPOSE 3000
-#EXPOSE 80
-#EXPOSE 443
+#EXPOSE 3000
+EXPOSE 80
+EXPOSE 443
 CMD ["node", ".output/server/index.mjs"]
