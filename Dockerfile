@@ -27,5 +27,4 @@ RUN npm run build
 
 #EXPOSE 3000
 EXPOSE 80
-EXPOSE 443
 CMD ["node", ".output/server/index.mjs"]
