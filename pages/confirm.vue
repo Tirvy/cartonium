@@ -3,10 +3,11 @@ definePageMeta({
   layout: "login",
 })
 const user = useSupabaseUser()
+const defaultPage = useDefaultPage();
 
 watch(user, () => {
   if (user.value) {
-    return navigateTo('/clubs/emarena/collection')
+    return navigateTo(defaultPage)
   }
 }, { immediate: true })
 </script>

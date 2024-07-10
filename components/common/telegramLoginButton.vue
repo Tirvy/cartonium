@@ -11,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits(['auth']);
 
 onMounted(() => {
+  const defaultPage = useDefaultPage();
   if (telegramLoginButton.value) {
     const useCallback = false;
     const script = document.createElement("script");
@@ -23,7 +24,7 @@ onMounted(() => {
       script.setAttribute('data-onauth', 'onTelegramAuth(user)');
     }
     else {
-      const nextRoute = props.next || 'clubs/emarena/collection';
+      const nextRoute = props.next || defaultPage;
       script.setAttribute('data-auth-url', '/auth/telegram-callback?next=' + nextRoute);
     }
     script.setAttribute('data-request-access', 'write');

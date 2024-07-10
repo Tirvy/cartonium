@@ -9,6 +9,7 @@ definePageMeta({
   name: 'gatherings-root',
   middleware: [
     async function (to, from) {
+      console.log(to);
       const clubPermissions = useClubPermissions();
 
       // todo: fix kostil'

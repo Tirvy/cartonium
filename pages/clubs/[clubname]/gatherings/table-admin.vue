@@ -85,6 +85,18 @@ const loaders: Ref<Loaders> = ref({
     dateRange: false
 });
 
+definePageMeta({
+    name: 'gatherings-table-admin',
+    middleware: [
+        async function (to, from) {
+            const clubPermissions = useClubPermissions();
+            if (!clubPermissions) {
+                return navigateTo(to.path + '/table', { replace: true });
+            }
+        }
+    ],
+});
+
 const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {
     query: {
         clubid: currentClub.value.id,

@@ -20,9 +20,21 @@
           </v-col>
         </v-row>
       </template>
-      <v-col v-else-if="!user" class="d-flex justify-center">
-        <common-login></common-login>
-      </v-col>
+
+      <template v-else-if="!user">
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <v-card-title>
+              Логин для админов
+            </v-card-title>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <common-login></common-login>
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </v-main>
 </template>

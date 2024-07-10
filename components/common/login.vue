@@ -95,7 +95,7 @@ const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
 
 const redirectPath = useCookie('sb-redirect-path');
-const defaultRedirectPath = '/clubs/emarena/collection';
+const defaultRedirectPath = useDefaultPage();
 watchEffect(() => {
   if (user.value) {
     if (redirectPath.value) {
@@ -163,7 +163,7 @@ async function signUpNewUser() {
     email: signupEmail.value,
     password: signupPassword.value,
     options: {
-      emailRedirectTo: 'http://192.168.100.5:3000/clubs/emarena/add-games',
+      emailRedirectTo: defaultRedirectPath,
     },
   })
 }

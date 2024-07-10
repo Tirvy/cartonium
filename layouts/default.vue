@@ -11,7 +11,7 @@
         </nuxt-link>
       </template>
 
-      <v-app-bar-title>Ареночка</v-app-bar-title>
+      <v-app-bar-title>{{ currentClub?.title }}</v-app-bar-title>
 
       <template v-slot:append>
         <NuxtLink v-if="avatar.show" :to="profileLink">
@@ -42,6 +42,8 @@
 <script setup lang="ts">
 
 const redirectPath = useCookie('sb-redirect-path');
+const currentClub: Ref<Club> = useState('club');
+
 const lastClub = computed(() => {
   const path = redirectPath.value || "";
   const splitted = path.split('/');
@@ -53,7 +55,7 @@ const lastClub = computed(() => {
 
 const route = useRoute();
 const clubName = computed(() => {
-  return route.params.clubname || lastClub.value || 'emarena';
+  return route.params.clubname || lastClub.value || 'terra';
 });
 
 const profileLink = `/clubs/${clubName.value}/profile`;
@@ -120,7 +122,7 @@ const avatar = computed(() => {
     show: !!user.value,
     pictureUrl: user.value?.user_metadata?.avatar_url,
     name: user.value?.user_metadata.first_name,
-    initials: user.value?.user_metadata?.full_name.split(' ').map((item: string) => item[0].toUpperCase()).join(''),
+    initials: user.value?.user_metadata?.full_name?.split(' ').map((item: string) => item[0].toUpperCase()).join(''),
   }
 });
 

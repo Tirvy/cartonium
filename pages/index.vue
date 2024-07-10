@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+
 
 <template>
   <v-container fluid class="fill-height">
@@ -10,6 +9,12 @@
     </v-row>
   </v-container>
 </template>
+
+<script setup lang="ts">
+const defaultPage = useDefaultPage();
+
+navigateTo(defaultPage)
+</script>
 
 <style scoped>
 .login-card {

@@ -55,11 +55,12 @@
       </v-row>
 
       <v-empty-state v-if="gatheringsWithDates.length === 0"
-                text="Можете сами начать собирать людей кнопкой '+' снизу-справа"
-                title="Не найдено сборов в клубе" />
+        text="Можете сами начать собирать людей кнопкой '+' снизу-справа" title="Не найдено сборов в клубе" />
     </v-container>
-  <v-fab location="bottom end" icon="mdi-plus"  to="./item" app size="large" variant="outlined" order="1">
-  </v-fab>
+    <v-fab location="bottom end" icon="mdi-plus" to="./item" app size="large" variant="outlined" order="1">
+      <v-icon icon="mdi-plus"></v-icon>
+      <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
+    </v-fab>
   </v-main>
 
 </template>

@@ -3,7 +3,7 @@ export const useClubPermissions = (): { relation_type: string, club_id: string }
   const currentClub: Ref<Club> = useState('club');
 
   const forcedPermissions = localStorage.getItem('forcePermissions');
-  if (forcedPermissions) {
+  if (forcedPermissions && currentClub.value) {
     switch (forcedPermissions) {
       case 'admin':
         case 'owner':
