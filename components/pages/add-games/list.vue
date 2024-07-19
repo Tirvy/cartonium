@@ -38,7 +38,8 @@ const emit = defineEmits<{
 const currentClub: Ref<Club> = useState('club');
 
 // making games list
-const gamesList = ref(data.data);
+// const gamesList = ref(data.data);
+const gamesList = ref("");
 
 async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);

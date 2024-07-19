@@ -28,14 +28,16 @@ definePageMeta({
 
       async function updatePermissions() {
         const user = useSupabaseUser()
-        const clubPermissions = useState('clubPermissions');
+        const currentClub: Ref<Club | null> = useState('club');
 
         const clubs = await $fetch('/api/supabase/my-clubs-permissions', {
           query: {
             userid: user?.value?.id,
+            clubid: currentClub.value?.id,
           }
         });
-        clubPermissions.value = clubs as { club_id: string }[];
+        console.log('permissions updated', clubs);
+        clubPermissions.value = clubs as { club_id: string, relation_type: string }[];
       }
 
       async function getClubData(clubname: string | undefined) {

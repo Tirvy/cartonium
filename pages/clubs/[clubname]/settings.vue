@@ -10,7 +10,7 @@ definePageMeta({
       const currentClub: Ref<Club> = useState('club');
       const clubPermissions = useClubPermissions();
 
-      if (!clubPermissions) {
+      if (!clubPermissions.value) {
         return navigateTo('/clubs/' + currentClub.value.urlName + '/collection');
       }
     },

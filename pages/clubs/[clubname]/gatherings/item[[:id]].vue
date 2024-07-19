@@ -183,7 +183,7 @@ async function getClubTables(search?: string) {
     });
     tables.value = foundTables;
 }
-if (clubPermissions) {
+if (clubPermissions.value) {
     getClubTables();
 }
 

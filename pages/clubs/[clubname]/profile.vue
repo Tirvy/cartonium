@@ -7,7 +7,7 @@
             <v-switch v-model="isDarkTheme" label="Включить ночную тему"></v-switch>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="false">
           <v-col>
             <v-switch v-model="forcePermissionsAdmin" label="force admin"></v-switch>
           </v-col>
@@ -71,7 +71,6 @@ const forcePermissionsAdmin = computed({
   },
   set(value) {
     const newValue = value ? 'admin' : 'guest';
-    console.log(value, newValue);
     localStorage.setItem('forcePermissions', newValue);
     localIsAdminValue.value = newValue;
   }

@@ -90,7 +90,7 @@ definePageMeta({
     middleware: [
         async function (to, from) {
             const clubPermissions = useClubPermissions();
-            if (!clubPermissions) {
+            if (!clubPermissions.value) {
                 return navigateTo(to.path + '/table', { replace: true });
             }
         }

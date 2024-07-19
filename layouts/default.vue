@@ -93,7 +93,7 @@ let pages = [
 
 const clubPermissions = useClubPermissions();
 const pagesList = computed(() => {
-  return pages.filter(item => !item.permissions || clubPermissions)
+  return pages.filter(item => !item.permissions || clubPermissions.value)
 })
 
 
@@ -117,12 +117,22 @@ const clubAvatar = computed(() => {
 // setting up user avatar
 const user = useSupabaseUser();
 
+const initials = computed(() => {
+  let source = user.value?.user_metadata?.full_name || user.value?.user_metadata?.name;
+
+  if (source) {
+    return source.split(' ').map((item: string) => item[0].toUpperCase()).join('');
+  }
+
+  return user.value?.email?.split('@').map(str => str[0]).join('@').toUpperCase();
+}) 
+
 const avatar = computed(() => {
   return {
     show: !!user.value,
     pictureUrl: user.value?.user_metadata?.avatar_url,
     name: user.value?.user_metadata.first_name,
-    initials: user.value?.user_metadata?.full_name?.split(' ').map((item: string) => item[0].toUpperCase()).join(''),
+    initials: initials.value,
   }
 });
 

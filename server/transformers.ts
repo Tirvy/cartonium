@@ -54,6 +54,27 @@ export function gameBoxFromSupabase(data: any): GameBoxWithClub {
         clubId: data.club_id || undefined,
     };
 }
+export function gameBoxToSupabase(gameBox: GameBoxWithClub): any {
+    return {
+      alias_tesera: gameBox.aliasTesera,
+      id_bgg: gameBox.idBgg,
+      id_tesera: gameBox.idTesera,
+      link_bgg: gameBox.linkBgg,
+      link_tesera: gameBox.linkTesera,
+      photo_url: gameBox.photoUrl,
+      players_good: gameBox.playersGood,
+      players_max: gameBox.playersMax,
+      players_min: gameBox.playersMin,
+      playtime_avg: gameBox.playtimeAvg,
+      playtime_max: gameBox.playtimeMax,
+      playtime_min: gameBox.playtimeMin,
+      rating_bgg: gameBox.ratingBgg,
+      rating_tesera: gameBox.ratingTesera,
+      title: gameBox.title,
+      titles: gameBox.titles,
+      year: gameBox.year,
+    };
+  }
 
 // gathering
 export function gatheringFromSupabase(data: any): Gathering {

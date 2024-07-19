@@ -9,14 +9,17 @@ export default defineEventHandler(async (event) => {
   if (!titles?.length) {
     throw createError({ statusMessage: 'title required' })
   }
-  const user = await serverSupabaseUser(event)
-  const client = await serverSupabaseClient<Database>(event)
+  const client = await serverSupabaseClient<Database>(event);
+
+  console.log(titles.length, 1);
 
   const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titles);
+  console.log(error, 3);
   if (error) {
     throw createError({ message: error.message })
   }
 
+  console.log(data.length, 2);
   return data.map(gameBoxFromSupabase);
   // return data.map(gameBoxFromSupabase);
 })
