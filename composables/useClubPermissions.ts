@@ -19,7 +19,6 @@ export const useClubPermissions = (): Ref<{ relation_type: string, club_id: stri
     }
   } else {
     permissionsRet.value = clubPermissions?.value?.find(item => item.club_id === currentClub.value.id);
-    Зомби
   }
 
   return permissionsRet;

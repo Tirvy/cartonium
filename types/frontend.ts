@@ -1,5 +1,6 @@
 export interface GameboxAddData{
     name: string
+    preciseSearch?: string
     foundGamebox: GameBox | null,
     indaclub: boolean,
     gameTeseraVariants: GameBoxSearchResult[],
@@ -29,8 +30,8 @@ export interface SearchResultBgg {
     id: number
     title: string
     year: number
-
 }
+export type GamedataSource = "tesera" | "bgg";
 
 export interface SearchResultTesera {
 

@@ -42,8 +42,6 @@ const props = defineProps<{
 }>(); 
 
 const imageURL = computed(() => {
-    
-    // todo: fix asap!
-    return `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;
+    return props.value.photoUrl || `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;
 })
 </script>

@@ -23,31 +23,38 @@
 
         <v-col v-else-if="gathwd.gathering">
           <v-card>
-            <v-card-title>
-              {{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}
-            </v-card-title>
-            <v-card-subtitle>
-              [{{ gathwd.date }}]
-            </v-card-subtitle>
-            <v-card-text>
-              ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
-              <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
-                {{ guest.title }}
-                <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
-              </p>
-            </v-card-text>
-            <v-card-text>
-              <td>{{ gathwd.gathering.commentOwner }}</td>
-            </v-card-text>
+            <div class="d-flex flex-no-wrap justify-start ">
+              <v-avatar class="ma-3" size="180" rounded="0">
+                <v-img :cover="false" height="180" :src="gathwd.gathering.gamebox?.photoUrl"></v-img>
+              </v-avatar>
+              <div>
+                <v-card-title>
+                  {{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}
+                </v-card-title>
+                <v-card-subtitle>
+                  [{{ gathwd.date }}]
+                </v-card-subtitle>
+                <v-card-text>
+                  ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
+                  <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
+                    {{ guest.title }}
+                    <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
+                  </p>
+                </v-card-text>
+                <v-card-text>
+                  <td>{{ gathwd.gathering.commentOwner }}</td>
+                </v-card-text>
+              </div>
+            </div>
             <v-card-actions v-if="user?.id">
               <v-btn @click="guestSet(gathwd.gathering.id, 1)">
                 Присоедениться
               </v-btn>
-              <v-btn @click="guestSet(gathwd.gathering.id, 0)">
-                Покинуть сбор
-              </v-btn>
               <v-btn @click="showDialogGuests(gathwd.gathering)">
                 Добавить гостей
+              </v-btn>
+              <v-btn @click="guestSet(gathwd.gathering.id, 0)">
+                Покинуть сбор
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -152,4 +159,9 @@ function showDialogGuests(gathering: Gathering) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.gathering-img {
+  width: 180px;
+  height: 180px;
+}
+</style>

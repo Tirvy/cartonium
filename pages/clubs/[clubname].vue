@@ -36,7 +36,7 @@ definePageMeta({
             clubid: currentClub.value?.id,
           }
         });
-        console.log('permissions updated', clubs);
+        // console.log('permissions updated', clubs);
         clubPermissions.value = clubs as { club_id: string, relation_type: string }[];
       }
 

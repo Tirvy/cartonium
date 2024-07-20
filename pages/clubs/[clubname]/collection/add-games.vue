@@ -20,11 +20,13 @@
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 3">
-                    <pages-add-games-add-gameboxes :items="controlDataOutOfClub" @getGameBoxData="getGameBoxData" />
+                    <pages-add-games-add-gameboxes :items="controlDataOutOfClub" @getGameBoxData="getGameBoxData"
+                        :loading="loaders.gettingData" @search="searchAgainSpecific" />
                 </v-col>
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 4">
-                    <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase" />
+                    <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase"
+                        :loading="loaders.gettingData" />
                 </v-col>
             </v-row>
         </v-container>
@@ -42,11 +44,14 @@
 </template>
 
 <script setup lang="ts">
-import type { GameBox, GameBoxDataTesera, GameBoxDataBgg } from '~/types/frontend.js';
+import type { GameBox, GameBoxDataTesera, GameBoxDataBgg, GamedataSource } from '~/types/frontend.js';
 import type { SearchedGameBox, SyncTeseraBggMap, GameboxAddData } from "~/types/frontend.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'
 
+const loaders: Ref<Loaders> = ref({
+    gettingData: false
+});
 
 const currentClub: Ref<Club> = useState('club');
 
@@ -161,90 +166,123 @@ async function addTheseExisting(selectedExisting: GameboxAddData[]) {
 async function getGamesBaseInfo() {
     const cdataToProgress = controlData.value.filter(item => !item.indaclub);
     let progress = 0;
+    loaders.value.gettingData = true;
 
-    cdataToProgress.forEach((cdata: GameboxAddData, index: number) => {
-        setTimeout(async () => {
-            const resTesera: any = await $fetch('/api/tesera/search', { query: { title: cdata.name } });
+    cdataToProgress.forEach(async (cdata: GameboxAddData, index: number) => {
+        cdata.preciseSearch = cdata.name;
+        const resTesera: unknown = await $fetch('/api/tesera/search', { query: { title: cdata.name } });
 
-            if (Array.isArray(resTesera) && resTesera.length) {
-                cdata.gameTeseraVariants = resTesera;
-                cdata.gameTesera = resTesera[0];
+        if (Array.isArray(resTesera) && resTesera.length) {
+            cdata.gameTeseraVariants = resTesera;
+            cdata.gameTesera = resTesera[0];
 
-                const searchTitles = resTesera[0].titles.filter((title: string) => {
-                    return !(+title > 1995 && +title < 2040);
-                })
-                const resBgg = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
-                if (Array.isArray(resBgg) && resBgg.length) {
-                    cdata.gameBggVariants = resBgg;
-                    cdata.gameBgg = resBgg[0];
-                }
+            const searchTitles = resTesera[0].titles.filter((title: string) => {
+                return !(+title >= 1995 && +title < 2040);
+            })
+            const resBgg = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
+            if (Array.isArray(resBgg) && resBgg.length) {
+                cdata.gameBggVariants = resBgg;
+                cdata.gameBgg = resBgg[0];
             }
+        }
 
-            progress++;
-            if (progress === cdataToProgress.length) { 
-                // to force recalc
-                controlData.value = [...controlData.value]
-            }
-        }, index * requestInterval);
+        progress++;
+        if (progress === cdataToProgress.length) {
+            // to force recalc
+            controlData.value = [...controlData.value]
+            loaders.value.gettingData = false;
+        }
     });
 };
+
+async function searchForeignData(source: GamedataSource, titles: string[]) {
+    if (source === 'tesera') {
+        const res = await $fetch('/api/tesera/search', { query: { title: titles } });
+        return res;
+    } else if (source === 'bgg') {
+        const res = await $fetch('/api/bgg/search', { query: { titles: titles } });
+        return res;
+    }
+}
+
+async function searchAgainSpecific(cdata: GameboxAddData, source: GamedataSource) {
+    if (!cdata?.preciseSearch?.length) {
+        return;
+    }
+
+    const titles = [cdata.preciseSearch];
+    const data = await searchForeignData(source, titles);
+    if (Array.isArray(data)) {
+        if (source === 'tesera') {
+            cdata.gameTeseraVariants = data;
+            if (data.length) {
+                cdata.gameTesera = data[0];
+            } else {
+                cdata.gameTesera = null;
+            }
+        } else {
+            cdata.gameBggVariants = data;
+            if (data.length) {
+                cdata.gameBgg = data[0];
+            } else {
+                cdata.gameBgg = null;
+            }
+        }
+    }
+}
 
 
 // leech data from bgg and tesera
 
 async function getGameBoxData(syncData: SyncTeseraBggMap) {
-    const requestInterval = 1000;
-    const cdataToProgress = controlData.value.filter(item => syncData[item.name]?.selected);
+    const cdataToProgress = controlData.value.filter(item => {
+        return syncData[item.name] && syncData[item.name].selected && (syncData[item.name].gameBgg || syncData[item.name].gameTesera);
+    });
 
-    if (cdataToProgress.length > 0) {
-        cdataToProgress
-            .forEach((cdataItem: any, index: number) => {
-                setTimeout(async () => {
-                    const gameInfo = syncData[cdataItem.name];
-                    let ret = {
-                        id: 0,
-                        title: "",
-                        titles: [] as string[],
-                        aliasTesera: undefined,
-                        idBgg: undefined,
-                        idTesera: undefined,
-                        linkBgg: undefined,
-                        linkTesera: undefined,
-                        photoUrl: undefined,
-                        playersGood: undefined,
-                        playersMax: undefined,
-                        playersMin: undefined,
-                        playtimeAvg: undefined,
-                        playtimeMax: undefined,
-                        playtimeMin: undefined,
-                        ratingBgg: undefined,
-                        ratingTesera: undefined,
-                        year: undefined,
-                    };
-                    if (gameInfo.gameTesera) {
-                        let teseraRet: GameBoxDataTesera = await $fetch('/api/tesera/get-gamebox', {
-                            query: { alias: gameInfo.gameTesera.alias },
-                        });
-                        ret.titles.push(teseraRet.title);
-                        Object.keys(ret).forEach((key) => {
-                            (ret as any)[key] = (ret as any)[key] || (teseraRet as any)[key];
-                        });
-                    }
-                    if (gameInfo.gameBgg) {
-                        let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', {
-                            query: { id: gameInfo.gameBgg.id },
-                        });
-                        ret.titles.push(bggRet.title as string);
-                        Object.keys(ret).forEach((key) => {
-                            (ret as any)[key] = (ret as any)[key] || (bggRet as any)[key];
-                        });
-                    }
-                    ret.titles.push(cdataItem.name);
-                    saveData.value.push(ret);
-                }, index * requestInterval);
-            });
-        await timeout((cdataToProgress.length + 1) * 1000);
-    }
+    cdataToProgress
+        .forEach(async (cdataItem: any, index: number) => {
+            const gameInfo = syncData[cdataItem.name];
+            let ret = {
+                id: 0,
+                title: "",
+                titles: [] as string[],
+                aliasTesera: undefined,
+                idBgg: undefined,
+                idTesera: undefined,
+                linkBgg: undefined,
+                linkTesera: undefined,
+                photoUrl: undefined,
+                playersGood: undefined,
+                playersMax: undefined,
+                playersMin: undefined,
+                playtimeAvg: undefined,
+                playtimeMax: undefined,
+                playtimeMin: undefined,
+                ratingBgg: undefined,
+                ratingTesera: undefined,
+                year: undefined,
+            };
+            if (gameInfo.gameTesera) {
+                let teseraRet: GameBoxDataTesera = await $fetch('/api/tesera/get-gamebox', {
+                    query: { alias: gameInfo.gameTesera.alias },
+                });
+                ret.titles.push(teseraRet.title);
+                Object.keys(ret).forEach((key) => {
+                    (ret as any)[key] = (ret as any)[key] || (teseraRet as any)[key];
+                });
+            }
+            if (gameInfo.gameBgg) {
+                let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', {
+                    query: { id: gameInfo.gameBgg.id },
+                });
+                ret.titles.push(bggRet.title as string);
+                Object.keys(ret).forEach((key) => {
+                    (ret as any)[key] = (ret as any)[key] || (bggRet as any)[key];
+                });
+            }
+            ret.titles.push(cdataItem.name);
+            saveData.value.push(ret);
+        });
 
     stepNumber.value++;
 }

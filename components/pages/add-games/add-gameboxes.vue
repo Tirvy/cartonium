@@ -33,22 +33,24 @@
                 </thead>
                 <tbody>
                     <tr v-for="gameInfo in props.items" :key="gameInfo.name">
-                        <td>
+                        <td class="checkbox-cell">
                             <v-checkbox v-model="localData[gameInfo.name].selected"></v-checkbox>
                         </td>
                         <td class="name-column">
-                            <div style="max-width: 150px">
-                                {{ gameInfo.name }}
+                            <div style="max-width: 250px">
+                                <v-textarea v-model="gameInfo.preciseSearch"></v-textarea>
                             </div>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameTeseraVariants" :source="'tesera'"
-                                v-model="localData[gameInfo.name].gameTesera">
+                                v-model="localData[gameInfo.name].gameTesera" :loading="props.loading"
+                                @search="emit('search', gameInfo, 'tesera')">
                             </pages-add-games-table-item>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameBggVariants" :source="'bgg'"
-                                v-model="localData[gameInfo.name].gameBgg">
+                                v-model="localData[gameInfo.name].gameBgg" :loading="props.loading"
+                                @search="emit('search', gameInfo, 'bgg')">
                             </pages-add-games-table-item>
                         </td>
                     </tr>
@@ -74,6 +76,10 @@ const props = defineProps({
     items: {
         type: Array<GameboxAddData>,
         default: [],
+    },
+    loading: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -101,6 +107,7 @@ watch((() => props.items),
 
 const emit = defineEmits<{
     (e: 'getGameBoxData', selected: SyncTeseraBggMap): void
+    (e: 'search', gameInfo: GameboxAddData, source: GamedataSource): void
 }>()
 
 function getGameBoxData() {
@@ -140,6 +147,10 @@ const gamesListFormattedFiltered = computed(() => {
 </script>
 
 <style scoped>
+.checkbox-cell {
+    width: 30px;
+}
+
 .cell-game-thing {
     vertical-align: top;
     padding: 5px 0;

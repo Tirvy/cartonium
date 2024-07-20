@@ -1,6 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
 import { gameBoxFromSupabase } from '~/server/transformers';
+import { formatDiagnosticsWithColorAndContext } from 'typescript';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -11,15 +12,20 @@ export default defineEventHandler(async (event) => {
   }
   const client = await serverSupabaseClient<Database>(event);
 
-  console.log(titles.length, 1);
+  let retData: unknown[] = [];
 
-  const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titles);
-  console.log(error, 3);
-  if (error) {
-    throw createError({ message: error.message })
+  const splitLimit = 80;
+  let titlesLeft = [...titles];
+  while (titlesLeft.length > splitLimit) {
+    const titlesNow = titlesLeft.slice(0, splitLimit);
+    const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titlesNow);
+    if (error) {
+      throw createError({ message: error.message })
+    }
+    retData = retData.concat(data);
+    titlesLeft = titlesLeft.slice(splitLimit);
   }
 
-  console.log(data.length, 2);
-  return data.map(gameBoxFromSupabase);
-  // return data.map(gameBoxFromSupabase);
+
+  return retData.map(gameBoxFromSupabase);
 })
