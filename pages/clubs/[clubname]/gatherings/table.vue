@@ -35,8 +35,9 @@
                   [{{ gathwd.date }}]
                 </v-card-subtitle>
                 <v-card-text>
-                  ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
+                  Записались ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
                   <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
+                    <UserAvatar :value="guest"></UserAvatar>
                     {{ guest.title }}
                     <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
                   </p>

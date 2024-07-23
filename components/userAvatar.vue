@@ -1,0 +1,27 @@
+<template>
+  <v-avatar :image="avatar.pictureUrl" color="yellow" size="16">
+    <v-img :alt="avatar.name" v-if="avatar.pictureUrl" :src="avatar.pictureUrl"></v-img>
+    <template v-else>
+      {{ avatar.initials }}
+    </template>
+  </v-avatar>
+</template>
+
+<script lang="ts" setup>
+const props = defineProps<{ value: GatheringGuest }>();
+
+const initials = computed(() => {
+  let source = props.value?.title;
+  return source.split(' ').map((item: string) => item[0].toUpperCase()).join('');
+})
+const avatar = computed(() => {
+  return {
+    show: !!props.value,
+    pictureUrl: props.value?.imageUrl,
+    name: props.value?.title,
+    initials: initials.value,
+  }
+});
+</script>
+
+<style scoped></style>

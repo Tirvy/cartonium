@@ -95,11 +95,15 @@ export function gatheringFromSupabase(data: any): Gathering {
 export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
     const userDataSource = data.raw_user_meta_data;
     const userData = userDataSource && {
-        title: userDataSource.first_name,
-        imageUrl: userDataSource.picture,
+        title: getName(userDataSource),
+        imageUrl: userDataSource.avatar_url,
         messageUrl: '',
         totalGuests: data.guests_number,
         id: data.user_id,
+    }
+
+    function getName(userData: any): string {
+        return userDataSource.first_name || userDataSource.name || userDataSource.email?.split('@')[0] || 'Unknown';
     }
     return {
         clubId: data.club_id,

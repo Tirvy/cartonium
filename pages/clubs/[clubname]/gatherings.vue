@@ -11,14 +11,11 @@ definePageMeta({
     async function (to, from) {
       const clubPermissions = useClubPermissions();
 
-      // todo: fix kostil'
-      const routeSplitted = to.path.split('/');
-      const lastOnPath = routeSplitted[routeSplitted.length - 1];
       if (to.name === 'gatherings-root') {
         if (!clubPermissions.value) {
-          return navigateTo(to.path + '/table', { replace: true });
+          return navigateTo(to.fullPath + '/table', { replace: true });
         } else {
-          return navigateTo(to.path + '/table-admin', { replace: true });
+          return navigateTo(to.fullPath + '/table-admin', { replace: true });
         }
       }
 
