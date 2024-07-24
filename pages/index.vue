@@ -11,10 +11,10 @@
 <script setup lang="ts">
 
 definePageMeta({
-  name: 'root',
+  name: 'root-index',
   middleware: [
     async function (to, from) {
-      if (to.name === 'root') {
+      if (to.name === 'root-index') {
         const defaultPage = useDefaultPage();
         console.log(defaultPage, to);
         return navigateTo(defaultPage);

@@ -1,3 +1,8 @@
+
 export const useDefaultPage = () => {
-  return '/clubs/terra/gatherings/table'
+  const router = useRouter();
+
+  const route = router.getRoutes().find(item => item.name === 'gatherings-public');
+  const ret = { ...route, params: { clubname: 'terra' } };
+  return ret;
 }

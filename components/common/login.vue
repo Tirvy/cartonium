@@ -95,7 +95,7 @@ const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
 
 const redirectPath = useCookie('sb-redirect-path');
-const defaultRedirectPath = useDefaultPage();
+const defaultRedirectPath = useDefaultPage().path;
 watchEffect(() => {
   if (user.value) {
     if (redirectPath.value) {

@@ -37,7 +37,7 @@
                 <v-card-text>
                   Записались ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
                   <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
-                    <UserAvatar :value="guest"></UserAvatar>
+                    <user-avatar :value="guest"></user-avatar>
                     {{ guest.title }}
                     <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
                   </p>
@@ -81,6 +81,10 @@ const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
+
+definePageMeta({
+  name: 'gatherings-public'
+});
 
 async function updateFilters() {
   const data = await $fetch('/api/supabase/gatherings', {
