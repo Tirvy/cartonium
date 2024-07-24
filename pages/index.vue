@@ -11,11 +11,14 @@
 <script setup lang="ts">
 
 definePageMeta({
+  name: 'root',
   middleware: [
     async function (to, from) {
-      const defaultPage = useDefaultPage();
-      console.log(defaultPage);
-      return navigateTo(defaultPage);
+      if (to.name === 'root') {
+        const defaultPage = useDefaultPage();
+        console.log(defaultPage, to);
+        return navigateTo(defaultPage);
+      }
     },
   ],
 });
