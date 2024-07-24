@@ -1,5 +1,3 @@
-
-
 <template>
   <v-container fluid class="fill-height">
     <v-row>
@@ -11,9 +9,16 @@
 </template>
 
 <script setup lang="ts">
-const defaultPage = useDefaultPage();
 
-navigateTo(defaultPage)
+definePageMeta({
+  middleware: [
+    async function (to, from) {
+      const defaultPage = useDefaultPage();
+      console.log(defaultPage);
+      return navigateTo(defaultPage);
+    },
+  ],
+});
 </script>
 
 <style scoped>
