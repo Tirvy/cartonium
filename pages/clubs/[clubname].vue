@@ -9,7 +9,14 @@ import { abortNavigation } from 'nuxt/app';
 import type { Club } from '~/types/frontend';
 
 
+
 definePageMeta({
+  validate: async (to) => {
+    const clubname = to.params.clubname as string;
+    const clubDataUpdate = useUpdateClubData();
+    const newClubData = await clubDataUpdate(clubname);
+    return !!newClubData?.id;
+  },
   middleware: [
     async function (to, from) {
       const currentClub: Ref<Club | null> = useState('club');
@@ -17,11 +24,8 @@ definePageMeta({
       const clubname = to.params.clubname as string;
 
       if (!currentClub.value || currentClub.value.title !== clubname) {
-        const newClubData = await getClubData(clubname);
-        if (!newClubData || !newClubData.id) {
-          currentClub.value = null;
-          return abortNavigation();
-        }
+        const clubDataUpdate = useUpdateClubData();
+        const newClubData = await clubDataUpdate(clubname);
         currentClub.value = newClubData;
         await updatePermissions();
       }
@@ -40,21 +44,6 @@ definePageMeta({
         clubPermissions.value = clubs as { club_id: string, relation_type: string }[];
       }
 
-      async function getClubData(clubname: string | undefined) {
-        const route = to;
-        const clubnameToCheck = clubname || route.params.clubname;
-
-        if (!clubnameToCheck || clubnameToCheck === 'undefined') {
-          return null;
-        }
-
-        const clubData: Club = await $fetch('/api/supabase/club-data', {
-          query: {
-            clubname: route.params.clubname,
-          }
-        });
-        return clubData;
-      }
     },
   ],
 });

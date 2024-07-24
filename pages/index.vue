@@ -16,7 +16,7 @@ definePageMeta({
     async function (to, from) {
       if (to.name === 'root-index') {
         const defaultPage = useDefaultPage();
-        console.log(defaultPage, to);
+        console.log(defaultPage, to, from);
         return navigateTo(defaultPage);
       }
     },
