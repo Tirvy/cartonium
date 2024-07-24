@@ -1,3 +1,3 @@
 export const useDefaultPage = () => {
-  return '/clubs/terra/gatherings'
+  return '/clubs/terra/gatherings/table'
 }
