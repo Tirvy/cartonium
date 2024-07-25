@@ -53,6 +53,10 @@ const fetchedCollection: Ref<GameBox[]> = ref([])
 const drawerState: Ref<boolean> = ref(true);
 const loading: Ref<boolean> = ref(false);
 
+definePageMeta({
+    name: 'club-collection'
+})
+
 const filter = ref(
     {
         title: '',

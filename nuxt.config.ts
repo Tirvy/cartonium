@@ -22,7 +22,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/',
       callback: '/confirm',
-      include: ['/clubs(/*)/gatherings(/*)?','/clubs/*/information/edit','/clubs(/*)/settings(/*)?','/admin(/*)?'],
+      include: ['/clubs/*/information/edit','/clubs(/*)/settings(/*)?','/admin(/*)?'],
       exclude: ['users/*'],
       cookieRedirect: true,
     }, 
