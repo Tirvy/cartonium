@@ -13,8 +13,11 @@
         </v-container>
     </v-main>
 
-    <v-navigation-drawer location="right" v-model="drawerState">
+    <v-navigation-drawer location="right" v-model="drawerState" order="8">
         <v-list density="compact" nav>
+            <v-list-item-title>
+                Фильтры
+            </v-list-item-title>
             <v-list-item>
                 <v-text-field v-model="filter.title" label="Название" clearable></v-text-field>
             </v-list-item>

@@ -10,6 +10,14 @@ function shouldStopEvent(event: H3Event) {
     return apiToTimeout.some(url => getRequestURL(event).pathname.startsWith(url));
 }
 
+let tooManyRequestsTimeoutTime = 300000;
+let tooManyRequestsTimeout: NodeJS.Timeout | undefined = undefined;
+function setBigTimeout() {
+    tooManyRequestsTimeout = setTimeout(() => {
+        tooManyRequestsTimeout = undefined;
+    }, tooManyRequestsTimeoutTime);
+}
+
 export default defineNitroPlugin((nitroApp) => {
     nitroApp.hooks.hook("request", async (event) => {
         if (shouldStopEvent(event)) {
@@ -18,10 +26,19 @@ export default defineNitroPlugin((nitroApp) => {
             } else {
                 new Promise(resolve => bggResolveQueue.push(resolve));
             }
+
+            if (tooManyRequestsTimeout) {
+                event.respondWith(new Response(null, { status: 429 }));
+            }
         }
     });
     nitroApp.hooks.hook("afterResponse", async (event) => {
         if (shouldStopEvent(event)) {
+            const status = getResponseStatus(event);
+
+            if (status === 429) {
+                setBigTimeout();
+            }
             if (bggResolveQueue.length > 0) {
                 setTimeout(() => {
                     bggResolveQueue.shift();

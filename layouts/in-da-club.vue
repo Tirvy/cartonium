@@ -29,7 +29,7 @@
 
     <slot />
 
-    <v-bottom-navigation grow color="grey" height="44">
+    <v-bottom-navigation grow color="grey" height="44" fixed>
       <v-btn v-for="page in pagesList" :to="page.path">
         <v-icon :icon="page.icon"></v-icon>
         <span>{{ page.title }}</span>
