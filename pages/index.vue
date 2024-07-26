@@ -10,6 +10,8 @@
 
 <script setup lang="ts">
 
+const user = useSupabaseUser();
+
 definePageMeta({
   name: 'root-index',
   middleware: [

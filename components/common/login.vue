@@ -93,6 +93,7 @@ const loaders: Ref<Loaders> = ref({
 
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
+const updateUserPermissions = useUpdateUserPermissions();
 
 const redirectPath = useCookie('sb-redirect-path');
 const defaultRedirectPath = useDefaultPage().path;
@@ -117,7 +118,6 @@ async function signInWithProvider(provider: string) {
 }
 
 async function signInWithKeycloak() {
-  console.log(1);
   const { data, error } = await auth.signInWithOAuth({
     provider: 'keycloak',
     options: {
@@ -147,7 +147,7 @@ async function signInWithEmail() {
     snackbar.value.text = error.message;
     snackbar.value.show = true;
   }
-
+  updateUserPermissions();
 }
 
 async function singInAsGuest() {

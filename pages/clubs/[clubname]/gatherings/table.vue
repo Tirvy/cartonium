@@ -82,7 +82,6 @@ const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
 const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
-console.log(user);
 
 definePageMeta({
   name: 'gatherings-public'

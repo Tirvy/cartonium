@@ -42,9 +42,11 @@
 <script setup>
 const client = useSupabaseClient()
 const user = useSupabaseUser()
+const updateUserPermissions = useUpdateUserPermissions();
 
 const logout = async () => {
-  await client.auth.signOut()
+  await client.auth.signOut();
+  updateUserPermissions();
 }
 
 import { useTheme } from 'vuetify'
