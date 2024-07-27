@@ -202,6 +202,9 @@ export interface GameBoxWithClub extends GameBox {
 }*/
 
 export interface Club {
+    collectionSearchRating: boolean
+    collectionSearchDuration: boolean
+    collectionSearchPlayers: boolean
     id: string;
     title: string;
     urlName: string;

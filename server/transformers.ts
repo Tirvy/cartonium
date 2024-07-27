@@ -10,6 +10,9 @@ export function clubFromSupabase(data: any, clubSettingsData: any): Club {
         avatarUrl: clubSettingsData.avatar_url,
         guestCanGatherOwn: clubSettingsData.guest_can_gather_own,
         guestCanReserve: clubSettingsData.guest_can_reserve,
+        collectionSearchRating: clubSettingsData.collection_search_rating,
+        collectionSearchDuration: clubSettingsData.collection_search_duration,
+        collectionSearchPlayers: clubSettingsData.collection_search_players,
     };
 }
 
@@ -56,25 +59,25 @@ export function gameBoxFromSupabase(data: any): GameBoxWithClub {
 }
 export function gameBoxToSupabase(gameBox: GameBoxWithClub): any {
     return {
-      alias_tesera: gameBox.aliasTesera,
-      id_bgg: gameBox.idBgg,
-      id_tesera: gameBox.idTesera,
-      link_bgg: gameBox.linkBgg,
-      link_tesera: gameBox.linkTesera,
-      photo_url: gameBox.photoUrl,
-      players_good: gameBox.playersGood,
-      players_max: gameBox.playersMax,
-      players_min: gameBox.playersMin,
-      playtime_avg: gameBox.playtimeAvg,
-      playtime_max: gameBox.playtimeMax,
-      playtime_min: gameBox.playtimeMin,
-      rating_bgg: gameBox.ratingBgg,
-      rating_tesera: gameBox.ratingTesera,
-      title: gameBox.title,
-      titles: gameBox.titles,
-      year: gameBox.year,
+        alias_tesera: gameBox.aliasTesera,
+        id_bgg: gameBox.idBgg,
+        id_tesera: gameBox.idTesera,
+        link_bgg: gameBox.linkBgg,
+        link_tesera: gameBox.linkTesera,
+        photo_url: gameBox.photoUrl,
+        players_good: gameBox.playersGood,
+        players_max: gameBox.playersMax,
+        players_min: gameBox.playersMin,
+        playtime_avg: gameBox.playtimeAvg,
+        playtime_max: gameBox.playtimeMax,
+        playtime_min: gameBox.playtimeMin,
+        rating_bgg: gameBox.ratingBgg,
+        rating_tesera: gameBox.ratingTesera,
+        title: gameBox.title,
+        titles: gameBox.titles,
+        year: gameBox.year,
     };
-  }
+}
 
 // gathering
 export function gatheringFromSupabase(data: any): Gathering {
