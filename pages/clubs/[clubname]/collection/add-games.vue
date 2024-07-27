@@ -48,6 +48,7 @@ import type { GameBox, GameBoxDataTesera, GameBoxDataBgg, GamedataSource } from 
 import type { SearchedGameBox, SyncTeseraBggMap, GameboxAddData } from "~/types/frontend.ts";
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue'
+import { isNumberObject } from 'util/types';
 
 const loaders: Ref<Loaders> = ref({
     gettingData: false
@@ -176,8 +177,15 @@ async function getGamesBaseInfo() {
             cdata.gameTeseraVariants = resTesera;
             cdata.gameTesera = resTesera[0];
 
-            const searchTitles = resTesera[0].titles.filter((title: string) => {
-                return !(+title >= 1995 && +title < 2040);
+            const searchTitlesHashed = resTesera[0].titles.reduce((acc: any, title: string) => {
+                acc[title.trim()] = true;
+                return acc;
+            }, {});
+            const searchTitles = Object.keys(searchTitlesHashed).filter((title: string) => {
+                if (+title > 0) {
+                    return cdata.name.includes(title);
+                }
+                return true;
             })
             const resBgg = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
             if (Array.isArray(resBgg) && resBgg.length) {
@@ -206,6 +214,7 @@ async function searchForeignData(source: GamedataSource, titles: string[]) {
 }
 
 async function searchAgainSpecific(cdata: GameboxAddData, source: GamedataSource) {
+    console.log(cdata, source);
     if (!cdata?.preciseSearch?.length) {
         return;
     }

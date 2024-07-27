@@ -40,17 +40,22 @@
                             <div style="max-width: 250px">
                                 <v-textarea v-model="gameInfo.preciseSearch"></v-textarea>
                             </div>
+                            <div>
+                                Переподтянуть:
+                            </div>
+                            <div>
+                                <v-btn @click="emit('search', gameInfo, 'tesera')"> Тесеру</v-btn>
+                                <v-btn @click="emit('search', gameInfo, 'bgg')"> БГГ</v-btn>
+                            </div>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameTeseraVariants" :source="'tesera'"
-                                v-model="localData[gameInfo.name].gameTesera" :loading="props.loading"
-                                @search="emit('search', gameInfo, 'tesera')">
+                                v-model="localData[gameInfo.name].gameTesera" :loading="props.loading">
                             </pages-add-games-table-item>
                         </td>
                         <td class="cell-game-thing">
                             <pages-add-games-table-item :items="gameInfo.gameBggVariants" :source="'bgg'"
-                                v-model="localData[gameInfo.name].gameBgg" :loading="props.loading"
-                                @search="emit('search', gameInfo, 'bgg')">
+                                v-model="localData[gameInfo.name].gameBgg" :loading="props.loading">
                             </pages-add-games-table-item>
                         </td>
                     </tr>

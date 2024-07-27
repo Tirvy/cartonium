@@ -22,6 +22,7 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
     let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i], exact: 1 } });
     let resParsed = parser.parse(res as string);
 
+    console.log(searchTexts[i], 1, resParsed.items.item);
     if (resParsed.items.item) {
       if (Array.isArray(resParsed.items.item)) {
         return resParsed.items.item.map((item: any) => parseGameData(item));
@@ -34,6 +35,7 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
     let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i] } });
     let ret = parser.parse(res as string);
 
+    console.log(searchTexts[i], 2, ret.items.item);
     if (ret.items.item && Array.isArray(ret.items.item)) {
       return ret.items.item.map((item: any) => parseGameData(item));
     }
@@ -45,7 +47,7 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
 export default defineEventHandler(async (event) => {
   try {
     const query = getQuery(event);
-    const searchTexts = (query.titles as String[]);
+    const searchTexts: string[] = Array.isArray(query.titles) ? query.titles : [query.titles];
 
     if (!searchTexts) {
       return { result: { query: 'titles must be a string' } };

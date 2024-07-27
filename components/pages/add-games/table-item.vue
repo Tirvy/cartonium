@@ -3,7 +3,7 @@
         <v-select label="варианты" :items="selectorVariants"
             :model-value="selectedItemName" @update:model-value="selectVariant" :loading="props.loading"></v-select>
         <v-img style="max-height: 120px;" v-if="source === 'tesera'" :src="selectedItem?.photoUrl"></v-img>
-        <div v-if="source === 'bgg'">
+        <div>
             year: {{ selectedItem?.year }}
         </div>
     </div>
