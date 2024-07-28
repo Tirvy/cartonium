@@ -24,5 +24,24 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  return data.map(gatheringWithGuestsFromSupabase);
+  return clampGatherings(data.map(gatheringWithGuestsFromSupabase));
 })
+
+function clampGatherings(gatheringsArray: GatheringWithGuests[]) {
+  let hashed = gatheringsArray.reduce((acc: any, gathering) => {
+    const foundItem: GatheringWithGuests = acc[gathering.id];
+    if (foundItem) {
+      foundItem.guests = [...foundItem.guests, ...gathering.guests];
+      foundItem.slotsFilled = foundItem.guests.reduce((acc: number, item) => {
+        return acc + item.totalGuests
+      }, 0);
+    } else {
+      acc[gathering.id] = {
+        ...gathering,
+      }
+    }
+    return acc;
+  }, {})
+
+  return Object.values(hashed);
+} 

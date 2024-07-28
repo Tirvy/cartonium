@@ -50,13 +50,13 @@
               </div>
             </div>
             <v-card-actions v-if="user?.id">
-              <v-btn @click="guestSet(gathwd.gathering.id, 1)">
+              <v-btn @click="guestSet(gathwd.gathering.id, 1)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canJoin">
                 Присоедениться
               </v-btn>
-              <v-btn @click="showDialogGuests(gathwd.gathering)">
+              <!-- <v-btn v-if="false" @click="showDialogGuests(gathwd.gathering)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canAddGuests">
                 Добавить гостей
-              </v-btn>
-              <v-btn @click="guestSet(gathwd.gathering.id, 0)">
+              </v-btn> -->
+              <v-btn @click="guestSet(gathwd.gathering.id, 0)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canLeave">
                 Покинуть сбор
               </v-btn>
             </v-card-actions>
@@ -102,6 +102,21 @@ async function updateFilters() {
   }
 }
 updateFilters();
+
+const gatheringsComputedValues = computed(() => {
+
+  return gatherings.value.reduce((acc: any, item) => {
+    const userIsInThisGathering = item.guests.some(guest => guest.id === user.value?.id);
+    acc[item.id] = {
+      canJoin: !userIsInThisGathering,
+      canLeave: userIsInThisGathering,
+      canAddGuests: userIsInThisGathering && (item.slotsFilled < item.guestsMax)
+    }
+    console.log(item.slotsFilled, item.guestsMax, userIsInThisGathering && (item.slotsFilled < item.guestsMax));
+
+    return acc;
+  }, {});
+});
 
 interface gatheringsHash {
   [key: string]: GatheringWithGuests[]
@@ -152,15 +167,17 @@ async function guestSet(gatheringId: number, number: number) {
   });
 
   if (!data.error) {
-    const gatheringWithUser = gatherings.value.find(gathering => gathering.id === gatheringId);
-    const currentUserAsGuest = useCurrentUserAsGuest();
-    let guestUseritem = gatheringWithUser?.guests.find(item => item.id === currentUserAsGuest.id);
-    if (guestUseritem) {
-      guestUseritem.totalGuests = number
-    } else {
-      currentUserAsGuest.totalGuests = number;
-      gatheringWithUser?.guests.push(currentUserAsGuest)
-    }
+    updateFilters();
+    // todo: add recalc on front! There is code under it!
+    // const gatheringWithUser = gatherings.value.find(gathering => gathering.id === gatheringId);
+    // const currentUserAsGuest = useCurrentUserAsGuest();
+    // let guestUseritem = gatheringWithUser?.guests.find(item => item.id === currentUserAsGuest.id);
+    // if (guestUseritem) {
+    //   guestUseritem.totalGuests = number
+    // } else {
+    //   currentUserAsGuest.totalGuests = number;
+    //   gatheringWithUser?.guests.push(currentUserAsGuest)
+    // }
   }
 }
 
