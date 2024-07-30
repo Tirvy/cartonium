@@ -31,7 +31,7 @@
               </v-avatar>
               <div>
                 <v-card-title>
-                  {{ gathwd.gathering.gamebox ? gathwd.gathering.gamebox.title : gathwd.gathering.ownTitle }}
+                  {{ gathwd.gathering.gamebox.title || gathwd.gathering.ownTitle }}
                 </v-card-title>
                 <v-card-subtitle>
                   [{{ gathwd.date }}]
