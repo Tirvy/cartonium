@@ -50,13 +50,15 @@
               </div>
             </div>
             <v-card-actions v-if="user?.id">
-              <v-btn @click="guestSet(gathwd.gathering.id, 1)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canJoin">
+              <v-btn @click="guestSet(gathwd.gathering.id, 1)"
+                :disabled="!gatheringsComputedValues[gathwd.gathering.id].canJoin">
                 Присоедениться
               </v-btn>
               <!-- <v-btn v-if="false" @click="showDialogGuests(gathwd.gathering)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canAddGuests">
                 Добавить гостей
               </v-btn> -->
-              <v-btn @click="guestSet(gathwd.gathering.id, 0)" :disabled="!gatheringsComputedValues[gathwd.gathering.id].canLeave">
+              <v-btn @click="guestSet(gathwd.gathering.id, 0)"
+                :disabled="!gatheringsComputedValues[gathwd.gathering.id].canLeave">
                 Покинуть сбор
               </v-btn>
             </v-card-actions>
@@ -107,12 +109,12 @@ const gatheringsComputedValues = computed(() => {
 
   return gatherings.value.reduce((acc: any, item) => {
     const userIsInThisGathering = item.guests.some(guest => guest.id === user.value?.id);
+    const notMax = item.guestsMax > item.slotsFilled;
     acc[item.id] = {
-      canJoin: !userIsInThisGathering,
+      canJoin: !userIsInThisGathering && notMax,
       canLeave: userIsInThisGathering,
-      canAddGuests: userIsInThisGathering && (item.slotsFilled < item.guestsMax)
+      canAddGuests: userIsInThisGathering && notMax
     }
-    console.log(item.slotsFilled, item.guestsMax, userIsInThisGathering && (item.slotsFilled < item.guestsMax));
 
     return acc;
   }, {});

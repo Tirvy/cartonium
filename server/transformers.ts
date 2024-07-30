@@ -96,17 +96,17 @@ export function gatheringFromSupabase(data: any): Gathering {
 }
 
 export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
-    const userDataSource = data.raw_user_meta_data;
-    const userData = userDataSource && {
+    const userDataSource = data.raw_user_meta_data || data;
+    const userData = {
         title: getName(userDataSource),
-        imageUrl: userDataSource.avatar_url,
+        imageUrl: data.avatar_url,
         messageUrl: '',
         totalGuests: data.guests_number,
         id: data.user_id,
     }
 
     function getName(userData: any): string {
-        return userDataSource.first_name || userDataSource.name || userDataSource.email?.split('@')[0] || 'Unknown';
+        return userData.first_name || userData.name || userData.full_name || userData.email?.split('@')[0] || 'Unknown';
     }
     return {
         clubId: data.club_id,
@@ -122,7 +122,7 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         ownerId: data.owner_id,
         ownerUser: data.owneruser,
         startDate: data.start_date,
-        guests: userDataSource ? [userData] : [],
+        guests: !!userData ? [userData] : [],
         slotsFilled: data.guests_number || 0,
     };
 
