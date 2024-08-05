@@ -31,13 +31,12 @@
               </v-avatar>
               <div>
                 <v-card-title>
-                  {{ gathwd.gathering.gamebox.title || gathwd.gathering.ownTitle }}
+                  {{ gathwd.gathering.gamebox.title || gathwd.gathering.ownTitle }} ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
                 </v-card-title>
                 <v-card-subtitle>
                   [{{ gathwd.date }}]
                 </v-card-subtitle>
                 <v-card-text>
-                  Записались ({{ gathwd.gathering.slotsFilled }}/{{ gathwd.gathering.guestsMax }})
                   <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
                     <user-avatar :value="guest"></user-avatar>
                     {{ guest.title }}

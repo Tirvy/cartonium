@@ -68,6 +68,13 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col cols="12" class="flex justify-center">
+          <v-btn @click="navigateTo('./table')">
+            Обратно к списку
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-container>
   </v-main>
 

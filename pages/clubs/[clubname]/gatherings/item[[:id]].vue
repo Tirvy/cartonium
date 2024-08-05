@@ -54,7 +54,7 @@
                         </v-col>
                         <v-col v-if="!gatheringId">
                             <v-text-field label="Сколько гостей приведете с собой" v-model="hostGuestsNumber"
-                                :rules="[ruleIsNumber]"></v-text-field>
+                                :rules="[ruleIsNumber, ruleLessThanTotal]"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -151,6 +151,12 @@ const yesterday = new Date();
 yesterday.setDate(today.getDate() - 1);
 function dateIsTodayOnward (date: unknown) {
     return date as Date > yesterday;
+}
+function ruleLessThanTotal(val: string) {
+    if ((+val + 1) > +guestsMax.value) {
+        return 'Не может быть больше общего числа гостей'
+    }
+    return true;
 }
 
 /* in case it needs optimization
