@@ -20,6 +20,8 @@ function getGoodRating(poll: any[]) {
     }
   }).filter((item: any) => {
     return item.results.best > item.results.bad || item.results.good > item.results.bad;
+  }).filter((item: any) => {
+    return !!item.players
   }).map((item: any) => {
     return item.players
   })

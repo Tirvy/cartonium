@@ -4,15 +4,15 @@
             Введите список игр, которые хотите добавить в коллекцию клуба
         </v-card-title>
         <v-card-subtitle>
-            Названия игр должны быть разделены переводом строки
+            Названия игр должны быть разделены переводом строки. Не больше 100 за раз.
         </v-card-subtitle>
         <v-card-text>
-            <v-textarea counter rows="14" class="w-100" row-height="12" label="games list" v-model="gamesList">
+            <v-textarea counter rows="14" class="w-100" row-height="12" label="games list" v-model="gamesList"
+                :rules="[ruleMaxRows]">
             </v-textarea>
         </v-card-text>
         <v-card-actions>
             <div>
-
                 <v-btn :disabled="!gamesList" @click="getGamesBaseInfo">
                     Разобрать список
                 </v-btn>
@@ -41,23 +41,31 @@ const currentClub: Ref<Club> = useState('club');
 // const gamesList = ref(data.data);
 const gamesList = ref("");
 
+function ruleMaxRows(value: string) {
+    const splitted: string[] = value.trim().split(/[\t\n]/);
+    return splitted.length < 100;
+}
+
 async function getGamesBaseInfo() {
     const splitted: string[] = gamesList.value.trim().split(/[\t\n]/);
     const onlyGoodStrings: string[] = splitted.filter((q: string) => !!q).map((item: string) => item.trim());
-    const stringsHashed = onlyGoodStrings.reduce((total, title) => ({...total, [title]: true }), {});
+    const stringsHashed = onlyGoodStrings.reduce((total, title) => ({ ...total, [title]: true }), {});
 
     const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: Object.keys(stringsHashed) } });
-    const gameboxesInClub: number[] = await $fetch('/api/supabase/check-games-in-club',
-        {
-            method: 'POST',
-            query:
+    let gameboxesInClub: number[] = [];
+    if (gameboxesFound.length) {
+        gameboxesInClub = await $fetch('/api/supabase/check-games-in-club',
             {
-                clubid: currentClub.value.id,
-            },
-            body: {
-                ids: gameboxesFound.map(gamebox => gamebox.id)
-            }
-        });
+                method: 'POST',
+                query:
+                {
+                    clubid: currentClub.value.id,
+                },
+                body: {
+                    ids: gameboxesFound.map(gamebox => gamebox.id)
+                }
+            });
+    }
 
     emit('input', {
         titles: onlyGoodStrings,

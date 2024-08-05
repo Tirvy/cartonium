@@ -9,7 +9,7 @@
         </v-row>
         <v-row v-if="false">
           <v-col>
-            <v-switch v-model="forcePermissionsAdmin" label="force admin"></v-switch>
+            <v-switch v-model="forcePermissionsAdmin" color="primary" label="force admin"></v-switch>
           </v-col>
         </v-row>
         <v-row>

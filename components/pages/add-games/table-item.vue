@@ -1,10 +1,21 @@
 <template>
     <div>
-        <v-select label="варианты" :items="selectorVariants"
-            :model-value="selectedItemName" @update:model-value="selectVariant" :loading="props.loading"></v-select>
+        <v-select label="варианты" :items="selectorVariants" :model-value="selectedItemName"
+            @update:model-value="selectVariant" :loading="props.loading"></v-select>
         <v-img style="max-height: 120px;" v-if="source === 'tesera'" :src="selectedItem?.photoUrl"></v-img>
-        <div>
+        <div v-if="selectedItem?.year">
             year: {{ selectedItem?.year }}
+        </div>
+        <div v-if="selectedItem?.titles">
+            Альтернативные имена
+            <v-icon color="info" size="small" icon="mdi-information" end />
+            <v-tooltip activator="parent" location="bottom">{{ selectedItem?.titles }}</v-tooltip>
+        </div>
+        <div v-if="link">
+            link:
+            <nuxt-link :to="link" target="_blank">
+                {{ link }}
+            </nuxt-link>
         </div>
     </div>
 </template>
@@ -56,8 +67,18 @@ function selectVariant(title: string) {
     emit('update:modelValue', variant);
 }
 
+const link = computed(() => {
+    if (selectedItem.value?.id) {
+        return 'https://boardgamegeek.com/boardgame/' + selectedItem.value?.id;
+    }
+    if (selectedItem.value?.alias) {
+        return 'https://tesera.ru/game/' + selectedItem.value?.alias
+    }
+    return null;
+})
+
 function getItemName(item: GameBoxSearchResult) {
-    return `${item.title || item.titles?.[0] || 'unknown'}${item.year ? '('+item.year+')' : ''}`;
+    return `${item.title || item.titles?.[0] || 'unknown'}${item.year ? '(' + item.year + ')' : ''}`;
 }
 
 const dummyVariant = {

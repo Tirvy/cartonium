@@ -3,8 +3,11 @@
         <v-card-title>
             Добавляем недостающие игры в бд
         </v-card-title>
+        <v-card-subtitle>
+            Для каждой игры выберете её на тесере и бгг. Если их там нет - выбирайте "----" или снимайте галочку
+        </v-card-subtitle>
         <v-card-text>
-            <v-btn-toggle v-model="tableSourceChosen" variant="outlined" color="primary" shaped mandatory>
+            <v-btn-toggle v-if="false" v-model="tableSourceChosen" variant="outlined" color="primary" shaped mandatory>
                 <v-btn v-for="dataSource in dataSources" :value="dataSource">
                     {{ dataSource.title }}: {{ gamesListFormattedFilteredHashed[dataSource.alias].length }}
                 </v-btn>
@@ -42,6 +45,10 @@
                             </div>
                             <div>
                                 Переподтянуть:
+                                <v-icon color="info" size="small" icon="mdi-information" end />
+                                <v-tooltip activator="parent" location="bottom">
+                                    Если нет нужной игры - введите сверху название и нажмите кнопку внизу чтобы перезапустить поиск
+                                </v-tooltip>
                             </div>
                             <div>
                                 <v-btn @click="emit('search', gameInfo, 'tesera')"> Тесеру</v-btn>

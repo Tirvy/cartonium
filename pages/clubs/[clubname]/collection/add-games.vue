@@ -28,6 +28,10 @@
                     <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase"
                         :loading="loaders.gettingData" />
                 </v-col>
+                <v-divider />
+                <v-col cols="12" v-if="stepNumber === 5">
+                    <pages-add-games-ending />
+                </v-col>
             </v-row>
         </v-container>
         <v-snackbar v-model="snackbar" multi-line>
@@ -177,16 +181,7 @@ async function getGamesBaseInfo() {
             cdata.gameTeseraVariants = resTesera;
             cdata.gameTesera = resTesera[0];
 
-            const searchTitlesHashed = resTesera[0].titles.reduce((acc: any, title: string) => {
-                acc[title.trim()] = true;
-                return acc;
-            }, {});
-            const searchTitles = Object.keys(searchTitlesHashed).filter((title: string) => {
-                if (+title > 0) {
-                    return cdata.name.includes(title);
-                }
-                return true;
-            })
+            const searchTitles = [cdata.name];
             const resBgg = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
             if (Array.isArray(resBgg) && resBgg.length) {
                 cdata.gameBggVariants = resBgg;
@@ -214,7 +209,6 @@ async function searchForeignData(source: GamedataSource, titles: string[]) {
 }
 
 async function searchAgainSpecific(cdata: GameboxAddData, source: GamedataSource) {
-    console.log(cdata, source);
     if (!cdata?.preciseSearch?.length) {
         return;
     }
@@ -305,7 +299,6 @@ async function sendGameboxesToSupabase() {
         let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
             method: "POST", body: saveData.value
         });
-        showSnackbar('Все игры добавлены в бд');
         await $fetch('/api/supabase/add-games-to-club',
             {
                 method: 'post',
@@ -313,7 +306,8 @@ async function sendGameboxesToSupabase() {
                 body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
             });
 
-        showSnackbar('Все игры добавлены в клуб');
+        showSnackbar('Все игры добавлены в бд и в клуб');
+        stepNumber.value = 5;
     }
 }
 

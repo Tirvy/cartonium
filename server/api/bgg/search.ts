@@ -27,7 +27,7 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
       if (Array.isArray(resParsed.items.item)) {
         return resParsed.items.item.map((item: any) => parseGameData(item));
       }
-      return [parseGameData(resParsed.items.item)]
+      return [parseGameData(resParsed.items.item)] 
     }
   }
 
