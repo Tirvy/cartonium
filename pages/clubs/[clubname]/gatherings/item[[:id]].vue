@@ -249,7 +249,7 @@ async function saveGathering() {
         body: {
             club_id: currentClub.value.id,
             id: gatheringId.value || undefined, // only used if admin/owner edits
-            start_date: dateAdapter.toISO(dateToSend),
+            start_date: dateToSend,
             gamebox_id: gameboxForGathering.value,
             comment_owner: commentOwner.value,
             guests_max: +(guestsMax.value.trim()) || 0,

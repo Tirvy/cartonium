@@ -67,6 +67,7 @@ export default defineNuxtPlugin(nuxtApp => {
     },
     locale: {
       locale: 'ru',
+      fallback: 'en-GB',
       messages: { ru },
     },
   })

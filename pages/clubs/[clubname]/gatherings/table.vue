@@ -179,7 +179,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
     gatheringsHashedByDate.value[key].forEach(gathering => {
       ret.push({
         type: 'gathering',
-        date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime'),
+        date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime24h').slice(0, 5),
         gathering: gathering
       });
     })

@@ -97,7 +97,7 @@ export function gatheringFromSupabase(data: any): Gathering {
 
 export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
     const userDataSource = data.raw_user_meta_data || data;
-    const userData = {
+    const userData = data.guests_number && {
         title: getName(userDataSource),
         imageUrl: data.avatar_url,
         messageUrl: '',
