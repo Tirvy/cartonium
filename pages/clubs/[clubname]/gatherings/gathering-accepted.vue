@@ -1,5 +1,5 @@
 <template>
-  <v-main><v-container fill-height fluid class="d-flex align-center">
+  <v-main><v-container fill-height fluid>
       <v-row class="justify-center align-center">
         <v-col style="max-width: 600px;">
           <v-card>
@@ -68,8 +68,8 @@
           </v-card>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col cols="12" class="flex justify-center">
+      <v-row class="justify-center align-center">
+        <v-col class="d-flex justify-center">
           <v-btn @click="navigateTo('./table')">
             Обратно к списку
           </v-btn>
