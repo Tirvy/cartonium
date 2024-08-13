@@ -263,6 +263,14 @@ export interface GatheringsWithDates {
     gathering?: GatheringWithGuests
 }
 
+export interface GatheringComputedValue {
+    canJoin: boolean,
+    canLeave: boolean,
+    canAddGuests: boolean,
+    hasMyGuests: boolean,
+    myGuests: number,
+}
+
 export interface Loaders {
     [key: string]: boolean
 }

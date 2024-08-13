@@ -1,0 +1,115 @@
+<template>
+    <v-card v-if="!mobile" :loading="loading">
+        <div class="d-flex flex-no-wrap justify-start ">
+            <v-avatar class="ma-3" size="180" rounded="0">
+                <v-img :cover="false" height="180" :src="props.gathering.gamebox?.photoUrl"></v-img>
+            </v-avatar>
+            <div>
+                <v-card-title>
+                    {{ props.gathering.gamebox.title || props.gathering.ownTitle }} ({{ props.gathering.slotsFilled
+                    }}/{{ props.gathering.guestsMax }})
+                </v-card-title>
+                <v-card-subtitle>
+                    [{{ props.date }}]
+                </v-card-subtitle>
+                <v-card-text>
+                    <p v-for="guest in props.gathering.guests" :key="guest.imageUrl">
+                        <user-avatar :value="guest"></user-avatar>
+                        {{ guest.title }}
+                        <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
+                    </p>
+                </v-card-text>
+                <v-card-text>
+                    <td>{{ props.gathering.commentOwner }}</td>
+                </v-card-text>
+            </div>
+        </div>
+        <v-card-actions v-if="user?.id">
+            <v-btn @click="emit('guestSet', props.gathering.id, 1)" :disabled="!gatheringComputedValue.canJoin">
+                Присоедениться
+            </v-btn>
+            <v-btn @click="emit('showDialogGuests', props.gathering)"
+                :disabled="!props.gatheringComputedValue.canAddGuests && !props.gatheringComputedValue.hasMyGuests">
+                {{ props.gatheringComputedValue.hasMyGuests ? 'Изменить гостей' : 'Добавить гостей' }}
+            </v-btn>
+            <v-btn @click="emit('guestSet', props.gathering.id, 0)" :disabled="!props.gatheringComputedValue.canLeave">
+                Покинуть сбор
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+    <v-card v-else :loading="loading">
+        <div class="d-flex flex-no-wrap justify-start ">
+            <v-avatar class="ma-3" size="150" rounded="0">
+                <v-img :cover="false" height="150" :src="props.gathering.gamebox?.photoUrl"></v-img>
+            </v-avatar>
+            <v-card-actions v-if="user?.id" class="flex-column">
+                <v-row>
+                    <v-col>
+
+                        <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 1)"
+                            :disabled="!gatheringComputedValue.canJoin">
+                            Присоедениться
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+
+                        <v-btn variant="outlined" @click="emit('showDialogGuests', props.gathering)"
+                            :disabled="!props.gatheringComputedValue.canAddGuests && !props.gatheringComputedValue.hasMyGuests">
+                            {{ props.gatheringComputedValue.hasMyGuests ? 'Изменить гостей' : 'Добавить гостей' }}
+                        </v-btn>
+                    </v-col>
+
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 0)"
+                            :disabled="!props.gatheringComputedValue.canLeave">
+                            Покинуть сбор
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-card-actions>
+        </div>
+        <div>
+            <v-card-title>
+                {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
+                ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }})
+            </v-card-title>
+            <v-card-subtitle>
+                [{{ props.date }}]
+            </v-card-subtitle>
+            <v-card-text>
+                <p v-for="guest in props.gathering.guests" :key="guest.imageUrl">
+                    <user-avatar :value="guest"></user-avatar>
+                    {{ guest.title }}
+                    <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
+                </p>
+            </v-card-text>
+            <v-card-text>
+                <td>{{ props.gathering.commentOwner }}</td>
+            </v-card-text>
+        </div>
+    </v-card>
+</template>
+
+<script setup lang="ts">
+
+const user = useSupabaseUser();
+import { useDisplay } from 'vuetify'
+const { mobile } = useDisplay();
+
+const props = defineProps<{
+    loading: boolean,
+    date: string,
+    gathering: GatheringWithGuests
+    gatheringComputedValue: GatheringComputedValue
+}>();
+
+const emit = defineEmits<{
+    (e: 'guestSet', id: number, number: number): void
+    (e: 'showDialogGuests', gathering: Gathering): void
+}>()
+
+</script>

@@ -24,46 +24,10 @@
         </v-col>
 
         <v-col v-else-if="gathwd.gathering">
-          <v-card :loading="loading.gatheringId === gathwd.gathering.id">
-            <div class="d-flex flex-no-wrap justify-start ">
-              <v-avatar class="ma-3" size="180" rounded="0">
-                <v-img :cover="false" height="180" :src="gathwd.gathering.gamebox?.photoUrl"></v-img>
-              </v-avatar>
-              <div>
-                <v-card-title>
-                  {{ gathwd.gathering.gamebox.title || gathwd.gathering.ownTitle }} ({{ gathwd.gathering.slotsFilled
-                  }}/{{ gathwd.gathering.guestsMax }})
-                </v-card-title>
-                <v-card-subtitle>
-                  [{{ gathwd.date }}]
-                </v-card-subtitle>
-                <v-card-text>
-                  <p v-for="guest in gathwd.gathering.guests" :key="guest.imageUrl">
-                    <user-avatar :value="guest"></user-avatar>
-                    {{ guest.title }}
-                    <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
-                  </p>
-                </v-card-text>
-                <v-card-text>
-                  <td>{{ gathwd.gathering.commentOwner }}</td>
-                </v-card-text>
-              </div>
-            </div>
-            <v-card-actions v-if="user?.id">
-              <v-btn @click="guestSet(gathwd.gathering.id, 1)"
-                :disabled="!gatheringsComputedValues[gathwd.gathering.id].canJoin">
-                Присоедениться
-              </v-btn>
-              <v-btn @click="showDialogGuests(gathwd.gathering)"
-                :disabled="!gatheringsComputedValues[gathwd.gathering.id].canAddGuests && !gatheringsComputedValues[gathwd.gathering.id].hasMyGuests">
-                {{ gatheringsComputedValues[gathwd.gathering.id].hasMyGuests ? 'Изменить гостей' : 'Добавить гостей' }}
-              </v-btn>
-              <v-btn @click="guestSet(gathwd.gathering.id, 0)"
-                :disabled="!gatheringsComputedValues[gathwd.gathering.id].canLeave">
-                Покинуть сбор
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+          <pages-gatherings-table-item :date="gathwd.date" :gathering="gathwd.gathering"
+            :loading="loading.gatheringId === gathwd.gathering.id"
+            :gatheringComputedValue="gatheringsComputedValues[gathwd.gathering.id]" @showDialogGuests="showDialogGuests"
+            @guestSet="guestSet"></pages-gatherings-table-item>
         </v-col>
       </v-row>
 
@@ -92,8 +56,7 @@
 
           <template v-slot:actions>
             <v-btn text="Отмена" @click="dialog.guests = false"></v-btn>
-            <v-btn text="Ok" type="submit" v-if="gatheringToEdit"
-              :disabled="guestsDialogSame"></v-btn>
+            <v-btn text="Ok" type="submit" v-if="gatheringToEdit" :disabled="guestsDialogSame"></v-btn>
           </template>
         </v-card>
       </v-form>
@@ -103,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Gathering, GatheringWithGuests, GatheringsWithDates } from '~/types/frontend'
+import type { Gathering, GatheringWithGuests, GatheringsWithDates, GatheringComputedValue } from '~/types/frontend'
 import { useDate } from 'vuetify';
 const dateAdapter = useDate();
 const gatherings: Ref<GatheringWithGuests[]> = ref([]);
@@ -131,7 +94,7 @@ async function updateFilters() {
 }
 updateFilters();
 
-const gatheringsComputedValues = computed(() => {
+const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue }>(() => {
 
   return gatherings.value.reduce((acc: any, item) => {
     const userGathering = item.guests.find(guest => guest.id === user.value?.id);
@@ -222,7 +185,7 @@ const dialog = ref({
 
 const guestsDialogNumber = ref(0);
 const gatheringToEdit = ref<Gathering>();
-const  guestsDialogSame = computed(() => {
+const guestsDialogSame = computed(() => {
   if (!gatheringToEdit.value) return true;
   return gatheringsComputedValues.value[gatheringToEdit.value.id].myGuests === guestsDialogNumber.value;
 })
