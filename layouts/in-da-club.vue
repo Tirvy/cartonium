@@ -36,6 +36,10 @@
       </v-btn>
     </v-bottom-navigation>
 
+    <v-snackbar :model-value="true" color="info" order="10" variant="flat" location="top" timeout="1500" timer="true" z-index="999">
+      В мобильной версии админские разделы ограничены
+    </v-snackbar>
+
   </v-app>
 </template>
 
@@ -83,6 +87,7 @@ let pages = [
     path: `/clubs/${clubName.value}/settings`,
     icon: 'mdi-cog-outline',
     permissions: true,
+    mobile: false,
   },
   {
     title: 'Профиль',
@@ -91,13 +96,18 @@ let pages = [
   }
 ];
 
+const { mobile } = useDisplay();
 const clubPermissions = useClubPermissions();
 const pagesList = computed(() => {
-  return pages.filter(item => !item.permissions || clubPermissions.value)
+  return pages.filter(item => {
+    if (item.permissions && !clubPermissions.value) return false;
+    if (mobile && item.mobile === false) return false;
+    return true;
+  })
 })
 
 
-import { useTheme } from 'vuetify'
+import { useDisplay, useTheme } from 'vuetify'
 const theme = useTheme()
 
 const storedTheme = localStorage.getItem('theme');
@@ -125,7 +135,7 @@ const initials = computed(() => {
   }
 
   return user.value?.email?.split('@').map(str => str[0]).join('@').toUpperCase();
-}) 
+})
 
 const avatar = computed(() => {
   return {
