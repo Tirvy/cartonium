@@ -3,41 +3,28 @@
     <v-container>
       <v-sheet>
 
-        <v-data-table :item-value="item => item.id" select-strategy="all" v-model="selected"
-          :headers="headersGameBoxList" :items="gameboxes" show-select>
+        <v-text-field :model-value="search" @update:model-value="updateSearch" label="Search"
+          prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line></v-text-field>
+
+        <v-data-table :item-value="item => item.id" :headers="headersGameBoxList" :items="gameboxes"
+          @update:options="loadItems" :loading="loadign.table" :search="search">
         </v-data-table>
 
       </v-sheet>
-      <v-btn @click="getNewPictures">
-        get new pictures
-      </v-btn>
     </v-container>
   </v-main>
 </template>
 
 <script lang="ts" setup>
 
-import type { GameBoxWithClub } from '@/types/frontend';
+import type { GameBox, GameBoxWithClub } from '@/types/frontend';
 
-// gameboxes.value = data as GameBoxWithClub[];
 
-const { data: gameboxes, refresh } = (await useFetch('/api/supabase/gameboxes')) as { data: Ref<GameBoxWithClub[]>, refresh: () => void };
-// gameboxes.value = data as GameBoxWithClub[];
+const gameboxes: Ref<GameBox[]> = ref([]);
+
+
 
 const columns = useConstants('columns');
-
-const selected: Ref<number[]> = ref(gameboxes.value.map(item => item.id));
-
-async function getNewPictures() {
-  const ret = await $fetch('/api/common/add-pictures',
-    {
-      method: 'post',
-      body: { gameBoxIds: selected.value }
-    });
-
-  refresh()
-  // gameboxes.value = await $fetch('/api/supabase/gameboxes');
-}
 
 const headersGameBoxList = [...columns.map((key: string) => {
   return {
@@ -45,6 +32,28 @@ const headersGameBoxList = [...columns.map((key: string) => {
     key: key,
   }
 })];
+
+const loadign = ref({
+  table: false,
+})
+
+const search = ref('');
+const updateSearch = useDebounce((string: string) => {
+  search.value = string
+}, 1000)
+
+async function loadItems({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: { key: string, order: string }, search: string }) {
+  loadign.value.table = true;
+
+  const data = await $fetch('/api/supabase/gameboxes', {
+    query: { page, itemsPerPage, sortBy, search },
+  }) as { items: GameBox[] };
+
+  if (data.items) {
+    gameboxes.value = data.items;
+  }
+  loadign.value.table = false;
+}
 
 </script>
 

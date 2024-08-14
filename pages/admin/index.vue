@@ -3,10 +3,10 @@
     <v-container>
       <v-sheet>
         <v-list>
-          <v-list-item to="./gameboxes">
+          <v-list-item to="/admin/gameboxes">
             gameboxes
           </v-list-item>
-          <v-list-item to="./gameboxes-pictures">
+          <v-list-item to="/admin/gameboxes-pictures">
             gameboxes-pictures
           </v-list-item>
         </v-list>
