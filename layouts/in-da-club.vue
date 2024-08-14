@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
 
-    <v-app-bar dense>
+    <v-app-bar dense class="px-2">
 
       <template v-slot:prepend>
         <nuxt-link :to="clubSettings">
