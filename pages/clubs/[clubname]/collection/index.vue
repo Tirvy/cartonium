@@ -16,9 +16,9 @@
     <v-navigation-drawer location="right" v-model="drawerState" order="8">
         <v-form @submit.prevent="applyFilter">
             <v-list density="compact" nav>
-                <v-list-item-title>
+                <v-list-item>
                     Фильтры
-                </v-list-item-title>
+                </v-list-item>
                 <v-list-item>
                     <v-text-field v-model="filter.title" label="Название" clearable></v-text-field>
                 </v-list-item>
@@ -41,13 +41,13 @@
         </v-form>
     </v-navigation-drawer>
 
-    <v-fab v-if="!drawerState" location="top end"app size="large"
-        variant="outlined" order="1" @click="drawerState = true">
+    <v-fab v-if="!drawerState" location="top end" app size="large" variant="outlined" order="1"
+        @click="drawerState = true">
         Фильтры
     </v-fab>
 
-    <v-fab v-if="clubPermissions && !mobile" location="bottom end" icon="mdi-plus" to="./collection/add-games" app size="large"
-        variant="outlined" order="1">
+    <v-fab v-if="clubPermissions && !mobile" location="bottom end" icon="mdi-plus" to="./collection/add-games" app
+        size="large" variant="outlined" order="1">
     </v-fab>
 </template>
 

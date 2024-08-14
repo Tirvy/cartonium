@@ -7,6 +7,9 @@
             <v-card-item class="flex-0-1" style="min-width: 0;">
                 <v-card-title>
                     {{ value.title }}
+                    <v-tooltip v-if="mobile" :open-on-click="true" activator="parent" location="top">
+                        {{ value.title }}
+                    </v-tooltip>
                 </v-card-title>
                 <v-card-subtitle>
                     <v-container>
@@ -35,11 +38,13 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify';
 import type { GameBox } from '~/types/frontend.js';
+const { mobile } = useDisplay();
 
 const props = defineProps<{
     value: GameBox
-}>(); 
+}>();
 
 const imageURL = computed(() => {
     return props.value.photoUrl || `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;

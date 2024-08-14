@@ -93,6 +93,7 @@ let pages = [
     title: 'Профиль',
     path: `/clubs/${clubName.value}/profile`,
     icon: 'mdi-account',
+    mobile: false,
   }
 ];
 
