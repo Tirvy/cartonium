@@ -46,7 +46,7 @@
         Фильтры
     </v-fab>
 
-    <v-fab v-if="clubPermissions" location="bottom end" icon="mdi-plus" to="./collection/add-games" app size="large"
+    <v-fab v-if="clubPermissions && !mobile" location="bottom end" icon="mdi-plus" to="./collection/add-games" app size="large"
         variant="outlined" order="1">
     </v-fab>
 </template>
