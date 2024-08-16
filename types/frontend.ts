@@ -79,8 +79,8 @@ export interface GameBoxDataTesera {
 
 
 export interface GameBox {
-    aliasTesera: string | undefined;
     id: number;
+    aliasTesera: string | undefined;
     idBgg: number | undefined;
     idTesera: number | undefined;
     linkBgg: string | undefined;
