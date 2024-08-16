@@ -49,7 +49,8 @@
           <template v-slot:text>
             Гости - это люди, которые придут с вами на сбор, но которые не хотят (или не могут) зайти в приложение и
             присоедениться сами
-            <v-text-field :rules="[ruleIsNumber]" v-model="guestsDialogNumber">
+            <v-text-field :rules="[ruleIsNumber, ruleIsNotNegative, ruleLessThanMaxGuests]"
+              v-model="guestsDialogNumber">
 
             </v-text-field>
           </template>
@@ -106,6 +107,7 @@ const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue
       canAddGuests: userIsInThisGathering && notMax,
       hasMyGuests: !!userGathering && userGathering.totalGuests > 1,
       myGuests: !!userGathering && userGathering.totalGuests,
+      slotsAvailable: item.guestsMax - item.slotsFilled,
     }
 
     return acc;
@@ -130,8 +132,8 @@ const gatheringsHashedByDate = computed<gatheringsHash>(() => {
   return {};
 })
 const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
-  const keys = Object.keys(gatheringsHashedByDate.value);
-  const ret: GatheringsWithDates[] = [];
+  const keys = Object.keys(gatheringsHashedByDate.value).sort();
+  let ret: GatheringsWithDates[] = [];
   keys.forEach(key => {
     ret.push({
       type: 'date',
@@ -146,7 +148,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
         gathering: gathering
       });
     })
-  })
+  });
   return ret;
 });
 
@@ -193,6 +195,20 @@ function showDialogGuests(gathering: Gathering) {
   gatheringToEdit.value = gathering;
   guestsDialogNumber.value = gatheringsComputedValues.value[gatheringToEdit.value.id].myGuests - 1;
   dialog.value.guests = true;
+}
+
+function ruleLessThanMaxGuests(value: string) {
+  const numValue = +value;
+  if (isNaN(numValue)) return true;
+  if (!gatheringToEdit.value) return false;
+  const computedValue = gatheringsComputedValues.value[gatheringToEdit.value.id];
+  const myGuests = computedValue.myGuests;
+  const availablePlaces = computedValue.slotsAvailable;
+  const maxAvailableValue = myGuests + availablePlaces - 1;
+  if (numValue > maxAvailableValue) {
+    return `Введите число меньше чем оставшееся число мест (${maxAvailableValue})`;
+  }
+  return true;
 }
 
 function guestsApply() {

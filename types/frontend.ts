@@ -269,6 +269,7 @@ export interface GatheringComputedValue {
     canAddGuests: boolean,
     hasMyGuests: boolean,
     myGuests: number,
+    slotsAvailable: number,
 }
 
 export interface Loaders {
