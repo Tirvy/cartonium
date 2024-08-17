@@ -202,6 +202,9 @@ export interface GameBoxWithClub extends GameBox {
 }*/
 
 export interface Club {
+    gatheringWarning: string
+    reservationLinks: string[]
+    reservationPhones: string[]
     collectionSearchRating: boolean
     collectionSearchDuration: boolean
     collectionSearchPlayers: boolean
@@ -236,6 +239,7 @@ export interface Gathering {
     id: number
     ownerId: string
     startDate: string
+    ownName: string
 }
 
 export interface GatheringGuest {

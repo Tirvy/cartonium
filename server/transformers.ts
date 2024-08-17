@@ -13,6 +13,9 @@ export function clubFromSupabase(data: any, clubSettingsData: any): Club {
         collectionSearchRating: clubSettingsData.collection_search_rating,
         collectionSearchDuration: clubSettingsData.collection_search_duration,
         collectionSearchPlayers: clubSettingsData.collection_search_players,
+        reservationLinks: clubSettingsData.reservation_links || [],
+        reservationPhones: clubSettingsData.reservation_phones || [],
+        gatheringWarning: clubSettingsData.gathering_warning || '',
     };
 }
 
@@ -92,6 +95,7 @@ export function gatheringFromSupabase(data: any): Gathering {
         id: data.id,
         ownerId: data.owner_id,
         startDate: data.start_date,
+        ownName: data.own_name,
     };
 }
 
@@ -124,6 +128,7 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         startDate: data.start_date,
         guests: !!userData ? [userData] : [],
         slotsFilled: data.guests_number || 0,
+        ownName: data.own_name,
     };
 
 }

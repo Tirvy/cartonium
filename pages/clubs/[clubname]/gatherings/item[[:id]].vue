@@ -262,6 +262,9 @@ async function saveGathering() {
     })
     const lastGathering = useState('lastGathering');
     lastGathering.value = data;
+
+    const lastGatheringName = useState('lastGatheringName');
+    lastGatheringName.value = !isClubGamebox.value ? ownGatheringName.value : gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title;
     navigateTo('./gathering-accepted');
     loaders.value.save = false;
 }
