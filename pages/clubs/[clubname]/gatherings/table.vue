@@ -14,6 +14,19 @@
           </NuxtLink>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-btn-toggle v-model="tableView" variant="outlined" mandatory divided rounded class="w-100">
+            <v-btn value="minimal" icon="mdi-view-sequential-outline" class="flex-grow-1">
+            </v-btn>
+
+            <v-btn value="compact" icon="mdi-view-compact-outline" class="flex-grow-1">
+            </v-btn>
+            <v-btn value="full" icon="mdi-view-day-outline" class="flex-grow-1">
+            </v-btn>
+          </v-btn-toggle>
+        </v-col>
+      </v-row>
       <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
         text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
       <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
@@ -24,7 +37,7 @@
         </v-col>
 
         <v-col v-else-if="gathwd.gathering">
-          <pages-gatherings-table-item :date="gathwd.date" :gathering="gathwd.gathering"
+          <pages-gatherings-table-item :view="tableView" :date="gathwd.date" :gathering="gathwd.gathering"
             :loading="loading.gatheringId === gathwd.gathering.id"
             :gatheringComputedValue="gatheringsComputedValues[gathwd.gathering.id]" @showDialogGuests="showDialogGuests"
             @guestSet="guestSet"></pages-gatherings-table-item>
@@ -220,6 +233,13 @@ function guestsApply() {
     gatheringToEdit.value = undefined;
   }
 }
+
+
+// ---- view -----
+const tableView = ref<'minimal' | 'compact' | 'full'>('full');
+
+
+
 </script>
 
 <style scoped>
