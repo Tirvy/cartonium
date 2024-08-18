@@ -106,9 +106,9 @@
                   </v-list-item>
                 </template>
                 <v-list-item>
-                  <v-list-item-subtitle>
-                    Информацию можно подглянуть на вкладке "о клубе"
-                  </v-list-item-subtitle>
+                  <p>
+                    Информацию можно подглянуть на вкладке "о клубе" внизу страницы
+                  </p>
                 </v-list-item>
               </v-list>
 

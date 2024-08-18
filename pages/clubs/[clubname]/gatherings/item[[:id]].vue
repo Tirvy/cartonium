@@ -13,11 +13,22 @@
                                 v-model="startTime" :rules="[ruleIsTime]"></v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row>
-                        <v-col>
+                    <v-row v-if="ownGatheringNameAvailable">
+                        <v-col cols="12">
+                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded class="w-100">
+                                <v-btn value="club" class="flex-grow-1">
+                                    Игра клуба
+                                </v-btn>
+
+                                <v-btn value="own" class="flex-grow-1">
+                                    Своя игра
+                                </v-btn>
+                            </v-btn-toggle>
+                        </v-col>
+                        <v-col cols="12" v-show="gameboxSource === 'club'">
                             <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
                                 color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
-                                :eager="true">
+                                :eager="true" @update:model-value="updatePeopleCount">
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -29,32 +40,17 @@
                                 </template>
                             </v-autocomplete>
                         </v-col>
-                        <v-col v-if="ownGatheringNameAvailable" cols="4">
-
-                            <v-btn :active="!isClubGamebox" @click="isClubGamebox = !isClubGamebox">
-                                Нет в списке?
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="!isClubGamebox">
-                        <p>
-                            Если в списке выше нет нужной игры, то вы можете сами указать название игры/встречи здесь.
-                        </p>
-                        <v-text-field v-model="ownGatheringName"></v-text-field>
-                    </v-row>
-                    <v-row v-if="reservingAvailable">
-                        <v-col>
-                            <v-checkbox label="Поискать еще игроков?" v-model="publicGathering"></v-checkbox>
+                        <v-col cols="12" v-show="gameboxSource === 'own'">
+                            <p>
+                                Если в списке нет нужной игры, то вы можете сами указать название игры/встречи здесь.
+                            </p>
+                            <v-text-field label="Название сбора" v-model="ownGatheringName"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Сколько человек надо на игру (в сумме)" v-model="guestsMax"
-                                :rules="[ruleIsNumber]"></v-text-field>
-                        </v-col>
-                        <v-col v-if="!gatheringId">
-                            <v-text-field label="Сколько гостей приведете с собой" v-model="hostGuestsNumber"
-                                :rules="[ruleIsNumber, ruleLessThanTotal]"></v-text-field>
+                            <v-text-field label="Максимум человек" v-model="guestsMax"
+                                :rules="[ruleIsNumber]" @input="isGuestsMaxDirty = true"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -90,7 +86,7 @@
                         </v-row>
                     </template>
                     <v-row>
-                        <v-col>
+                        <v-col class="d-flex justify-end">
                             <v-btn type="submit" :loading="loaders.save">сохранить</v-btn>
                         </v-col>
                     </v-row>
@@ -102,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Gathering, Loaders } from '~/types/frontend'
+import type { GameBox, Gathering, Loaders } from '~/types/frontend'
 import { DateIOFormats } from "@date-io/core/IUtils";
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
@@ -137,6 +133,7 @@ const hostGuestsNumber = ref("0");
 const publicGathering = ref(true);
 const isClubGamebox = ref(true);
 const ownGatheringName = ref('');
+const isGuestsMaxDirty = ref(false);
 
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
@@ -149,7 +146,7 @@ const tables = ref<Table[]>([])
 const today = new Date();
 const yesterday = new Date();
 yesterday.setDate(today.getDate() - 1);
-function dateIsTodayOnward (date: unknown) {
+function dateIsTodayOnward(date: unknown) {
     return date as Date > yesterday;
 }
 function ruleLessThanTotal(val: string) {
@@ -157,6 +154,16 @@ function ruleLessThanTotal(val: string) {
         return 'Не может быть больше общего числа гостей'
     }
     return true;
+}
+
+const gameboxSource = ref('club');
+
+function updatePeopleCount(val: number | undefined) {
+    if (!val) return;
+    let foundGamebox = gameboxesSearchList.value.find(box => box.id === val);
+    if (!isGuestsMaxDirty.value && foundGamebox) {
+        guestsMax.value = (foundGamebox.playersMax || '4')?.toString();
+    }
 }
 
 /* in case it needs optimization
