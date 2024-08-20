@@ -14,21 +14,24 @@
           </NuxtLink>
         </v-col>
       </v-row>
-      <v-row>
+
+      <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
+        text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
+
+      <v-row v-if="user && gatheringsWithDates.length > 0">
         <v-col cols="12">
           <v-btn-toggle v-model="tableView" variant="outlined" mandatory divided rounded class="w-100">
             <v-btn value="minimal" icon="mdi-view-sequential-outline" class="flex-grow-1">
             </v-btn>
 
-            <v-btn value="compact" icon="mdi-view-compact-outline" class="flex-grow-1">
-            </v-btn>
+            <!-- <v-btn value="compact" icon="mdi-view-compact-outline" class="flex-grow-1"> -->
+            <!-- </v-btn> -->
             <v-btn value="full" icon="mdi-view-day-outline" class="flex-grow-1">
             </v-btn>
           </v-btn-toggle>
         </v-col>
       </v-row>
-      <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
-        text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
+
       <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
         <v-col v-if="gathwd.type === 'date'">
           <v-list-subheader>
