@@ -6,7 +6,7 @@
                     <v-row>
                         <v-col>
                             <v-date-input label="Дата" prepend-icon="" prepend-inner-icon="$calendar"
-                                v-model="startDate" :allowed-dates="dateIsTodayOnward"></v-date-input>
+                                v-model="startDate" :allowed-dates="dateIsTodayOnward" hide-actions></v-date-input>
                         </v-col>
                         <v-col>
                             <v-text-field v-maska:[timeMaskOptions] placeholder="12:30" label="Время"
@@ -55,7 +55,7 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-textarea label="Комментарий к встречи" v-model="commentOwner"
+                            <v-textarea label="Комментарий (виден всем)" v-model="commentOwner"
                                 :disabled="!publicGathering"></v-textarea>
                         </v-col>
                     </v-row>
