@@ -23,7 +23,8 @@
                     <v-img height="400" src="~/assets/images/chill.png" alt="wait" />
                     <p>Подожди, происходит магия</p>
                     <v-progress-linear :model-value="loadingProgress.now * 100 / loadingProgress.total" height="25">
-                        <strong>{{ Math.ceil(loadingProgress.now * 100 / loadingProgress.total) }}%</strong></v-progress-linear>
+                        <strong>{{ Math.ceil(loadingProgress.now * 100 / loadingProgress.total)
+                            }}%</strong></v-progress-linear>
                 </v-col>
                 <v-col cols="12" v-if="stepNumber === 3">
                     <pages-add-games-add-gameboxes :items="controlDataOutOfClub" @getGameBoxData="getGameBoxData"
@@ -325,6 +326,7 @@ async function sendGameboxesToSupabase() {
         let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
             method: "POST", body: saveData.value
         });
+        loaders.value.gettingData = true;
         await $fetch('/api/supabase/add-games-to-club',
             {
                 method: 'post',
@@ -332,6 +334,7 @@ async function sendGameboxesToSupabase() {
                 body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
             });
 
+        loaders.value.gettingData = false;
         showSnackbar('Все игры добавлены в бд и в клуб');
         stepNumber.value = 5;
     }

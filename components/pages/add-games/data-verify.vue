@@ -9,7 +9,7 @@
         </v-card-text>
         <v-card-actions>
             <div>
-                <v-btn @click="sendGameboxesToSupabase">
+                <v-btn @click="sendGameboxesToSupabase" :loading="loading">
                     Отправить в супабейз
                 </v-btn>
             </div>
@@ -25,6 +25,10 @@ const props = defineProps({
     items: {
         type: Array<any>,
         default: [],
+    },
+    loading: {
+        type: Boolean,
+        default: false,
     },
 });
 
