@@ -20,7 +20,8 @@
 
       <v-row v-if="user && gatheringsWithDates.length > 0">
         <v-col cols="12">
-          <v-btn-toggle v-model="tableView" variant="outlined" mandatory divided rounded class="w-100">
+          <v-btn-toggle v-model="tableView" @update:model-value="saveViewPreferance" variant="outlined" mandatory
+            divided rounded class="w-100">
             <v-btn value="minimal" icon="mdi-view-sequential-outline" class="flex-grow-1">
             </v-btn>
 
@@ -239,8 +240,18 @@ function guestsApply() {
 
 
 // ---- view -----
-const tableView = ref<'minimal' | 'compact' | 'full'>('full');
+let stored = localStorage.getItem('gatherings-view');
+let initialViewValue: 'minimal' | 'compact' | 'full' = 'full'
+if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
+  initialViewValue = stored;
+}
+const tableView = ref<'minimal' | 'compact' | 'full'>(initialViewValue);
 
+function saveViewPreferance(value: string) {
+  localStorage.setItem('gatherings-view', value);
+}
+
+// end ---- view -----
 
 
 </script>
