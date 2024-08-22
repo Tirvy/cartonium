@@ -3,7 +3,6 @@
         <v-container>
             <v-row>
                 <v-col cols="12">
-
                     <v-breadcrumbs :items="breadcrumbItems">
                         <template v-slot:divider>
                             <v-icon icon="mdi-chevron-right"></v-icon>
@@ -19,11 +18,19 @@
                         @sendGameboxesToSupabase="addTheseExisting" />
                 </v-col>
                 <v-divider />
+
+                <v-col cols="12" v-if="loadingProgress.total">
+                    <v-img height="400" src="~/assets/images/chill.png" alt="wait" />
+                    <p>Подожди, происходит магия</p>
+                    <v-progress-linear :model-value="loadingProgress.now * 100 / loadingProgress.total" height="25">
+                        <strong>{{ Math.ceil(loadingProgress.now * 100 / loadingProgress.total) }}%</strong></v-progress-linear>
+                </v-col>
                 <v-col cols="12" v-if="stepNumber === 3">
                     <pages-add-games-add-gameboxes :items="controlDataOutOfClub" @getGameBoxData="getGameBoxData"
                         :loading="loaders.gettingData" @search="searchAgainSpecific" />
                 </v-col>
                 <v-divider />
+
                 <v-col cols="12" v-if="stepNumber === 4">
                     <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase"
                         :loading="loaders.gettingData" />
@@ -168,32 +175,42 @@ async function addTheseExisting(selectedExisting: GameboxAddData[]) {
     stepNumber.value++;
 }
 
+const loadingProgress = ref({
+    now: 0,
+    total: 0,
+});
+
 async function getGamesBaseInfo() {
     const cdataToProgress = controlData.value.filter(item => !item.indaclub);
-    let progress = 0;
+    loadingProgress.value.now = 0;
+    loadingProgress.value.total = cdataToProgress.length;
     loaders.value.gettingData = true;
 
     cdataToProgress.forEach(async (cdata: GameboxAddData, index: number) => {
         cdata.preciseSearch = cdata.name;
-        const resTesera: unknown = await $fetch('/api/tesera/search', { query: { title: cdata.name } });
+        const resTesera: { items: GameBoxSearchResult[] } = await $fetch('/api/tesera/search', { query: { title: cdata.name } });
+        const itemsTesera = resTesera?.items;
 
-        if (Array.isArray(resTesera) && resTesera.length) {
-            cdata.gameTeseraVariants = resTesera;
-            cdata.gameTesera = resTesera[0];
+        if (Array.isArray(itemsTesera) && itemsTesera.length) {
+            cdata.gameTeseraVariants = itemsTesera;
+            cdata.gameTesera = itemsTesera[0];
 
             const searchTitles = [cdata.name];
-            const resBgg = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
-            if (Array.isArray(resBgg) && resBgg.length) {
-                cdata.gameBggVariants = resBgg;
-                cdata.gameBgg = resBgg[0];
+            const resBgg: { items: GameBoxSearchResult[] } = await $fetch('/api/bgg/search', { query: { titles: searchTitles } });
+            const itemsBgg = resBgg?.items;
+            if (Array.isArray(itemsBgg) && itemsBgg.length) {
+                cdata.gameBggVariants = itemsBgg;
+                cdata.gameBgg = itemsBgg[0];
             }
         }
 
-        progress++;
-        if (progress === cdataToProgress.length) {
+        loadingProgress.value.now++;
+        if (loadingProgress.value.now === loadingProgress.value.total) {
             // to force recalc
             controlData.value = [...controlData.value]
             loaders.value.gettingData = false;
+            loadingProgress.value.total = 0;
+            loadingProgress.value.now = 0;
         }
     });
 };
@@ -242,6 +259,10 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
         return syncData[item.name] && syncData[item.name].selected && (syncData[item.name].gameBgg || syncData[item.name].gameTesera);
     });
 
+
+    loadingProgress.value.now = 0;
+    loadingProgress.value.total = cdataToProgress.length;
+
     cdataToProgress
         .forEach(async (cdataItem: any, index: number) => {
             const gameInfo = syncData[cdataItem.name];
@@ -285,6 +306,11 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
             }
             ret.titles.push(cdataItem.name);
             saveData.value.push(ret);
+            loadingProgress.value.now++;
+            if (loadingProgress.value.now == loadingProgress.value.total) {
+                loadingProgress.value.now = 0;
+                loadingProgress.value.total = 0;
+            }
         });
 
     stepNumber.value++;

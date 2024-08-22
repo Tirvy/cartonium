@@ -21,17 +21,17 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const title: string = (query.title as string).trim();
     if (!title) {
-      return { result: { error: 'title must be a string' } };
+      return { error: 'title must be a string' };
     }
 
     const res: any = await $fetch(`${apiURL}/search`, { query: { query: title } });
     if (Array.isArray(res)) {
-      return res.map(item => formatRet(item));
+      return { items: res.map(item => formatRet(item)) };
     }
-    return [];
+    return { items: [] };
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return { result: [], error: error.message };
+      return { items: [], error: error.message };
     }
     console.log(String(error));
   }
