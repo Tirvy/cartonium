@@ -68,11 +68,6 @@ const clubSettings = `/clubs/${clubName.value}/settings`;
 
 let pages = [
   {
-    title: 'Коллекция',
-    path: `/clubs/${clubName.value}/collection`,
-    icon: 'mdi-list-box',
-  },
-  {
     title: 'Сборы',
     path: `/clubs/${clubName.value}/gatherings/table`,
     icon: 'mdi-table-furniture',
@@ -81,6 +76,11 @@ let pages = [
     title: 'О клубе',
     path: `/clubs/${clubName.value}/information/public`,
     icon: 'mdi-information',
+  },
+  {
+    title: 'Коллекция',
+    path: `/clubs/${clubName.value}/collection`,
+    icon: 'mdi-list-box',
   },
   {
     title: 'Настройки клуба',
