@@ -11,7 +11,7 @@ definePageMeta({
       const clubPermissions = useClubPermissions();
 
       if (!clubPermissions.value) {
-        return navigateTo('/clubs/' + currentClub.value.urlName + '/collection');
+        return navigateTo('/clubs/' + currentClub.value.urlName + '/gatherings');
       }
     },
   ],

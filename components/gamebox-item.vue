@@ -4,15 +4,14 @@
             <v-avatar class="ma-3" size="100" rounded="0">
                 <v-img :cover="false" height="100" :src="imageURL"></v-img>
             </v-avatar>
-            <v-card-item class="flex-0-1" style="min-width: 0;">
+            <v-card-item class="flex-0-1 pl-1" style="min-width: 0;">
                 <v-card-title>
                     {{ value.title }}
                     <v-tooltip v-if="mobile" :open-on-click="true" activator="parent" location="top">
                         {{ value.title }}
                     </v-tooltip>
                 </v-card-title>
-                <v-card-subtitle>
-                    <v-container>
+                <v-card-text class="text-medium-emphasis">
                         <v-row>
                             <v-col>
                                 RatingTesera: {{ value.ratingTesera }}
@@ -29,8 +28,7 @@
                                 Playtime: {{ value.playtimeMin }} - {{ value.playtimeMax }}
                             </v-col>
                         </v-row>
-                    </v-container>
-                </v-card-subtitle>
+                </v-card-text>
             </v-card-item>
         </div>
 

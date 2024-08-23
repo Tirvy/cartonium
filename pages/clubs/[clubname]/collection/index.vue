@@ -41,9 +41,8 @@
         </v-form>
     </v-navigation-drawer>
 
-    <v-fab v-if="!drawerState" location="top end" app size="large" variant="outlined" order="1"
+    <v-fab v-if="!drawerState" location="top end" icon="mdi-filter-outline" app size="large" variant="elevated" order="1"
         @click="drawerState = true">
-        Фильтры
     </v-fab>
 
     <v-fab v-if="clubPermissions && !mobile" location="bottom end" icon="mdi-plus" to="./collection/add-games" app
@@ -88,6 +87,12 @@ const filter = ref(
         maxPlaytime: "0",
     }
 );
+
+setTimeout(() => {
+    if (mobile) {
+        drawerState.value = false;
+    }
+}, 100)
 
 const filterApplied = ref({ ...filter.value });
 

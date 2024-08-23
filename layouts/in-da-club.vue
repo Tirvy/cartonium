@@ -73,14 +73,14 @@ let pages = [
     icon: 'mdi-list-box',
   },
   {
-    title: 'О клубе',
-    path: `/clubs/${clubName.value}/information/public`,
-    icon: 'mdi-information',
-  },
-  {
     title: 'Сборы',
     path: `/clubs/${clubName.value}/gatherings/table`,
     icon: 'mdi-table-furniture',
+  },
+  {
+    title: 'О клубе',
+    path: `/clubs/${clubName.value}/information/public`,
+    icon: 'mdi-information',
   },
   {
     title: 'Настройки клуба',
