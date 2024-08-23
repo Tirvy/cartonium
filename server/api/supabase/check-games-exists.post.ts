@@ -16,14 +16,15 @@ export default defineEventHandler(async (event) => {
 
   const splitLimit = 80;
   let titlesLeft = [...titles];
-  while (titlesLeft.length > splitLimit) {
-    const titlesNow = titlesLeft.slice(0, splitLimit);
+  while (titlesLeft.length > 0) {
+    const toSlice = titlesLeft.length > splitLimit ? splitLimit : titlesLeft.length;
+    const titlesNow = titlesLeft.slice(0, toSlice);
     const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titlesNow);
     if (error) {
       throw createError({ message: error.message })
     }
     retData = retData.concat(data);
-    titlesLeft = titlesLeft.slice(splitLimit);
+    titlesLeft = titlesLeft.slice(toSlice);
   }
 
 
