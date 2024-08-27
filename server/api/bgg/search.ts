@@ -18,15 +18,15 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
 
   let id = null;
 
-  for (let i = 0; i < searchTexts.length && !id; i++) {
-    let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i], exact: 1 } });
-    let resParsed = parser.parse(res as string);
+  // for (let i = 0; i < searchTexts.length && !id; i++) {
+  //   let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i], exact: 1 } });
+  //   let resParsed = parser.parse(res as string);
 
-    // console.log(searchTexts[i], 1, resParsed.items.item);
-    if (hasResults(resParsed)) {
-      return formatResult(resParsed);
-    }
-  }
+  //   // console.log(searchTexts[i], 1, resParsed.items.item);
+  //   if (hasResults(resParsed)) {
+  //     return formatResult(resParsed);
+  //   }
+  // }
 
   for (let i = 0; i < searchTexts.length && !id; i++) {
     let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i] } });

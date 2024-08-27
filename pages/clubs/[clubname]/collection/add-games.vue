@@ -42,6 +42,7 @@
                 </v-col>
             </v-row>
         </v-container>
+
         <v-snackbar v-model="snackbar" multi-line>
             {{ snackbarText }}
 
@@ -51,6 +52,27 @@
                 </v-btn>
             </template>
         </v-snackbar>
+
+        <v-dialog v-model="errorDialog" max-width="600px">
+            <v-card>
+                <v-card-title>
+                    Произошла ошибка
+                </v-card-title>
+                <v-card-subtitle>
+                    Отправь её в чат с разработчиками
+                </v-card-subtitle>
+                <v-card-text>
+                    <v-textarea readonly :model-value="errorDialogText">
+                    </v-textarea>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue-darken-1" variant="text" @click="errorDialog = false">
+                        ok
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
     </v-main>
 </template>
@@ -324,20 +346,26 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
 
 async function sendGameboxesToSupabase() {
     if (saveData.value.length) {
-        let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
-            method: "POST", body: saveData.value
-        });
-        loaders.value.gettingData = true;
-        await $fetch('/api/supabase/add-games-to-club',
-            {
-                method: 'post',
-                query: { clubid: currentClub.value.id },
-                body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
-            });
+        try {
 
-        loaders.value.gettingData = false;
-        showSnackbar('Все игры добавлены в бд и в клуб');
-        stepNumber.value = 5;
+            let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
+                method: "POST", body: saveData.value
+            });
+            loaders.value.gettingData = true;
+            await $fetch('/api/supabase/add-games-to-club',
+                {
+                    method: 'post',
+                    query: { clubid: currentClub.value.id },
+                    body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
+                });
+
+            loaders.value.gettingData = false;
+            showSnackbar('Все игры добавлены в бд и в клуб');
+            stepNumber.value = 5;
+
+        } catch (error) {
+            setError(error)
+        }
     }
 }
 
@@ -351,6 +379,15 @@ function hashedListToSorted(toSort: any, sortSource: string[]) {
         }
     })
     return ret;
+}
+
+// error dialog
+const errorDialog = ref(false);
+const errorDialogText = ref('');
+
+function setError(error: any) {
+    errorDialog.value = true;
+    errorDialogText.value = JSON.stringify(error);
 }
 
 </script>
