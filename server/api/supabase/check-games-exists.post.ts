@@ -6,10 +6,11 @@ import { formatDiagnosticsWithColorAndContext } from 'typescript';
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const body = await readBody(event);
-  const titles = (body.titles as string[]);
+  let titles = (body.titles as string[]);
   if (!titles?.length) {
     throw createError({ statusMessage: 'title required' })
   }
+  titles = titles.map(title => title.trim().replace(/["'«»]/g, ''));
   const client = await serverSupabaseClient<Database>(event);
 
   let retData: unknown[] = [];

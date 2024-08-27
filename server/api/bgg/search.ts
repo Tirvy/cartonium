@@ -22,12 +22,9 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
     let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i], exact: 1 } });
     let resParsed = parser.parse(res as string);
 
-    //console.log(searchTexts[i], 1, resParsed.items.item);
-    if (resParsed.items.item) {
-      if (Array.isArray(resParsed.items.item)) {
-        return resParsed.items.item.map((item: any) => parseGameData(item));
-      }
-      return [parseGameData(resParsed.items.item)]
+    // console.log(searchTexts[i], 1, resParsed.items.item);
+    if (hasResults(resParsed)) {
+      return formatResult(resParsed);
     }
   }
 
@@ -35,13 +32,23 @@ async function getGameData(searchTexts: String[]): Promise<GameBoxSearchResult[]
     let res = await $fetch(`${apiURL}/search`, { query: { query: searchTexts[i] } });
     let ret = parser.parse(res as string);
 
-    //console.log(searchTexts[i], 2, ret.items.item);
-    if (ret.items.item && Array.isArray(ret.items.item)) {
-      return ret.items.item.map((item: any) => parseGameData(item));
+    // console.log(searchTexts[i], 2, ret.items.item);
+    if (hasResults(ret)) {
+      return formatResult(ret);
     }
   }
 
   return [];
+}
+
+function hasResults(data: any): boolean {
+  return data.items.item;
+}
+function formatResult(data: any) {
+  if (data.items.item && Array.isArray(data.items.item)) {
+    return data.items.item.map((item: any) => parseGameData(item));
+  }
+  return [parseGameData(data.items.item)];
 }
 
 export default defineEventHandler(async (event) => {

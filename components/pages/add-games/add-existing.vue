@@ -3,6 +3,9 @@
         <v-card-title>
             Добавляем игры в клуб
         </v-card-title>
+        <v-card-subtitle>
+            Эти игры из вашего списка уже есть в бд. Остальные игры из списка будут добавлены на следующих этапах
+        </v-card-subtitle>
         <v-card-text>
             <v-data-table :item-value="item => item.id" select-strategy="all" v-model="selected"
                 :headers="headersGameBoxList" :items="gameboxes" show-select>

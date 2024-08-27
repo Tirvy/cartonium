@@ -233,18 +233,19 @@ async function searchAgainSpecific(cdata: GameboxAddData, source: GamedataSource
 
     const titles = [cdata.preciseSearch];
     const data = await searchForeignData(source, titles);
-    if (Array.isArray(data)) {
+    const items = (data as { items: GameBoxSearchResult[] })?.items;
+    if (Array.isArray(items)) {
         if (source === 'tesera') {
-            cdata.gameTeseraVariants = data;
-            if (data.length) {
-                cdata.gameTesera = data[0];
+            cdata.gameTeseraVariants = items;
+            if (items.length) {
+                cdata.gameTesera = items[0];
             } else {
                 cdata.gameTesera = null;
             }
         } else {
-            cdata.gameBggVariants = data;
-            if (data.length) {
-                cdata.gameBgg = data[0];
+            cdata.gameBggVariants = items;
+            if (items.length) {
+                cdata.gameBgg = items[0];
             } else {
                 cdata.gameBgg = null;
             }
