@@ -89,7 +89,8 @@ const filter = ref(
 );
 
 setTimeout(() => {
-    if (mobile) {
+    console.log(mobile.value);
+    if (mobile.value) {
         drawerState.value = false;
     }
 }, 100)
