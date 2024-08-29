@@ -16,16 +16,27 @@
             </v-icon>
           </template>
 
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-toolbar-title>Gameboxes</v-toolbar-title>
+              <v-divider class="mx-4" inset vertical></v-divider>
+              <v-spacer></v-spacer>
+              <v-btn class="mb-2" color="primary" dark @click="editItem(undefined)">
+                New Item
+              </v-btn>
+            </v-toolbar>
+          </template>
+
         </v-data-table>
 
       </v-sheet>
     </v-container>
 
 
-    <v-dialog v-model="editDialog" max-width="500px">
+    <v-dialog v-model="editDialog" max-width="1000px">
       <v-card v-if="editedItem">
         <v-card-title>
-          <span class="text-h5">Изменение (todo, еще не работает) {{ editedItem.aliasTesera }}</span>
+          <span class="text-h5">{{ editedItem.aliasTesera }}</span>
         </v-card-title>
 
         <v-card-text>
@@ -105,12 +116,13 @@ const gameboxes: Ref<GameBox[]> = ref([]);
 
 const columns = useConstants('columns');
 
-const headersGameBoxList = [...columns.map((key: string) => {
+const headersGameBoxList = [{ title: 'Actions', key: 'actions', sortable: false }, ...columns.map((key: string) => {
   return {
     title: key,
     key: key,
   }
-})];
+}),
+];
 
 const loadign = ref({
   table: false,
@@ -146,8 +158,35 @@ const editDialog = computed({
     }
   }
 })
-function editItem(item: GameBox) {
-  editedItem.value = Object.assign({}, item)
+function editItem(item: GameBox | undefined) {
+  if (item) {
+    editedItem.value = Object.assign({}, item)
+  } else {
+    editedItem.value = getNewGamebox();
+  }
+}
+
+function getNewGamebox(): GameBox {
+  return {
+    id: 0,
+    title: '',
+    titles: [],
+    year: 0,
+    aliasTesera: '',
+    linkTesera: '',
+    idBgg: 0,
+    playersMin: 0,
+    playersMax: 0,
+    playersGood: [],
+    playtimeMin: 0,
+    playtimeMax: 0,
+    playtimeAvg: 0,
+    ratingBgg: 0,
+    ratingTesera: 0,
+    idTesera: 0,
+    linkBgg: '',
+    photoUrl: '',
+  }
 }
 function saveEdit() {
   editDialog.value = false;
