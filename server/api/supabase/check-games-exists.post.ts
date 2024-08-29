@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (!titles?.length) {
     throw createError({ statusMessage: 'title required' })
   }
-  titles = titles.map(title => title.trim().replace(/["'«»]/g, ''));
+  titles = titles.map(title => title.trim());
   const client = await serverSupabaseClient<Database>(event);
 
   let retData: unknown[] = [];

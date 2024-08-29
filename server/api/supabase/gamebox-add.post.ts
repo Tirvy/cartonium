@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const gameboxesFormattedForBd = gameboxes.map(gameBoxToSupabase)
 
-  const { data, error } = await client.from('gameboxes').insert(gameboxesFormattedForBd).select();
+  const { data, error } = await client.from('gameboxes').upsert(gameboxesFormattedForBd, { ignoreDuplicates: true }).select();
   if (error) {
     throw createError({ statusMessage: error.message })
   }

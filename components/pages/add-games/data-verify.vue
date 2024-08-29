@@ -4,7 +4,8 @@
             Отправляем новые игры в бд
         </v-card-title>
         <v-card-text>
-            <v-data-table select-strategy="all" :headers="headersGameBoxList" :items="props.items">
+            <v-data-table select-strategy="all" items-per-page="-1" v-model="selected"
+                :headers="headersGameBoxList" :items="props.items" item-value="title">
             </v-data-table>
         </v-card-text>
         <v-card-actions>
@@ -19,11 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import type { GameBox } from '~/types/frontend.js';
 
 const props = defineProps({
     items: {
-        type: Array<any>,
+        type: Array<GameBox>,
         default: [],
     },
     loading: {
@@ -31,14 +31,30 @@ const props = defineProps({
         default: false,
     },
 });
+const selected: Ref<string[]> = ref([]);
 
 const emit = defineEmits<{
-    (e: 'sendGameboxesToSupabase'): void
+    (e: 'sendGameboxesToSupabase', selected: GameBox[]): void
 }>()
 
 function sendGameboxesToSupabase() {
-    emit('sendGameboxesToSupabase');
+    // const toSend = props.items.filter(item => selected.value.includes(item.title));
+    const toSend = props.items;
+    emit('sendGameboxesToSupabase', toSend);
 }
+
+// unused code когда хотелось сделать и тут галочки
+watch((
+    () => !!props.loading),
+    (loading) => {
+        console.log(loading, props.loading)
+        if (!loading && selected.value.length === 0) {
+            selected.value = props.items.map(item => item.title);
+        }
+    },
+    {
+        immediate: true
+    })
 
 import columns from './gamebox-columns';
 

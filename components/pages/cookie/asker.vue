@@ -1,5 +1,5 @@
 <template>
-  <v-banner :avatar="avatar" stacked v-if="cookieBasic !== '1'" class="pb-20 flex-0-0">
+  <v-banner :avatar="avatar" stacked v-if="cookieBasic !== '1'" class="pb-20 flex-0-0 banner-head" :sticky="true">
     <template v-slot:text>
       Этот сайт использует cookies для обеспечения работы сайта. Пожалуйста, прочитайте нашу
       <nuxt-link :to="policyLink" blank>Политику
@@ -95,5 +95,8 @@ function acceptAll() {
 <style scoped>
 .pb-20 {
   padding-bottom: 80px;
+}
+.banner-head {
+  bottom: 0;
 }
 </style>

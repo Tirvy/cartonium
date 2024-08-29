@@ -20,7 +20,7 @@
                 <v-divider />
 
                 <v-col cols="12" v-if="loadingProgress.total">
-                    <v-img height="400" src="~/assets/images/chill.png" alt="wait" />
+                    <v-img class="animation-pulse" height="400" src="~/assets/images/chill.png" alt="wait" />
                     <p>Подожди, происходит магия</p>
                     <v-progress-linear :model-value="loadingProgress.now * 100 / loadingProgress.total" height="25">
                         <strong>{{ Math.ceil(loadingProgress.now * 100 / loadingProgress.total)
@@ -344,20 +344,36 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
 
 // to supabase 
 
-async function sendGameboxesToSupabase() {
-    if (saveData.value.length) {
+async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
+    if (gameboxesData.length) {
         try {
+            const titles = gameboxesData.map(item => item.title);
+            const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: titles } });
 
-            let ret: GameBox[] = await $fetch('/api/supabase/gamebox-add', {
-                method: "POST", body: saveData.value
+            let toSend = gameboxesData.filter(item => {
+                const found = gameboxesFound.find(gamebox => gamebox.title === item.title);
+                return !found;
             });
+
+            let ret: GameBox[] | unknown = await $fetch('/api/supabase/gamebox-add', {
+                method: "POST", body: toSend
+            }).catch(error => {
+                console.log(error)
+                setError(error);
+                return [];
+            });
+
+            if (!Array.isArray(ret) || !ret.length) {
+                return;
+            }
+
             loaders.value.gettingData = true;
             await $fetch('/api/supabase/add-games-to-club',
                 {
                     method: 'post',
                     query: { clubid: currentClub.value.id },
                     body: { gameBoxIds: ret.map(gameBox => gameBox.id) }
-                });
+                }).catch(error => setError(error));
 
             loaders.value.gettingData = false;
             showSnackbar('Все игры добавлены в бд и в клуб');
@@ -387,7 +403,31 @@ const errorDialogText = ref('');
 
 function setError(error: any) {
     errorDialog.value = true;
-    errorDialogText.value = JSON.stringify(error);
+    errorDialogText.value = JSON.stringify(error.message || { error });
 }
 
 </script>
+
+<style scoped>
+@keyframes pulse {
+    0% {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+}
+
+.animation-pulse {
+    animation: pulse 3s infinite ease-in-out;
+
+}
+</style>
