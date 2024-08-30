@@ -36,8 +36,8 @@
       </v-btn>
     </v-bottom-navigation>
 
-    <v-snackbar :model-value="true" color="info" order="10" variant="flat" location="top" timeout="1500" timer="true"
-      z-index="999">
+    <v-snackbar v-if="user && mobile" :model-value="true" color="info" order="10" variant="flat" location="top"
+      timeout="1500" timer="true" z-index="999">
       В мобильной версии админские разделы ограничены
     </v-snackbar>
 

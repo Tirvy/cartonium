@@ -2,7 +2,7 @@
   <v-banner :avatar="avatar" stacked v-if="cookieBasic !== '1'" class="pb-20 flex-0-0 banner-head" :sticky="true">
     <template v-slot:text>
       Этот сайт использует cookies для обеспечения работы сайта. Пожалуйста, прочитайте нашу
-      <nuxt-link :to="policyLink" blank>Политику
+      <nuxt-link :to="policyLink" target="_blank">Политику
         конфиденциальности</nuxt-link>
       для получения более подробной информации. Подтвердив использование cookies, вы соглашаетесь с использованием
       cookies.
@@ -20,7 +20,7 @@
           <v-card-text>
             <p class="pb-4">
               Этот сайт использует cookies для обеспечения работы сайта. Пожалуйста, прочитайте нашу
-              <nuxt-link :to="policyLink" blank>Политику
+              <nuxt-link :to="policyLink" target="_blank">Политику
                 конфиденциальности</nuxt-link>
               для получения более подробной информации.
             </p>
@@ -61,33 +61,46 @@
 
 <script lang="ts" setup>
 const dialog = ref(false);
-const cookieBasic = useCookie('agreed-to-cookie');
-const cookiePerformance = useCookie('agreed-to-cookie-performance');
+const cookieBasic = ref("");
+const cookiePerformance = ref("");
+const cookiePerformaceEditing = ref(true);
 const policyLink = '/privacy-policy.html';
 
 const props = defineProps<{
   avatar: string,
 }>();
 
-const cookiePerformaceEditing = ref(cookiePerformance.value === '1');
-console.log(cookieBasic.value, cookiePerformance.value, cookiePerformaceEditing.value)
+
+onMounted(() => {
+  cookieBasic.value = localStorage.getItem("agreed-to-cookie") + '';
+  cookiePerformance.value = localStorage.getItem("agreed-to-cookie-performance") + '';
+  cookiePerformaceEditing.value = cookiePerformance.value === '1';
+});
 
 function declineAll() {
   cookieBasic.value = '1';
   cookiePerformance.value = '0';
+  updateLocalStorage();
   dialog.value = false;
 }
 
 function save() {
   cookieBasic.value = '1';
   cookiePerformance.value = cookiePerformaceEditing.value ? '1' : '0';
+  updateLocalStorage();
   dialog.value = false;
 }
 
 function acceptAll() {
   cookieBasic.value = '1';
   cookiePerformance.value = '1';
+  updateLocalStorage();
   dialog.value = false;
+}
+
+function updateLocalStorage() {
+  localStorage.setItem("agreed-to-cookie", cookieBasic.value);
+  localStorage.setItem("agreed-to-cookie-performance", cookiePerformance.value);
 }
 
 </script>
@@ -96,6 +109,7 @@ function acceptAll() {
 .pb-20 {
   padding-bottom: 80px;
 }
+
 .banner-head {
   bottom: 0;
 }

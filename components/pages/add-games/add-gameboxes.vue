@@ -41,7 +41,7 @@
                         </td>
                         <td class="name-column">
                             <div style="max-width: 250px">
-                                <v-textarea v-model="gameInfo.preciseSearch"></v-textarea>
+                                <v-textarea v-model="gameInfo.preciseSearch" :label="gameInfo.name"></v-textarea>
                             </div>
                             <div>
                                 Переподтянуть:

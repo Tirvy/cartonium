@@ -323,6 +323,10 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
                 let bggRet: GameBoxDataBgg = await $fetch('/api/bgg/get-gamebox', {
                     query: { id: gameInfo.gameBgg.id },
                 });
+                if (!bggRet) {
+                    console.log('bggRet is null', gameInfo.gameBgg);
+                    setError([gameInfo.gameBgg, bggRet]);
+                }
                 ret.titles.push(bggRet.title as string);
                 Object.keys(ret).forEach((key) => {
                     (ret as any)[key] = (ret as any)[key] || (bggRet as any)[key];
