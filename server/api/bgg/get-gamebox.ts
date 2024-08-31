@@ -7,8 +7,8 @@ const parser = new XMLParser({
 });
 
 function getGoodRating(poll: any[]) {
-  const ratings = poll.find((item: any) => item['@_name'] === 'suggested_numplayers');
-  return ratings.results.map((item: any) => {
+  let ratings = poll.find((item: any) => item['@_name'] === 'suggested_numplayers');
+  return arrize(ratings.results).map((item: any) => {
     const results = {
       best: +item.result.find((item: any) => item['@_value'] === 'Best')["@_numvotes"],
       good: +item.result.find((item: any) => item['@_value'] === 'Recommended')["@_numvotes"],
@@ -25,13 +25,10 @@ function getGoodRating(poll: any[]) {
   }).map((item: any) => {
     return item.players
   })
-} 
+}
 
 function getName(obj: any): string {
-  if (Array.isArray(obj.items.item.name)) {
-    return obj.items.item.name.find((item: any) => item['@_type'] === 'primary')['@_value']
-  }
-  return obj.items.item.name['@_value'];
+  return arrize(obj.items.item.name).find((item: any) => item['@_type'] === 'primary')['@_value']
 }
 
 export default defineEventHandler(async (event): Promise<GameBoxDataBgg | null> => {
@@ -70,6 +67,13 @@ export default defineEventHandler(async (event): Promise<GameBoxDataBgg | null> 
   }
   return null;
 });
+
+function arrize(data: any) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  return [data];
+}
 
 // search results
 /*

@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
 
   const gameboxesFormattedForBd = gameboxes.map(gameBoxToSupabase)
 
-  const { data, error } = await client.from('gameboxes').upsert(gameboxesFormattedForBd, { ignoreDuplicates: true }).select();
+  // onConflict: "alias_tesera" = temp fix [31.08.2024]
+  const { data, error } = await client.from('gameboxes').upsert(gameboxesFormattedForBd, { ignoreDuplicates: true, onConflict: "alias_tesera" }).select();
   if (error) {
     throw createError({ statusMessage: error.message })
   }

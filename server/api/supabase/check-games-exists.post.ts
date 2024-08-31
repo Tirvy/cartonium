@@ -28,6 +28,6 @@ export default defineEventHandler(async (event) => {
     titlesLeft = titlesLeft.slice(toSlice);
   }
 
-
+  
   return retData.map(gameBoxFromSupabase);
 })
