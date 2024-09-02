@@ -8,6 +8,11 @@ export default defineNuxtConfig({
     host: '0.0.0.0',
     port: 80,
   },
+  app: {
+    head: {
+      title: 'Cartonis',
+    }
+  },
   modules: [
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
@@ -22,10 +27,10 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/',
       callback: '/confirm',
-      include: ['/clubs/*/information/edit','/clubs(/*)/settings(/*)?','/admin(/*)?'],
+      include: ['/clubs/*/information/edit', '/clubs(/*)/settings(/*)?', '/admin(/*)?'],
       exclude: ['users/*'],
       cookieRedirect: true,
-    }, 
+    },
     cookieOptions: {
       secure: false
     }

@@ -40,6 +40,26 @@ definePageMeta({
     },
   ],
 });
+
+const currentClub: Ref<Club> = useState('club');
+
+const head = useHead({
+  title: `${currentClub.value?.title}`,
+  meta: [
+    {
+      name: 'description',
+      content: currentClub.value?.title,
+    },
+  ],
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: `/${currentClub.value?.urlName}_fav.png`,
+    },
+  ],
+});
+
 </script>
 
 <style></style>
