@@ -23,10 +23,5 @@ RUN npm install
 # Copy the rest of the application files to the container
 COPY . .
 
-# Build the Next.js application for production
-RUN npm run build
-
 #EXPOSE 3000
 #EXPOSE 80
-EXPOSE ${NITRO_PORT}
-CMD ["node", ".output/server/index.mjs"]
