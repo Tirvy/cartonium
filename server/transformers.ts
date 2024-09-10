@@ -107,6 +107,8 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         messageUrl: '',
         totalGuests: data.guests_number,
         id: data.user_id,
+        telegramLink: data.telegram_username ? `tg://resolve?domain=${data.telegram_username}` : undefined,
+        telegramUsername: data.telegram_username,
     }
 
     function getName(userData: any): string {

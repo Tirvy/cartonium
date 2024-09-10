@@ -7,7 +7,7 @@
           prepend-inner-icon="mdi-magnify" variant="outlined" hide-details single-line></v-text-field>
 
         <v-data-table :item-value="item => item.id" :headers="headersGameBoxList" :items="gameboxes"
-          @update:options="loadItems" :loading="loadign.table" :search="search">
+          @update:options="loadItems" :loading="loading.table" :search="search">
 
 
           <template v-slot:item.actions="{ item }">
@@ -124,8 +124,9 @@ const headersGameBoxList = [{ title: 'Actions', key: 'actions', sortable: false 
 }),
 ];
 
-const loadign = ref({
+const loading = ref({
   table: false,
+  dialog: false
 })
 
 const search = ref('');
@@ -134,7 +135,7 @@ const updateSearch = useDebounce((string: string) => {
 }, 1000)
 
 async function loadItems({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: { key: string, order: string }, search: string }) {
-  loadign.value.table = true;
+  loading.value.table = true;
 
   const data = await $fetch('/api/supabase/gameboxes', {
     query: { page, itemsPerPage, sortBy, search },
@@ -143,7 +144,7 @@ async function loadItems({ page, itemsPerPage, sortBy, search }: { page: number,
   if (data.items) {
     gameboxes.value = data.items;
   }
-  loadign.value.table = false;
+  loading.value.table = false;
 }
 
 
@@ -188,9 +189,38 @@ function getNewGamebox(): GameBox {
     photoUrl: '',
   }
 }
-function saveEdit() {
-  editDialog.value = false;
+
+async function saveEdit() {
+  loading.value.dialog = true;
+  if (editedItem.value?.id) {
+    const ret = await $fetch('/api/supabase/gamebox-edit', {
+      method: 'POST',
+      body: {
+        gamebox: editedItem.value,
+      },
+    });
+    updateGamebox(editedItem.value);
+  } else if (editedItem.value) {
+    const addedGamebox = addGamebox(editedItem.value);
+  }
+  console.log(editedItem.value);
+  // editDialog.value = false;
+  loading.value.dialog = false;
   return true;
+}
+
+function updateGamebox(gamebox: GameBox) {
+  const index = gameboxes.value.findIndex(item => item.id === gamebox.id);
+  if (index !== -1) {
+    gameboxes.value[index] = gamebox;
+  }
+}
+
+function addGamebox(gamebox: GameBox) {
+  const addGamebox = (gamebox: GameBox) => {
+    gameboxes.value.push(gamebox);
+  }
+  return addGamebox;
 }
 
 </script>

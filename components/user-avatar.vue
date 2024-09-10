@@ -1,5 +1,5 @@
 <template>
-  <v-avatar :image="avatar.pictureUrl" color="yellow" size="16">
+  <v-avatar :image="avatar.pictureUrl" color="yellow" size="18" class="avatar-root">
     <v-img :alt="avatar.name" v-if="avatar.pictureUrl" :src="avatar.pictureUrl"></v-img>
     <template v-else>
       {{ avatar.initials }}
@@ -24,4 +24,8 @@ const avatar = computed(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.avatar-root {
+  font-size: 10px;
+}
+</style>

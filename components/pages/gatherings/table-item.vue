@@ -15,7 +15,9 @@
                 <v-card-text>
                     <p v-for="guest in props.gathering.guests" :key="guest.imageUrl">
                         <user-avatar :value="guest"></user-avatar>
-                        {{ guest.title }}
+                        <nuxt-link :to="guest.telegramLink">
+                            {{ guest.title }}
+                        </nuxt-link>
                         <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
                     </p>
                 </v-card-text>
@@ -26,7 +28,7 @@
         </div>
         <v-card-actions v-if="user?.id">
             <v-btn @click="emit('guestSet', props.gathering.id, 1)" :disabled="!gatheringComputedValue.canJoin">
-                Присоедениться
+                Присоединиться
             </v-btn>
             <v-btn @click="emit('showDialogGuests', props.gathering)"
                 :disabled="!props.gatheringComputedValue.canAddGuests && !props.gatheringComputedValue.hasMyGuests">
@@ -39,40 +41,36 @@
     </v-card>
     <v-card v-if="mobile && view === 'full'" :loading="loading">
         <div class="d-flex flex-no-wrap justify-start ">
-            <v-avatar class="ma-3" size="150" rounded="0">
+            <v-avatar class="ma-0" size="150" rounded="0">
                 <v-img :cover="false" height="150" :src="props.gathering.gamebox?.photoUrl"></v-img>
             </v-avatar>
             <v-card-actions v-if="user?.id" class="flex-column">
-                <v-row>
-                    <v-col>
-                        <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 1)"
-                            :disabled="!gatheringComputedValue.canJoin">
-                            Присоедениться
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col>
-
-                        <v-btn variant="outlined" @click="emit('showDialogGuests', props.gathering)"
-                            :disabled="!props.gatheringComputedValue.canAddGuests && !props.gatheringComputedValue.hasMyGuests">
-                            {{ props.gatheringComputedValue.hasMyGuests ? 'Изменить гостей' : 'Добавить гостей' }}
-                        </v-btn>
-                    </v-col>
-
-                </v-row>
-                <v-row>
-                    <v-col>
-                        <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 0)"
-                            :disabled="!props.gatheringComputedValue.canLeave">
-                            Покинуть сбор
-                        </v-btn>
-                    </v-col>
-                </v-row>
+                <v-container class="pa-0">
+                    <v-row dense class="flex-column">
+                        <v-col cols="12">
+                            <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 1)"
+                                :disabled="!gatheringComputedValue.canJoin">
+                                Присоединиться
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-btn variant="outlined" @click="emit('showDialogGuests', props.gathering)"
+                                :disabled="!props.gatheringComputedValue.canAddGuests && !props.gatheringComputedValue.hasMyGuests">
+                                {{ props.gatheringComputedValue.hasMyGuests ? 'Изменить гостей' : 'Добавить гостей' }}
+                            </v-btn>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-btn variant="outlined" @click="emit('guestSet', props.gathering.id, 0)"
+                                :disabled="!props.gatheringComputedValue.canLeave">
+                                Покинуть сбор
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-card-actions>
         </div>
         <div>
-            <v-card-title>
+            <v-card-title class="title-minimizer">
                 {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
                 ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }})
             </v-card-title>
@@ -80,14 +78,19 @@
                 [{{ props.date }}]
             </v-card-subtitle>
             <v-card-text>
-                <p v-for="guest in props.gathering.guests" :key="guest.imageUrl">
-                    <user-avatar :value="guest"></user-avatar>
-                    {{ guest.title }}
-                    <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
-                </p>
+                <div v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
+                    <user-avatar :value="guest" class="mb-1"></user-avatar>
+                    <span class="ms-1">{{ guest.title }}</span>
+                    <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
+                        @{{ guest.telegramUsername }}
+                    </nuxt-link>
+
+                    <span v-if="guest.totalGuests > 1"> + {{ guest.totalGuests - 1 }}</span>
+                </div>
             </v-card-text>
-            <v-card-text>
-                <td>{{ props.gathering.commentOwner }}</td>
+            <v-card-text v-if="props.gathering.commentOwner">
+                <v-textarea v-model="props.gathering.commentOwner" auto-grow readonly label="Комментарий хоста"
+                    rows="1"></v-textarea>
             </v-card-text>
         </div>
     </v-card>
@@ -128,7 +131,7 @@
                         <v-list-item>
                             <v-btn @click="emit('guestSet', props.gathering.id, 1)"
                                 :disabled="!gatheringComputedValue.canJoin">
-                                Присоедениться
+                                Присоединиться
                             </v-btn>
                         </v-list-item>
                         <v-list-item>
@@ -176,5 +179,18 @@ const emit = defineEmits<{
 .title-minimizer {
     white-space: normal;
     line-height: 1.2;
+}
+
+.user-link {
+    text-decoration: none;
+    color: #0088cc;
+}
+.user-link:hover {
+    text-decoration: underline;
+}
+
+.link-icon {
+    opacity: 0.8;
+
 }
 </style>

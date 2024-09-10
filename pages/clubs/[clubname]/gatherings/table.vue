@@ -1,12 +1,12 @@
 <template>
   <v-main>
     <v-container>
-      <v-row class="justify-space-between">
+      <v-row class="justify-space-between" v-if="clubPermissions">
         <v-col>
         </v-col>
         <v-spacer />
         <v-col>
-          <NuxtLink to="./table-admin" v-if="clubPermissions">
+          <NuxtLink to="./table-admin">
             <v-list-item :link="true">
               К виду для админов
 
@@ -18,10 +18,10 @@
       <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
         text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
 
-      <v-row v-if="user && gatheringsWithDates.length > 0">
+      <v-row v-if="user && gatheringsWithDates.length > 0" dense>
         <v-col cols="12">
           <v-btn-toggle v-model="tableView" @update:model-value="saveViewPreferance" variant="outlined" mandatory
-            divided rounded class="w-100">
+            divided rounded density="compact" class="w-100">
             <v-btn value="minimal" icon="mdi-view-sequential-outline" class="flex-grow-1">
             </v-btn>
 
@@ -65,7 +65,7 @@
 
           <template v-slot:text>
             Гости - это люди, которые придут с вами на сбор, но которые не хотят (или не могут) зайти в приложение и
-            присоедениться сами
+            присоединиться сами
             <v-text-field :rules="[ruleIsNumber, ruleIsNotNegative, ruleLessThanMaxGuests]"
               v-model="guestsDialogNumber">
 

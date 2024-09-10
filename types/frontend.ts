@@ -248,6 +248,8 @@ export interface GatheringGuest {
     imageUrl: string
     totalGuests: number
     id: string
+    telegramLink: string
+    telegramUsername: string | undefined
 }
 
 export interface GatheringWithGuests extends Gathering {

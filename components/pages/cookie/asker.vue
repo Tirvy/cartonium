@@ -1,5 +1,5 @@
 <template>
-  <v-banner :avatar="avatar" stacked v-if="cookieBasic !== '1'" class="pb-20 flex-0-0 banner-head" :sticky="true">
+  <v-banner :avatar="shownAvatar" stacked v-if="cookieBasic !== '1'" class="pb-20 flex-0-0 banner-head" :sticky="true">
     <template v-slot:text>
       Этот сайт использует cookies для обеспечения работы сайта. Пожалуйста, прочитайте нашу
       <nuxt-link :to="policyLink" target="_blank">Политику
@@ -12,7 +12,7 @@
       <v-dialog v-model="dialog" max-width="500">
         <template v-slot:activator="{ props }">
           <v-btn class="text-none" color="blue-darken-4" rounded="0" variant="outlined" v-bind="props">
-            Настроить Cookies
+            Настроить
           </v-btn>
         </template>
 
@@ -60,15 +60,25 @@
 </template>
 
 <script lang="ts" setup>
+import { useDisplay } from 'vuetify';
 const dialog = ref(false);
 const cookieBasic = ref("");
 const cookiePerformance = ref("");
 const cookiePerformaceEditing = ref(true);
 const policyLink = '/privacy-policy.html';
 
+const { mobile } = useDisplay();
+
 const props = defineProps<{
   avatar: string,
 }>();
+
+const shownAvatar = computed(() => {
+  if (props.avatar && !mobile.value) {
+    return props.avatar;
+  }
+  return undefined;
+});
 
 
 onMounted(() => {

@@ -10,5 +10,7 @@ export const useCurrentUserAsGuest = (): GatheringGuest => {
     messageUrl: '',
     totalGuests: 0,
     id: user.value.id,
+    telegramLink: `tg://resolve?domain=${userDataSource.telegram_username}`,
+    telegramUsername: userDataSource.telegramUsername,
   }
 }
