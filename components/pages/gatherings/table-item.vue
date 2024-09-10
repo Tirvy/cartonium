@@ -13,10 +13,11 @@
                     [{{ props.date }}]
                 </v-card-subtitle>
                 <v-card-text>
-                    <p v-for="guest in props.gathering.guests" :key="guest.imageUrl">
-                        <user-avatar :value="guest"></user-avatar>
-                        <nuxt-link :to="guest.telegramLink">
-                            {{ guest.title }}
+                    <p v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
+                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <span class="ms-2">{{ guest.title }}</span>
+                        <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
+                            @{{ guest.telegramUsername }}
                         </nuxt-link>
                         <span v-if="guest.totalGuests > 1">+ {{ guest.totalGuests - 1 }}</span>
                     </p>
@@ -185,6 +186,7 @@ const emit = defineEmits<{
     text-decoration: none;
     color: #0088cc;
 }
+
 .user-link:hover {
     text-decoration: underline;
 }
