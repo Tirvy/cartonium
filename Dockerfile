@@ -14,4 +14,4 @@ RUN echo "SUPABASE_URL is ${SUPABASE_URL}"
 # Set the working directory in the container
 WORKDIR /app
 #EXPOSE 3000
-#EXPOSE 80
+EXPOSE 430
