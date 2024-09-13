@@ -262,7 +262,7 @@ async function saveGathering() {
             guests_max: +(guestsMax.value.trim()) || 0,
             table_id: table.value,
             comment_club: commentClub.value,
-            own_name: !isClubGamebox.value ? ownGatheringName.value : undefined,
+            own_name: ownGatheringName.value,
 
             with_host: +(hostGuestsNumber.value.trim()) || 0,
         }
@@ -271,7 +271,7 @@ async function saveGathering() {
     lastGathering.value = data;
 
     const lastGatheringName = useState('lastGatheringName');
-    lastGatheringName.value = !isClubGamebox.value ? ownGatheringName.value : gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title;
+    lastGatheringName.value = ownGatheringName.value ? ownGatheringName.value : gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title;
     navigateTo('./gathering-accepted');
     loaders.value.save = false;
 }
