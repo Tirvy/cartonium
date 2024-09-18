@@ -38,6 +38,28 @@
             <v-btn @click="emit('guestSet', props.gathering.id, 0)" :disabled="!props.gatheringComputedValue.canLeave">
                 Покинуть сбор
             </v-btn>
+            <v-spacer />
+
+            <v-menu v-if="iAmTheOwner" location="bottom end">
+                <template v-slot:activator="{ props }">
+                    <v-card-actions>
+                        <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
+                    </v-card-actions>
+                </template>
+
+                <v-list>
+                    <v-list-item>
+                        <v-btn @click="emit('edit')">
+                            Редактировать
+                        </v-btn>
+                    </v-list-item>
+                    <v-list-item>
+                        <v-btn @click="emit('remove')">
+                            Удалить
+                        </v-btn>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </v-card-actions>
     </v-card>
     <v-card v-if="mobile && view === 'full'" :loading="loading">
@@ -78,17 +100,44 @@
             <v-card-subtitle>
                 [{{ props.date }}]
             </v-card-subtitle>
-            <v-card-text>
-                <div v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
-                    <user-avatar :value="guest" class="mb-1"></user-avatar>
-                    <span class="ms-1">{{ guest.title }}</span>
-                    <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
-                        @{{ guest.telegramUsername }}
-                    </nuxt-link>
+            <div class="d-flex justify-space">
+                <v-card-text>
+                    <div v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
+                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <span class="ms-1">{{ guest.title }}</span>
+                        <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
+                            @{{ guest.telegramUsername }}
+                        </nuxt-link>
 
-                    <span v-if="guest.totalGuests > 1"> + {{ guest.totalGuests - 1 }}</span>
+                        <span v-if="guest.totalGuests > 1"> + {{ guest.totalGuests - 1 }}</span>
+                    </div>
+                </v-card-text>
+                <div>
+
+                    <v-menu v-if="iAmTheOwner" location="bottom end">
+
+                        <template v-slot:activator="{ props }">
+                            <v-card-actions>
+                                <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
+                            </v-card-actions>
+                        </template>
+
+                        <v-list>
+                            <v-list-item>
+                                <v-btn @click="emit('edit')">
+                                    Редактировать
+                                </v-btn>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-btn @click="emit('remove')">
+                                    Удалить
+                                </v-btn>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </div>
-            </v-card-text>
+
+            </div>
             <v-card-text v-if="props.gathering.commentOwner">
                 <v-textarea v-model="props.gathering.commentOwner" auto-grow readonly label="Комментарий хоста"
                     rows="1"></v-textarea>
@@ -121,7 +170,8 @@
             </div>
             <v-spacer></v-spacer>
             <div>
-                <v-menu>
+                <v-menu location="bottom end">
+
                     <template v-slot:activator="{ props }">
                         <v-card-actions>
                             <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
