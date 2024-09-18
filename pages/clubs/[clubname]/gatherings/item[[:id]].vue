@@ -29,7 +29,7 @@
                         <v-col cols="12" v-show="gameboxSource === 'club'">
                             <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
                                 color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
-                                :eager="true" @update:model-value="updatePeopleCount">
+                                :eager="true" :rules="[ruleGatheringNameRequired]" @update:model-value="updatePeopleCount">
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -45,7 +45,7 @@
                             <p>
                                 Если в списке нет нужной игры, то вы можете сами указать название игры/встречи здесь.
                             </p>
-                            <v-text-field label="Название сбора" v-model="ownGatheringName"></v-text-field>
+                            <v-text-field :rules="[ruleGatheringNameRequired]" label="Название сбора" v-model="ownGatheringName"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -163,6 +163,17 @@ function dateIsTodayOnward(date: unknown) {
 function ruleLessThanTotal(val: string) {
     if ((+val + 1) > +guestsMax.value) {
         return 'Не может быть больше общего числа гостей'
+    }
+    return true;
+}
+
+function ruleGatheringNameRequired() {
+    if (gameboxSource.value === 'club' && !gameboxForGathering.value) {
+        return 'Необходимо выбрать игру'
+    }
+
+    if (gameboxSource.value === 'own' && !ownGatheringName.value) {
+        return 'Необходимо ввести название сбора'
     }
     return true;
 }
