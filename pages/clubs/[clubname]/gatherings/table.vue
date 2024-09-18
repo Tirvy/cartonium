@@ -44,7 +44,8 @@
           <pages-gatherings-table-item :view="tableView" :date="gathwd.date" :gathering="gathwd.gathering"
             :loading="loading.gatheringId === gathwd.gathering.id"
             :gatheringComputedValue="gatheringsComputedValues[gathwd.gathering.id]" @showDialogGuests="showDialogGuests"
-            @guestSet="guestSet"></pages-gatherings-table-item>
+            @guestSet="guestSet" @edit="gatheringEdit(gathwd.gathering)"
+            @remove="gatheringRemove(gathwd.gathering)"></pages-gatherings-table-item>
         </v-col>
       </v-row>
 
@@ -79,6 +80,18 @@
         </v-card>
       </v-form>
     </v-dialog>
+
+    <v-dialog v-model="removaGatheringModal" width="auto">
+      <v-card>
+        <v-card-title>
+          Вы уверены что хотите отменить сбор на "ХХХ"?
+        </v-card-title>
+        <v-card-actions class="justify-end">
+          <v-btn @click="removeGatheringConfirmed" :loading="loading.removeDialogYes">Да</v-btn>
+          <v-btn @click="removaGatheringModal = false">Нет</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-main>
 
 </template>
@@ -94,6 +107,7 @@ const user = useSupabaseUser();
 
 const loading = ref({
   gatheringId: 0,
+  removeDialogYes: false,
 })
 
 definePageMeta({
@@ -196,6 +210,39 @@ async function guestSet(gatheringId: number, number: number) {
   }
 }
 
+function gatheringEdit(gathering: Gathering) {
+  navigateTo('./item' + gathering.id);
+}
+
+
+const gatheringRemoveId = ref<number | null>(null);
+const removaGatheringModal = computed({
+  get() {
+    return !!gatheringRemoveId.value
+  },
+  set(value) {
+    if (!value) {
+      gatheringRemoveId.value = null;
+    }
+  }
+})
+function gatheringRemove(gathering: Gathering) {
+  gatheringRemoveId.value = gathering.id;
+}
+
+async function removeGatheringConfirmed() {
+  loading.value.removeDialogYes = true;
+  let res = await $fetch('/api/supabase/gathering-remove', {
+    method: 'POST',
+    body: {
+      gathering_id: gatheringRemoveId.value,
+    }
+  });
+  gatheringRemoveId.value = null;
+  updateFilters();
+  loading.value.removeDialogYes = false;
+}
+
 
 // set guests dialog
 const dialog = ref({
@@ -241,7 +288,7 @@ function guestsApply() {
 
 // ---- view -----
 let stored = localStorage.getItem('gatherings-view');
-let initialViewValue: 'minimal' | 'compact' | 'full' = 'full'
+let initialViewValue: 'minimal' | 'compact' | 'full' = 'minimal'
 if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
   initialViewValue = stored;
 }

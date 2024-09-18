@@ -17,3 +17,9 @@ useHead({
   }
 })
 </script>
+
+<style>
+.v-card-title {
+  white-space: normal;
+}
+</style>

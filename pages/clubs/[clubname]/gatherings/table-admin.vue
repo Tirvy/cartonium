@@ -165,6 +165,6 @@ function getTable(tableId: number | null) {
 }
 
 function editGathering(gathering: Gathering) {
-    navigateTo('./gatherings/item' + gathering.id);
+    navigateTo('./item' + gathering.id);
 }
 </script>

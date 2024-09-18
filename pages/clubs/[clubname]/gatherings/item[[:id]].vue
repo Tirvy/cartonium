@@ -15,7 +15,8 @@
                     </v-row>
                     <v-row v-if="ownGatheringNameAvailable">
                         <v-col cols="12">
-                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded class="w-100">
+                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded
+                                class="w-100">
                                 <v-btn value="club" class="flex-grow-1">
                                     Игра клуба
                                 </v-btn>
@@ -49,8 +50,8 @@
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Максимум человек" v-model="guestsMax"
-                                :rules="[ruleIsNumber]" @input="isGuestsMaxDirty = true"></v-text-field>
+                            <v-text-field label="Максимум человек" v-model="guestsMax" :rules="[ruleIsNumber]"
+                                @input="isGuestsMaxDirty = true"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -121,7 +122,6 @@ const loaders: Ref<Loaders> = ref({
 // ---- default form values
 const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const date = dateAdapter.date();
-console.log(date);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
@@ -131,10 +131,21 @@ const gameboxForGathering = ref<number | undefined>(undefined);
 const table = ref<number | null>(null);
 const hostGuestsNumber = ref("0");
 const publicGathering = ref(true);
-const isClubGamebox = ref(true);
 const ownGatheringName = ref('');
 const isGuestsMaxDirty = ref(false);
 
+const isClubGamebox = computed({
+    get() {
+        return gameboxSource.value === 'club'
+    },
+    set(value) {
+        if (value) {
+            gameboxSource.value = 'club'
+        } else {
+            gameboxSource.value = 'own'
+        }
+    }
+});
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
 function allowedDates(val: Date) {
@@ -224,6 +235,8 @@ async function getItem() {
             commentClub.value = foundItem.commentClub;
             gatheringId.value = foundItem.id;
             gameboxForGathering.value = foundItem.gameboxId;
+            gameboxSource.value = !!foundItem.ownName ? 'own' : 'club';
+            ownGatheringName.value = foundItem.ownName;
         }
         loaders.value.initial = false;
     }

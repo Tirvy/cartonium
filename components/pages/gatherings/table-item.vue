@@ -148,6 +148,20 @@
                                 Покинуть сбор
                             </v-btn>
                         </v-list-item>
+
+                        <template v-if="iAmTheOwner">
+                            <v-divider class="mt-1 mb-1" />
+                            <v-list-item>
+                                <v-btn @click="emit('edit')">
+                                    Редактировать
+                                </v-btn>
+                            </v-list-item>
+                            <v-list-item>
+                                <v-btn @click="emit('remove')">
+                                    Удалить
+                                </v-btn>
+                            </v-list-item>
+                        </template>
                     </v-list>
                 </v-menu>
             </div>
@@ -157,9 +171,9 @@
 
 <script setup lang="ts">
 
-const user = useSupabaseUser();
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
+const user = useSupabaseUser();
 
 const props = defineProps<{
     loading: boolean,
@@ -172,7 +186,13 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'guestSet', id: number, number: number): void
     (e: 'showDialogGuests', gathering: Gathering): void
+    (e: 'edit'): void
+    (e: 'remove'): void
 }>()
+
+const iAmTheOwner = computed(() => {
+    return props.gathering.ownerId === user.value?.id
+})
 
 </script>
 

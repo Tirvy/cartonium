@@ -142,8 +142,6 @@ if (!lastGathering.value) {
   navigateTo('./item');
 }
 
-console.log(lastGathering.value);
-
 </script>
 
 <style scoped></style>
