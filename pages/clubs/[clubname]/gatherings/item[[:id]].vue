@@ -15,8 +15,7 @@
                     </v-row>
                     <v-row v-if="ownGatheringNameAvailable">
                         <v-col cols="12">
-                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded
-                                class="w-100">
+                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded class="w-100">
                                 <v-btn value="club" class="flex-grow-1">
                                     Игра клуба
                                 </v-btn>
@@ -29,7 +28,7 @@
                         <v-col cols="12" v-show="gameboxSource === 'club'">
                             <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
                                 color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
-                                :eager="true" :rules="[ruleGatheringNameRequired]" @update:model-value="updatePeopleCount">
+                                :eager="true" @update:model-value="updatePeopleCount">
                                 <template v-slot:chip="{ props, item }">
                                     <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
                                         :text="item.raw.title"></v-chip>
@@ -45,13 +44,13 @@
                             <p>
                                 Если в списке нет нужной игры, то вы можете сами указать название игры/встречи здесь.
                             </p>
-                            <v-text-field :rules="[ruleGatheringNameRequired]" label="Название сбора" v-model="ownGatheringName"></v-text-field>
+                            <v-text-field label="Название сбора" v-model="ownGatheringName"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
-                            <v-text-field label="Максимум человек" v-model="guestsMax" :rules="[ruleIsNumber]"
-                                @input="isGuestsMaxDirty = true"></v-text-field>
+                            <v-text-field label="Максимум человек" v-model="guestsMax"
+                                :rules="[ruleIsNumber]" @input="isGuestsMaxDirty = true"></v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -122,6 +121,7 @@ const loaders: Ref<Loaders> = ref({
 // ---- default form values
 const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const date = dateAdapter.date();
+console.log(date);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
@@ -131,21 +131,10 @@ const gameboxForGathering = ref<number | undefined>(undefined);
 const table = ref<number | null>(null);
 const hostGuestsNumber = ref("0");
 const publicGathering = ref(true);
+const isClubGamebox = ref(true);
 const ownGatheringName = ref('');
 const isGuestsMaxDirty = ref(false);
 
-const isClubGamebox = computed({
-    get() {
-        return gameboxSource.value === 'club'
-    },
-    set(value) {
-        if (value) {
-            gameboxSource.value = 'club'
-        } else {
-            gameboxSource.value = 'own'
-        }
-    }
-});
 // ---- form setup
 const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, optional: true }, } };
 function allowedDates(val: Date) {
@@ -163,17 +152,6 @@ function dateIsTodayOnward(date: unknown) {
 function ruleLessThanTotal(val: string) {
     if ((+val + 1) > +guestsMax.value) {
         return 'Не может быть больше общего числа гостей'
-    }
-    return true;
-}
-
-function ruleGatheringNameRequired() {
-    if (gameboxSource.value === 'club' && !gameboxForGathering.value) {
-        return 'Необходимо выбрать игру'
-    }
-
-    if (gameboxSource.value === 'own' && !ownGatheringName.value) {
-        return 'Необходимо ввести название сбора'
     }
     return true;
 }
@@ -246,8 +224,6 @@ async function getItem() {
             commentClub.value = foundItem.commentClub;
             gatheringId.value = foundItem.id;
             gameboxForGathering.value = foundItem.gameboxId;
-            gameboxSource.value = !!foundItem.ownName ? 'own' : 'club';
-            ownGatheringName.value = foundItem.ownName;
         }
         loaders.value.initial = false;
     }
@@ -286,7 +262,7 @@ async function saveGathering() {
             guests_max: +(guestsMax.value.trim()) || 0,
             table_id: table.value,
             comment_club: commentClub.value,
-            own_name: !isClubGamebox.value ? ownGatheringName.value : undefined,
+            own_name: gameboxSource.value === 'club' ? undefined : ownGatheringName.value,
 
             with_host: +(hostGuestsNumber.value.trim()) || 0,
         }
@@ -295,7 +271,9 @@ async function saveGathering() {
     lastGathering.value = data;
 
     const lastGatheringName = useState('lastGatheringName');
-    lastGatheringName.value = !isClubGamebox.value ? ownGatheringName.value : gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title;
+    lastGatheringName.value = gameboxSource.value === 'club' 
+        ? gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title 
+        : ownGatheringName.value;
     navigateTo('./gathering-accepted');
     loaders.value.save = false;
 }
