@@ -1,7 +1,6 @@
 import { defineNuxtRouteMiddleware, navigateTo } from "nuxt/app";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    console.log({ to, from });
     if (to.fullPath.includes('/admin')) {
         const defaultRedirectPath = useDefaultPage();
         const user = useSupabaseUser()

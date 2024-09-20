@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-    console.log({ to, from });
     const tokens = {
         access_token: to.query.telegram_access_token as string,
         refresh_token: to.query.telegram_refresh_token as string
