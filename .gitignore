@@ -26,4 +26,4 @@ logs
 # Supabase
 supabase
 !server/api/supabase
-types/supabase.ts
+.generated/supabase-database.ts

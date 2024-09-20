@@ -8,8 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "type": "supabase gen types typescript --project-id 'impmukiwmihnyyzvyjyp' --schema public > types/supabase.ts",
-    "type-local": "npx supabase gen types typescript --local > types/supabase.ts"
+    "type": "supabase gen types typescript --project-id 'impmukiwmihnyyzvyjyp' --schema public > .generated/supabase-database.ts",
+    "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.6",
@@ -23,7 +23,7 @@
     "eslint-plugin-vue": "^9.17.0",
     "nuxt": "^3.9.3",
     "prettier": "^3.0.2",
-    "supabase": "^1.176.2",
+    "supabase": "^1.192.5",
     "typescript": "^5.4",
     "vite-plugin-vuetify": "^2.0.3",
     "vue-tsc": "^1.8.8",
@@ -35,6 +35,7 @@
     "fast-xml-parser": "^4.2.7",
     "maska": "^2.1.11",
     "quill": "^2.0.2",
-    "sass": "^1.66.1"
+    "sass": "^1.66.1",
+    "type-fest": "^4.26.1"
   }
 }
