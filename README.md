@@ -17,6 +17,13 @@ pnpm install
 yarn install
 ```
 
+## Supabase autotypes
+
+```bash
+# npm
+npm run type
+```
+
 ## Development Server
 
 Start the development server on `http://localhost:3000`:
