@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   titles = titles.map(title => title.trim());
   const client = await serverSupabaseClient<Database>(event);
 
-  let retData: unknown[] = [];
+  let retData: any[] = [];
 
   const splitLimit = 80;
   let titlesLeft = [...titles];
@@ -29,5 +29,5 @@ export default defineEventHandler(async (event) => {
   }
 
   
-  return retData.map(gameBoxFromSupabase);
+  return retData.map((item: Tables<'gameboxes'>) => gameBoxFromSupabase(item));
 })

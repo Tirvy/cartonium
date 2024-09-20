@@ -95,7 +95,7 @@ export interface GameBox {
     ratingBgg: number | undefined;
     ratingTesera: number | undefined;
     title: string;
-    titles: Array<string> | undefined;
+    titles: Array<string>;
     year: number | undefined;
 }
 

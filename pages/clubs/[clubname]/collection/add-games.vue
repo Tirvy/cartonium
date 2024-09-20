@@ -299,7 +299,7 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
                 idTesera: undefined,
                 linkBgg: undefined,
                 linkTesera: undefined,
-                photoUrl: undefined,
+                photoUrl: "",
                 playersGood: undefined,
                 playersMax: undefined,
                 playersMin: undefined,

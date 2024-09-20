@@ -37,7 +37,7 @@ export function clubInfoFromSupabase(data: any): ClubInfo {
 }
 
 // gameBox
-export function gameBoxFromSupabase(data: any): GameBoxWithClub {
+export function gameBoxFromSupabase(data: Tables<'gameboxes_with_club_id'> | Tables<'gameboxes'>): GameBoxWithClub {
     return {
         aliasTesera: data.alias_tesera || undefined,
         id: data.id,
@@ -45,7 +45,7 @@ export function gameBoxFromSupabase(data: any): GameBoxWithClub {
         idTesera: data.id_tesera || undefined,
         linkBgg: data.link_bgg || undefined,
         linkTesera: data.link_tesera || undefined,
-        photoUrl: data.photo_url,
+        photoUrl: data.photo_url || undefined,
         playersGood: data.players_good || undefined,
         playersMax: data.players_max || undefined,
         playersMin: data.players_min || undefined,
@@ -57,28 +57,29 @@ export function gameBoxFromSupabase(data: any): GameBoxWithClub {
         title: data.title,
         titles: data.titles,
         year: data.year || undefined,
-        clubId: data.club_id || undefined,
+        clubId: 'club_id' in data ? data.club_id : null,
     };
 }
-export function gameBoxToSupabase(gameBox: GameBoxWithClub): any {
+export function gameBoxToSupabase(gameBox: GameBoxWithClub): Tables<'gameboxes'> {
     return {
-        alias_tesera: gameBox.aliasTesera,
-        id_bgg: gameBox.idBgg,
-        id_tesera: gameBox.idTesera,
-        link_bgg: gameBox.linkBgg,
-        link_tesera: gameBox.linkTesera,
-        photo_url: gameBox.photoUrl,
-        players_good: gameBox.playersGood,
-        players_max: gameBox.playersMax,
-        players_min: gameBox.playersMin,
-        playtime_avg: gameBox.playtimeAvg,
-        playtime_max: gameBox.playtimeMax,
-        playtime_min: gameBox.playtimeMin,
-        rating_bgg: gameBox.ratingBgg,
-        rating_tesera: gameBox.ratingTesera,
+        alias_tesera: gameBox.aliasTesera || null,
+        id_bgg: gameBox.idBgg || null,
+        id_tesera: gameBox.idTesera || null,
+        link_bgg: gameBox.linkBgg || null,
+        link_tesera: gameBox.linkTesera || null,
+        photo_url: gameBox.photoUrl || null,
+        players_good: gameBox.playersGood || null,
+        players_max: gameBox.playersMax || null,
+        players_min: gameBox.playersMin || null,
+        playtime_avg: gameBox.playtimeAvg || null,
+        playtime_max: gameBox.playtimeMax || null,
+        playtime_min: gameBox.playtimeMin || null,
+        rating_bgg: gameBox.ratingBgg || null,
+        rating_tesera: gameBox.ratingTesera || null,
         title: gameBox.title,
         titles: gameBox.titles,
-        year: gameBox.year,
+        year: gameBox.year || null,
+        id: gameBox.id,
     };
 }
 
