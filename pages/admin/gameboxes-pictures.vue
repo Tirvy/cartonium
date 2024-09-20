@@ -3,7 +3,7 @@
     <v-container>
       <v-sheet>
 
-        <v-data-table :item-value="item => item.id" select-strategy="all" v-model="selected"
+        <v-data-table item-value="id" select-strategy="all" v-model="selected"
           :headers="headersGameBoxList" :items="gameboxes" show-select>
         </v-data-table>
 
@@ -21,12 +21,12 @@ import type { GameBoxWithClub } from '@/types/frontend';
 
 // gameboxes.value = data as GameBoxWithClub[];
 
-const { data: gameboxes, refresh } = (await useFetch('/api/supabase/gameboxes')) as { data: Ref<GameBoxWithClub[]>, refresh: () => void };
-// gameboxes.value = data as GameBoxWithClub[];
+const { data, status, error, refresh, clear } = await useFetch('/api/supabase/gameboxes');
+const gameboxes: Ref<GameBoxWithClub[]> = ref(data.value.items);
 
 const columns = useConstants('columns');
-
-const selected: Ref<number[]> = ref(gameboxes.value.map((item: GameBoxWithClub) => item.id));
+// const selected: Ref<number[]> = ref(gameboxes.value.map((item: GameBoxWithClub) => item.id));
+const selected: Ref<number[]> = ref([]);
 
 async function getNewPictures() {
   const ret = await $fetch('/api/common/add-pictures',

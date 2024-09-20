@@ -44,7 +44,20 @@ const props = defineProps<{
     value: GameBox
 }>();
 
-const imageURL = computed(() => {
-    return props.value.photoUrl || `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;
-})
+const imageURL = computed(async () => {
+    var url = props.value.photoUrl;
+    try {
+        const supaUrl: string | undefined = await $fetch('/api/supabase/gamebox-picture', 
+        {
+            body: { id: props.value.id }
+        }) as string;
+        url = supaUrl;
+        
+
+    } catch (error) {
+        return props.value.photoUrl;
+    }
+    return url;
+
+});
 </script>
