@@ -6,10 +6,10 @@ FROM node:18-alpine
 # ARGS
 ARG SUPABASE_URL
 ARG SUPABASE_KEY
+ARG SUPABASE_ACCESS_TOKEN
 ARG NUXT_BOT_TOKEN
 ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
 ARG NITRO_PORT
-RUN echo "SUPABASE_URL is ${SUPABASE_URL}"
 
 # Set the working directory in the container
 WORKDIR /app
@@ -17,8 +17,14 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package.json package-lock.json ./
 
+# Setup local supabase
+RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
+RUN mkdir .generated
+RUN npm run type
+
 # Install dependencies
 RUN npm install
+
 
 # Copy the rest of the application files to the container
 COPY . .

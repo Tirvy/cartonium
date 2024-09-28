@@ -1,0 +1,1 @@
+docker build . -t cartonis -f Dockerfile $(sed 's/^/--build-arg /' .env)

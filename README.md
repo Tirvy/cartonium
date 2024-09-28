@@ -17,11 +17,16 @@ pnpm install
 yarn install
 ```
 
-## Supabase autotypes
+## Supabase Login
 
 ```bash
-# npm
-npm run type
+npx supabase login
+```
+
+## Supabase autotypes (login requiered)
+
+```bash
+sh execs/supabase-type.sh
 ```
 
 ## Development Server
@@ -73,3 +78,6 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 
 docker build . -t cartonis -f Dockerfile
 docker run -d cartonis
+
+# build Docker localy (mac)
+sh execs/docker-builder.sh
