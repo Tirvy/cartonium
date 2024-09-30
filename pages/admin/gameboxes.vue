@@ -51,7 +51,9 @@
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.year" label="year"></v-text-field>
               </v-col>
+            </v-row>
 
+            <v-row>
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.aliasTesera" label="aliasTesera"></v-text-field>
               </v-col>
@@ -59,9 +61,23 @@
                 <v-text-field v-model="editedItem.linkTesera" label="linkTesera"></v-text-field>
               </v-col>
               <v-col cols="12" md="4" sm="6">
-                <v-text-field v-model="editedItem.idBgg" label="linkBgg"></v-text-field>
+                <v-text-field v-model="editedItem.ratingTesera" label="ratingTesera"></v-text-field>
               </v-col>
+            </v-row>
 
+            <v-row>
+              <v-col cols="12" md="4" sm="6">
+                <v-text-field v-model="editedItem.idBgg" label="idBgg"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="4" sm="6">
+                <v-text-field v-model="editedItem.linkBgg" label="linkBgg"></v-text-field>
+              </v-col>
+              <v-col cols="12" md="4" sm="6">
+                <v-text-field v-model="editedItem.ratingBgg" label="ratingBgg"></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row>
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.playersMin" label="playersMin"></v-text-field>
               </v-col>
@@ -71,7 +87,9 @@
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.playersGood" label="playersGood"></v-text-field>
               </v-col>
+            </v-row>
 
+            <v-row>
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.playtimeMin" label="playtimeMin"></v-text-field>
               </v-col>
@@ -80,12 +98,6 @@
               </v-col>
               <v-col cols="12" md="4" sm="6">
                 <v-text-field v-model="editedItem.playtimeAvg" label="playtimeAvg"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="4" sm="6">
-                <v-text-field v-model="editedItem.ratingBgg" label="ratingBgg"></v-text-field>
-              </v-col>
-              <v-col cols="12" md="4" sm="6">
-                <v-text-field v-model="editedItem.ratingTesera" label="ratingTesera"></v-text-field>
               </v-col>
             </v-row>
           </v-container>

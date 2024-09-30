@@ -11,7 +11,7 @@ export default defineEventHandler(async (event): Promise<{ items: GameBoxWithClu
   const client = await serverSupabaseClient<Database>(event)
 
   const pageSize = +query.itemsPerPage || 25;
-  let request = client.from('gameboxes_with_club_id').select('*');
+  let request = client.from('gameboxes').select('*');
   if (query.search) {
     request = request.textSearch("title", query.search, {
       type: 'websearch',
