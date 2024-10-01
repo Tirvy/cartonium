@@ -1,64 +1,7 @@
 <template>
   <v-main>
-    <v-container>
-      <v-row class="justify-space-between" v-if="clubPermissions">
-        <v-col>
-        </v-col>
-        <v-spacer />
-        <v-col>
-          <NuxtLink to="./table-admin">
-            <v-list-item :link="true">
-              К виду для админов
-
-            </v-list-item>
-          </NuxtLink>
-        </v-col>
-      </v-row>
-
-      <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
-        text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
-
-      <v-row v-if="user && gatheringsWithDates.length > 0" dense>
-        <v-col cols="12">
-          <v-btn-toggle v-model="tableView" @update:model-value="saveViewPreferance" variant="outlined" mandatory
-            divided rounded density="compact" class="w-100">
-            <v-btn value="minimal" icon="mdi-view-sequential-outline" class="flex-grow-1">
-            </v-btn>
-
-            <!-- <v-btn value="compact" icon="mdi-view-compact-outline" class="flex-grow-1"> -->
-            <!-- </v-btn> -->
-            <v-btn value="full" icon="mdi-view-day-outline" class="flex-grow-1">
-            </v-btn>
-          </v-btn-toggle>
-        </v-col>
-      </v-row>
-
-      <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
-        <v-col v-if="gathwd.type === 'date'">
-          <v-list-subheader>
-            {{ gathwd.date }}
-          </v-list-subheader>
-        </v-col>
-
-        <v-col v-else-if="gathwd.gathering">
-          <pages-gatherings-table-item :view="tableView" :date="gathwd.date" :gathering="gathwd.gathering"
-            :loading="loading.gatheringId === gathwd.gathering.id"
-            :gatheringComputedValue="gatheringsComputedValues[gathwd.gathering.id]" @showDialogGuests="showDialogGuests"
-            @guestSet="guestSet" @edit="gatheringEdit(gathwd.gathering)"
-            @remove="gatheringRemove(gathwd.gathering)"></pages-gatherings-table-item>
-        </v-col>
-      </v-row>
-
-      <v-empty-state v-if="gatheringsWithDates.length === 0 && user"
-        text="Можете сами начать собирать людей кнопкой '+' снизу-справа" title="Не найдено сборов в клубе" />
-      <v-empty-state v-else-if="gatheringsWithDates.length === 0"
-        text="Зарегистрируйтесь через телеграм, чтобы начать собирать людей" title="Не найдено сборов в клубе" />
-    </v-container>
-
-    <v-fab v-if="user" location="bottom end" icon="mdi-plus" to="./item" app size="large" variant="outlined" order="1">
-      <v-icon icon="mdi-plus"></v-icon>
-      <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
-    </v-fab>
+    <NuxtPage :gatheringsWithDates="gatheringsWithDates" :gatheringsComputedValues="gatheringsComputedValues"
+      :loadingId="loading.gatheringId" :loadingList="loading.list" />
 
     <v-dialog v-model="dialog.guests" width="auto">
       <v-form @submit.prevent="guestsApply">
@@ -107,6 +50,7 @@ const user = useSupabaseUser();
 
 const loading = ref({
   gatheringId: 0,
+  list: false,
   removeDialogYes: false,
 })
 
@@ -115,6 +59,7 @@ definePageMeta({
 });
 
 async function updateFilters() {
+  loading.value.list = true;
   const data = await $fetch('/api/supabase/gatherings', {
     query: {
       clubid: currentClub.value.id,
@@ -123,6 +68,7 @@ async function updateFilters() {
   if (Array.isArray(data)) {
     gatherings.value = data;
   }
+  loading.value.list = false;
 }
 updateFilters();
 
@@ -286,21 +232,17 @@ function guestsApply() {
 }
 
 
-// ---- view -----
-let stored = localStorage.getItem('gatherings-view');
-let initialViewValue: 'minimal' | 'compact' | 'full' = 'minimal'
-if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
-  initialViewValue = stored;
-}
-const tableView = ref<'minimal' | 'compact' | 'full'>(initialViewValue);
 
-function saveViewPreferance(value: string) {
-  localStorage.setItem('gatherings-view', value);
-}
-
-// end ---- view -----
-
-
+definePageMeta({
+  name: 'gatherings-table',
+  middleware: [
+    async function (to, from) {
+      if (to.name === 'gatherings-table') {
+        return navigateTo(to.fullPath + '/list', { replace: true });
+      }
+    },
+  ],
+});
 </script>
 
 <style scoped>
