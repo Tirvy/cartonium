@@ -6,13 +6,19 @@
             </v-avatar>
             <div>
                 <v-card-title>
-                    {{ props.gathering.gamebox.title || props.gathering.ownTitle }} ({{ props.gathering.slotsFilled
-                    }}/{{ props.gathering.guestsMax }})
+                    {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
                 </v-card-title>
                 <v-card-subtitle>
-                    {{ date.full }}
+                    <span class="me-4">
+                        <v-icon icon="mdi-clock-time-two-outline" class="mr-1"></v-icon>
+                        {{ date.time }}
+                    </span>
+                    <common-week-indicator :date="date.dateObj"></common-week-indicator>
                 </v-card-subtitle>
                 <v-card-text>
+                    <div class="mb-2">
+                        Участники ({{ props.gathering.slotsFilled}}/{{ props.gathering.guestsMax }}):
+                    </div>
                     <p v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
                         <user-avatar :value="guest" class="mb-1"></user-avatar>
                         <span class="ms-2">{{ guest.title }}</span>
@@ -226,10 +232,12 @@
                         </span>
                     </span>
                 </v-card-subtitle>
-                <v-card-title class="pt-0 title-minimizer" @click="goToItem()">
-                    {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
-                    ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }})
-                </v-card-title>
+                <nuxt-link :to="linkToItem" class="title-link">
+                    <v-card-title class="pt-0 title-minimizer">
+                        {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
+                        ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }})
+                    </v-card-title>
+                </nuxt-link>
             </div>
             <v-spacer></v-spacer>
             <div>
@@ -307,9 +315,9 @@ const iAmTheOwner = computed(() => {
     return props.gathering.ownerId === user.value?.id
 })
 
-function goToItem() {
-    navigateTo(`/clubs/${currentClub.value?.urlName}/gatherings/table/${props.gathering.id}`)
-}
+const linkToItem = computed(() => {
+    return `/clubs/${currentClub.value?.urlName}/gatherings/table/${props.gathering.id}`
+})
 
 // -- date calculation start
 import { useDate } from 'vuetify';
@@ -319,9 +327,10 @@ const date = computed(() => {
     const hours = dateAdapter.format(value, 'hours24h');
     const minutes = dateAdapter.format(value, 'minutes');
     return {
-        time: dateAdapter.format(value, 'fullTime24h'),
+        time: `${hours}:${minutes}`,
         date: dateAdapter.format(value, 'fullDateWithWeekday'),
         full: `${hours}:${minutes}` + '  -  ' + dateAdapter.format(value, 'fullDateWithWeekday'),
+        dateObj: new Date(value),
     }
 })
 // -- date calculation end
@@ -332,6 +341,16 @@ const date = computed(() => {
 .title-minimizer {
     white-space: normal;
     line-height: 1.2;
+}
+
+.title-link {
+    opacity: 0.85;
+    text-decoration: none;
+    color: inherit;
+}
+
+.title-link:hover {
+    opacity: 1;
 }
 
 .user-link {

@@ -49,7 +49,7 @@
         </v-col>
 
         <v-col v-else-if="gathwd.gathering">
-          <pages-gatherings-table-item :view="tableView" :date="gathwd.date" :gathering="gathwd.gathering"
+          <pages-gatherings-table-item :view="tableView" :gathering="gathwd.gathering"
             :loading="loadingId === gathwd.gathering.id"
             :gatheringComputedValue="gatheringsComputedValues[gathwd.gathering.id]" @showDialogGuests="showDialogGuests"
             @guestSet="guestSet" @edit="gatheringEdit(gathwd.gathering)"
@@ -63,7 +63,7 @@
     <v-empty-state v-else-if="gatheringsWithDates.length === 0"
       text="Зарегистрируйтесь через телеграм, чтобы начать собирать людей" title="Не найдено сборов в клубе" />
   </v-container>
-  <v-fab v-if="user" location="bottom end" icon="mdi-plus" to="./item" app size="large" variant="outlined" order="1">
+  <v-fab v-if="user" location="bottom end" icon="mdi-plus" to="../item" app size="large" variant="outlined" order="1">
     <v-icon icon="mdi-plus"></v-icon>
     <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
   </v-fab>
@@ -107,8 +107,12 @@ const tableView = ref<'minimal' | 'compact' | 'full'>(initialViewValue);
 function saveViewPreferance(value: string) {
   localStorage.setItem('gatherings-view', value);
 }
-
 // end ---- view -----
+
+
+definePageMeta({
+  name: 'gatherings-table-list',
+});
 </script>
 
 <style scoped></style>

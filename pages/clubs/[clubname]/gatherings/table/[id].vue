@@ -12,7 +12,8 @@
         </template>
 
 
-        <v-fab location="bottom start" to="./list" app size="large" variant="outlined" order="1">
+        <v-fab location="bottom start" :to="{ name: 'gatherings-table-list' }" app size="large" variant="outlined"
+            order="1">
             <v-icon icon="mdi-format-list-checkbox"></v-icon>
             <v-tooltip activator="parent" location="end">К списку сборов</v-tooltip>
         </v-fab>
