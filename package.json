@@ -8,6 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "type": "supabase gen types typescript --project-id 'impmukiwmihnyyzvyjyp' --schema public > .generated/supabase-database.ts",
     "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts"
   },
   "devDependencies": {
