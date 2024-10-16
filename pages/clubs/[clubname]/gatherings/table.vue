@@ -1,7 +1,8 @@
 <template>
   <v-main>
     <NuxtPage :gatheringsWithDates="gatheringsWithDates" :gatheringsComputedValues="gatheringsComputedValues"
-      :loadingId="loading.gatheringId" :loadingList="loading.list" />
+      :loadingId="loading.gatheringId" :loadingList="loading.list" @gatheringRemove="gatheringRemove"
+      @gatheringEdit="gatheringEdit" />
 
     <v-dialog v-model="dialog.guests" width="auto">
       <v-form @submit.prevent="guestsApply">
@@ -27,7 +28,10 @@
     <v-dialog v-model="removaGatheringModal" width="auto">
       <v-card>
         <v-card-title>
-          Вы уверены что хотите отменить сбор на "ХХХ"?
+          Вы уверены что хотите отменить сбор на
+          <p>
+            "{{ gatheringToRemove?.ownName || gatheringToRemove?.gamebox.title }}"?
+          </p>
         </v-card-title>
         <v-card-actions class="justify-end">
           <v-btn @click="removeGatheringConfirmed" :loading="loading.removeDialogYes">Да</v-btn>
@@ -43,8 +47,15 @@
 import type { Gathering, GatheringWithGuests, GatheringsWithDates, GatheringComputedValue } from '~/types/frontend'
 import { useDate } from 'vuetify';
 const dateAdapter = useDate();
-const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
+const { data: gatherings, refresh: updateGatherings } = await useFetch<GatheringWithGuests[]>(
+  '/api/supabase/gatherings', {
+  query: {
+    clubid: currentClub.value.id,
+  },
+  lazy: true
+});
+
 const clubPermissions = useClubPermissions();
 const user = useSupabaseUser();
 
@@ -60,21 +71,13 @@ definePageMeta({
 
 async function updateFilters() {
   loading.value.list = true;
-  const data = await $fetch('/api/supabase/gatherings', {
-    query: {
-      clubid: currentClub.value.id,
-    }
-  });
-  if (Array.isArray(data)) {
-    gatherings.value = data;
-  }
+  await updateGatherings();
   loading.value.list = false;
 }
-updateFilters();
 
 const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue }>(() => {
 
-  return gatherings.value.reduce((acc: any, item) => {
+  return gatherings.value?.reduce((acc: any, item) => {
     const userGathering = item.guests.find(guest => guest.id === user.value?.id);
     const userIsInThisGathering = !!userGathering && userGathering.totalGuests > 0;
     const notMax = item.guestsMax > item.slotsFilled;
@@ -88,14 +91,14 @@ const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue
     }
 
     return acc;
-  }, {});
+  }, {}) || [];
 });
 
 interface gatheringsHash {
   [key: string]: GatheringWithGuests[]
 }
 const gatheringsHashedByDate = computed<gatheringsHash>(() => {
-  if (gatherings.value.length > 0) {
+  if (gatherings.value?.length) {
     let hashedByDate: gatheringsHash = {};
     gatherings.value.forEach(gathering => {
       const key = dateAdapter.toISO(dateAdapter.startOfDay(dateAdapter.date(gathering.startDate)));
@@ -157,34 +160,37 @@ async function guestSet(gatheringId: number, number: number) {
 }
 
 function gatheringEdit(gathering: Gathering) {
-  navigateTo('./item' + gathering.id);
+  navigateTo('../item' + gathering.id);
 }
 
 
-const gatheringRemoveId = ref<number | null>(null);
+const gatheringToRemove = ref<GatheringWithGuests | null>(null);
 const removaGatheringModal = computed({
   get() {
-    return !!gatheringRemoveId.value
+    return !!gatheringToRemove.value
   },
   set(value) {
     if (!value) {
-      gatheringRemoveId.value = null;
+      gatheringToRemove.value = null;
     }
   }
 })
-function gatheringRemove(gathering: Gathering) {
-  gatheringRemoveId.value = gathering.id;
+function gatheringRemove(gathering: GatheringWithGuests) {
+  gatheringToRemove.value = gathering;
+  console.log(gatheringToRemove.value);
 }
 
 async function removeGatheringConfirmed() {
+  if (!gatheringToRemove.value) return;
+
   loading.value.removeDialogYes = true;
   let res = await $fetch('/api/supabase/gathering-remove', {
     method: 'POST',
     body: {
-      gathering_id: gatheringRemoveId.value,
+      gathering_id: gatheringToRemove.value.id,
     }
   });
-  gatheringRemoveId.value = null;
+  gatheringToRemove.value = null;
   updateFilters();
   loading.value.removeDialogYes = false;
 }

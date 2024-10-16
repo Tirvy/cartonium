@@ -17,7 +17,7 @@
                 </v-card-subtitle>
                 <v-card-text>
                     <div class="mb-2">
-                        Участники ({{ props.gathering.slotsFilled}}/{{ props.gathering.guestsMax }}):
+                        Участники ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }}):
                     </div>
                     <p v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
                         <user-avatar :value="guest" class="mb-1"></user-avatar>
@@ -110,6 +110,7 @@
             <v-spacer />
 
             <v-menu v-if="iAmTheOwner" location="bottom end">
+
                 <template v-slot:activator="{ props }">
                     <v-card-actions>
                         <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props"></v-btn>
@@ -236,6 +237,7 @@
                     <v-card-title class="pt-0 title-minimizer">
                         {{ props.gathering.gamebox.title || props.gathering.ownTitle }}
                         ({{ props.gathering.slotsFilled }}/{{ props.gathering.guestsMax }})
+                        <v-icon icon="mdi-open-in-new" size="20" color="accent"></v-icon>
                     </v-card-title>
                 </nuxt-link>
             </div>
