@@ -81,7 +81,7 @@ const shownAvatar = computed(() => {
 });
 
 
-onMounted(() => {
+onBeforeMount(() => {
   cookieBasic.value = localStorage.getItem("agreed-to-cookie") + '';
   cookiePerformance.value = localStorage.getItem("agreed-to-cookie-performance") + '';
   cookiePerformaceEditing.value = cookiePerformance.value === '1';

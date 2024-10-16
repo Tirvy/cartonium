@@ -40,6 +40,7 @@
         </v-col>
       </v-row>
     </template>
+
     <template v-else>
       <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
         <v-col v-if="gathwd.type === 'date'">
@@ -97,12 +98,13 @@ function guestSet() {
 
 
 // ---- view -----
-let stored = localStorage.getItem('gatherings-view');
-let initialViewValue: 'minimal' | 'compact' | 'full' = 'minimal'
-if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
-  initialViewValue = stored;
-}
-const tableView = ref<'minimal' | 'compact' | 'full'>(initialViewValue);
+onBeforeMount(() => {
+  let stored = localStorage.getItem('gatherings-view');
+  if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
+    tableView.value = stored;
+  }
+})
+const tableView = ref<'minimal' | 'compact' | 'full'>('minimal');
 
 function saveViewPreferance(value: string) {
   localStorage.setItem('gatherings-view', value);

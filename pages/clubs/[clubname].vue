@@ -33,8 +33,6 @@ definePageMeta({
         const newClubData = await clubDataUpdate(clubname);
         currentClub.value = newClubData;
 
-        const updateUserPermissions = useUpdateUserPermissions();
-        await updateUserPermissions();
       }
 
     },

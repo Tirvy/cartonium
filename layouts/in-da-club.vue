@@ -118,12 +118,14 @@ const showAdminMobileWarning = computed(() => {
 import { useDisplay, useTheme } from 'vuetify'
 const theme = useTheme()
 
-const storedTheme = localStorage.getItem('theme');
-if (storedTheme && theme.themes.value[storedTheme]) {
-  theme.global.name.value = storedTheme;
-} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  theme.global.name.value = 'themeInitialDark';
-}
+onBeforeMount(() => {
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme && theme.themes.value[storedTheme]) {
+    theme.global.name.value = storedTheme;
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    theme.global.name.value = 'themeInitialDark';
+  }
+});
 
 // club avatar
 const clubAvatar = computed(() => {
