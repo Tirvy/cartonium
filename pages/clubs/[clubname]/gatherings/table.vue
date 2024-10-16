@@ -2,7 +2,7 @@
   <v-main>
     <NuxtPage :gatheringsWithDates="gatheringsWithDates" :gatheringsComputedValues="gatheringsComputedValues"
       :loadingId="loading.gatheringId" :loadingList="loadingList" @gatheringRemove="gatheringRemove"
-      @gatheringEdit="gatheringEdit"  @showDialogGuests="showDialogGuests" @guestSet="guestSet"/>
+      @gatheringEdit="gatheringEdit" @showDialogGuests="showDialogGuests" @guestSet="guestSet" />
 
     <v-dialog v-model="dialog.guests" width="auto">
       <v-form @submit.prevent="guestsApply">
@@ -157,7 +157,15 @@ async function guestSet(gatheringId: number, number: number) {
 }
 
 function gatheringEdit(gathering: Gathering) {
-  navigateTo('../item' + gathering.id);
+  navigateTo(
+    {
+      name: 'gathering-edit',
+      params: {
+        clubname: currentClub.value.urlName,
+        id: gathering.id,
+      }
+    }
+  );
 }
 
 

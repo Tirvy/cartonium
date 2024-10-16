@@ -86,17 +86,16 @@ export function gameBoxToSupabase(gameBox: GameBoxWithClub): Tables<'gameboxes'>
 // gathering
 export function gatheringFromSupabase(data: any): Gathering {
     return {
-        clubId: data.club_id,
-        commentClub: data.comment_club,
-        commentOwner: data.comment_owner,
-        gameboxId: data.gameboxes_ids,
-        tableId: data.table_id,
-        contact: data.contact,
-        guestsMax: data.guests_max,
         id: data.id,
         ownerId: data.owner_id,
         startDate: data.start_date,
+        commentOwner: data.comment_owner,
+        guestsMax: data.guests_max,
+        commentClub: data.comment_club,
+        clubId: data.club_id,
+        tableId: data.table_id,
         ownName: data.own_name,
+        gameboxId: data.gamebox_id,
     };
 }
 
@@ -123,7 +122,6 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         gamebox: gameBoxFromSupabase(data.gamebox),
         ownTitle: data.own_name,
         tableId: data.table_id,
-        contact: data.contact,
         guestsMax: data.guests_max,
         id: data.id,
         ownerId: data.owner_id,

@@ -1,98 +1,102 @@
 <template>
     <v-main>
         <v-container class="d-flex justify-center">
-            <v-sheet max-width="600px" width="600px">
-                <v-form @submit.prevent="saveGathering" v-model="formIsValid">
-                    <v-row>
-                        <v-col>
-                            <v-date-input label="Дата" prepend-icon="" prepend-inner-icon="$calendar"
-                                v-model="startDate" :allowed-dates="dateIsTodayOnward" hide-actions></v-date-input>
-                        </v-col>
-                        <v-col>
-                            <v-text-field v-maska:[timeMaskOptions] placeholder="12:30" label="Время"
-                                v-model="startTime" :rules="[ruleIsTime]"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row v-if="ownGatheringNameAvailable">
-                        <v-col cols="12">
-                            <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded class="w-100">
-                                <v-btn value="club" class="flex-grow-1">
-                                    Игра клуба
-                                </v-btn>
-
-                                <v-btn value="own" class="flex-grow-1">
-                                    Своя игра
-                                </v-btn>
-                            </v-btn-toggle>
-                        </v-col>
-                        <v-col cols="12" v-show="gameboxSource === 'club'">
-                            <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
-                                color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
-                                :eager="true" @update:model-value="updatePeopleCount">
-                                <template v-slot:chip="{ props, item }">
-                                    <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
-                                        :text="item.raw.title"></v-chip>
-                                </template>
-
-                                <template v-slot:item="{ props, item }">
-                                    <v-list-item v-bind="props" :prepend-avatar="item.raw.photoUrl"
-                                        :subtitle="item.raw.year" :title="item.raw.title"></v-list-item>
-                                </template>
-                            </v-autocomplete>
-                        </v-col>
-                        <v-col cols="12" v-show="gameboxSource === 'own'">
-                            <p>
-                                Если в списке нет нужной игры, то вы можете сами указать название игры/встречи здесь.
-                            </p>
-                            <v-text-field label="Название сбора" v-model="ownGatheringName"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-text-field label="Максимум человек" v-model="guestsMax"
-                                :rules="[ruleIsNumber]" @input="isGuestsMaxDirty = true"></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-textarea label="Комментарий (виден всем)" v-model="commentOwner"
-                                :disabled="!publicGathering"></v-textarea>
-                        </v-col>
-                    </v-row>
-
-                    <template v-if="clubPermissions">
-                        <v-row>
-                            <v-divider />
-                        </v-row>
-                        <v-row>
-                            <v-card-title>
-                                Админская часть (не видно гостям)
-                            </v-card-title>
-                        </v-row>
+            <v-skeleton-loader type="text,list-item,list-item, text, paragraph, actions" width="600px" height="400px" :loading="loaders.initial">
+                <v-card flat max-width="600px" width="600px">
+                    <v-form @submit.prevent="saveGathering" v-model="formIsValid">
                         <v-row>
                             <v-col>
-                                <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">
+                                <v-date-input label="Дата" prepend-icon="" prepend-inner-icon="$calendar"
+                                    v-model="startDate" :allowed-dates="dateIsTodayOnward" hide-actions></v-date-input>
+                            </v-col>
+                            <v-col>
+                                <v-text-field v-maska:[timeMaskOptions] placeholder="12:30" label="Время"
+                                    v-model="startTime" :rules="[ruleIsTime]"></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row v-if="ownGatheringNameAvailable">
+                            <v-col cols="12">
+                                <v-btn-toggle v-model="gameboxSource" variant="outlined" mandatory divided rounded
+                                    class="w-100">
+                                    <v-btn value="club" class="flex-grow-1">
+                                        Игра клуба
+                                    </v-btn>
+
+                                    <v-btn value="own" class="flex-grow-1">
+                                        Своя игра
+                                    </v-btn>
+                                </v-btn-toggle>
+                            </v-col>
+                            <v-col cols="12" v-show="gameboxSource === 'club'">
+                                <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
+                                    color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
+                                    :eager="true" @update:model-value="updatePeopleCount">
+                                    <template v-slot:chip="{ props, item }">
+                                        <v-chip v-bind="props" :prepend-avatar="item.raw.photoUrl"
+                                            :text="item.raw.title"></v-chip>
+                                    </template>
+
                                     <template v-slot:item="{ props, item }">
-                                        <v-list-item v-bind="props" :subtitle="item.raw.description"
-                                            :title="item.raw.title"></v-list-item>
+                                        <v-list-item v-bind="props" :prepend-avatar="item.raw.photoUrl"
+                                            :subtitle="item.raw.year" :title="item.raw.title"></v-list-item>
                                     </template>
                                 </v-autocomplete>
                             </v-col>
+                            <v-col cols="12" v-show="gameboxSource === 'own'">
+                                <p>
+                                    Если в списке нет нужной игры, то вы можете сами указать название игры/встречи
+                                    здесь.
+                                </p>
+                                <v-text-field label="Название сбора" v-model="ownGatheringName"></v-text-field>
+                            </v-col>
                         </v-row>
                         <v-row>
                             <v-col>
-                                <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
+                                <v-text-field label="Максимум человек" v-model="guestsMax" :rules="[ruleIsNumber]"
+                                    @input="isGuestsMaxDirty = true"></v-text-field>
                             </v-col>
                         </v-row>
-                    </template>
-                    <v-row>
-                        <v-col class="d-flex justify-end">
-                            <v-btn type="submit" :loading="loaders.save">сохранить</v-btn>
-                        </v-col>
-                    </v-row>
+                        <v-row>
+                            <v-col>
+                                <v-textarea label="Комментарий (виден всем)" v-model="commentOwner"
+                                    :disabled="!publicGathering"></v-textarea>
+                            </v-col>
+                        </v-row>
 
-                </v-form>
-            </v-sheet>
+                        <template v-if="clubPermissions">
+                            <v-row>
+                                <v-divider />
+                            </v-row>
+                            <v-row>
+                                <v-card-title>
+                                    Админская часть (не видно гостям)
+                                </v-card-title>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item v-bind="props" :subtitle="item.raw.description"
+                                                :title="item.raw.title"></v-list-item>
+                                        </template>
+                                    </v-autocomplete>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-textarea label="Комментарий админов" v-model="commentClub"></v-textarea>
+                                </v-col>
+                            </v-row>
+                        </template>
+                        <v-row>
+                            <v-col class="d-flex justify-end">
+                                <v-btn type="submit" :loading="loaders.save">сохранить</v-btn>
+                            </v-col>
+                        </v-row>
+
+                    </v-form>
+                </v-card>
+            </v-skeleton-loader>
         </v-container>
     </v-main>
 </template>
@@ -121,7 +125,6 @@ const loaders: Ref<Loaders> = ref({
 // ---- default form values
 const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const date = dateAdapter.date();
-console.log(date);
 const startTime = ref('')
 const guestsMax = ref('4');
 const commentOwner = ref('');
@@ -271,10 +274,15 @@ async function saveGathering() {
     lastGathering.value = data;
 
     const lastGatheringName = useState('lastGatheringName');
-    lastGatheringName.value = gameboxSource.value === 'club' 
-        ? gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title 
+    lastGatheringName.value = gameboxSource.value === 'club'
+        ? gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title
         : ownGatheringName.value;
     navigateTo('./gathering-accepted');
     loaders.value.save = false;
 }
+
+
+definePageMeta({
+    name: 'gathering-edit',
+});
 </script>

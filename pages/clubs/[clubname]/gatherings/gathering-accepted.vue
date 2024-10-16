@@ -50,22 +50,7 @@
                   </v-list-item-subtitle>
                 </v-list-item>
 
-                <v-list-item v-if="lastGathering.contact">
-
-                  <template v-slot:prepend>
-                    <v-avatar>
-                      <v-icon color="info">mdi-cellphone-message</v-icon>
-                    </v-avatar>
-                  </template>
-                  <v-list-item-title>
-                    Контакт обратной связи
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ lastGathering.contact }}
-                  </v-list-item-subtitle>
-                </v-list-item>
                 <v-list-item v-if="lastGathering.commentOwner">
-
                   <template v-slot:prepend>
                     <v-avatar>
                       <v-icon color="info">mdi-note</v-icon>

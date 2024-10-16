@@ -64,7 +64,8 @@
     <v-empty-state v-else-if="gatheringsWithDates.length === 0"
       text="Зарегистрируйтесь через телеграм, чтобы начать собирать людей" title="Не найдено сборов в клубе" />
   </v-container>
-  <v-fab v-if="user" location="bottom end" icon="mdi-plus" to="../item" app size="large" variant="outlined" order="1">
+  <v-fab v-if="user" location="bottom end" icon="mdi-plus" :to="{ name: 'gathering-edit' }" app size="large"
+    variant="outlined" order="1">
     <v-icon icon="mdi-plus"></v-icon>
     <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
   </v-fab>
