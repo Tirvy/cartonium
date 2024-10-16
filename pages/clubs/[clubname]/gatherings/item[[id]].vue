@@ -1,7 +1,8 @@
 <template>
     <v-main>
         <v-container class="d-flex justify-center">
-            <v-skeleton-loader type="text,list-item,list-item, text, paragraph, actions" width="600px" height="400px" :loading="loaders.initial">
+            <v-skeleton-loader type="text,list-item,list-item, text, paragraph, actions" width="600px" height="400px"
+                :loading="findGatheringStatus === 'pending' || loaders.initial">
                 <v-card flat max-width="600px" width="600px">
                     <v-form @submit.prevent="saveGathering" v-model="formIsValid">
                         <v-row>
@@ -28,7 +29,7 @@
                                 </v-btn-toggle>
                             </v-col>
                             <v-col cols="12" v-show="gameboxSource === 'club'">
-                                <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList"
+                                <v-autocomplete v-model="gameboxForGathering" :items="gameboxesSearchList || []"
                                     color="blue-grey-lighten-2" item-title="title" item-value="id" label="Выберите игру"
                                     :eager="true" @update:model-value="updatePeopleCount">
                                     <template v-slot:chip="{ props, item }">
@@ -74,7 +75,7 @@
                             </v-row>
                             <v-row>
                                 <v-col>
-                                    <v-autocomplete label="Стол" v-model="table" :items="tables" item-value="id">
+                                    <v-autocomplete label="Стол" v-model="table" :items="tables || []" item-value="id">
                                         <template v-slot:item="{ props, item }">
                                             <v-list-item v-bind="props" :subtitle="item.raw.description"
                                                 :title="item.raw.title"></v-list-item>
@@ -102,27 +103,20 @@
 </template>
 
 <script setup lang="ts">
-import type { GameBox, Gathering, Loaders } from '~/types/frontend'
-import { DateIOFormats } from "@date-io/core/IUtils";
-import { useDate } from 'vuetify';
-const dateAdapter = useDate()
-const route = useRoute();
-const router = useRouter();
 const clubPermissions = useClubPermissions();
-const user = useSupabaseUser();
 const currentClub: Ref<Club> = useState('club');
-const formIsValid: Ref<boolean | null> = ref(null);
 const reservingAvailable = currentClub.value.guestCanReserve;
 const ownGatheringNameAvailable = currentClub.value.guestCanGatherOwn;
 
-
 const loaders: Ref<Loaders> = ref({
     save: false,
-    initial: false,
+    initial: true,
 });
 
-
 // ---- default form values
+import { DateIOFormats } from "@date-io/core/IUtils";
+import { useDate } from 'vuetify';
+const dateAdapter = useDate();
 const startDate: Ref<DateIOFormats> = ref(dateAdapter.date() as DateIOFormats);
 const date = dateAdapter.date();
 const startTime = ref('')
@@ -143,8 +137,30 @@ const timeMaskOptions = { mask: '#0:##', tokens: { 0: { pattern: /[0-9]/, option
 function allowedDates(val: Date) {
     return val > new Date();
 };
-const gameboxesSearchList = ref<GameBox[]>([]);
-const tables = ref<Table[]>([])
+const { data: gameboxesSearchList, refresh: getClubGameboxes, status: getClubGameboxesStatus } = await useLazyFetch<GameBox[]>(
+    '/api/supabase/club-collection',
+    {
+        query: {
+            clubid: currentClub.value.id,
+            // limit: 14,
+            // search,
+        },
+        deep: false
+    },
+);
+const { data: tables, execute: getClubTables, status: getClubTablesStatus } = await useLazyFetch<Table[]>(
+    '/api/supabase/club-tables',
+    {
+        query: {
+            clubid: currentClub.value.id,
+        },
+        deep: false,
+        immediate: false
+    }
+);
+if (clubPermissions.value) {
+    getClubTables();
+}
 
 const today = new Date();
 const yesterday = new Date();
@@ -163,7 +179,7 @@ const gameboxSource = ref('club');
 
 function updatePeopleCount(val: number | undefined) {
     if (!val) return;
-    let foundGamebox = gameboxesSearchList.value.find(box => box.id === val);
+    let foundGamebox = gameboxesSearchList.value?.find(box => box.id === val);
     if (!isGuestsMaxDirty.value && foundGamebox) {
         guestsMax.value = (foundGamebox.playersMax || '4')?.toString();
     }
@@ -179,62 +195,43 @@ const updateGameboxSearch = useDebounce((search: string) => {
 //
 */
 
-async function getClubGameboxes(search?: string) {
-    const foundBoxes: GameBox[] = await $fetch('/api/supabase/club-collection', {
-        query: {
-            clubid: currentClub.value.id,
-            // limit: 14,
-            search,
-        }
-    });
-    gameboxesSearchList.value = foundBoxes;
-}
-getClubGameboxes();
 
-async function getClubTables(search?: string) {
-    const foundTables: Table[] = await $fetch('/api/supabase/club-tables', {
-        query: {
-            clubid: currentClub.value.id,
-        }
-    });
-    tables.value = foundTables;
-}
-if (clubPermissions.value) {
-    getClubTables();
-}
 
 // ---- Checking if we should load previously saved gathering
 // ---- getting this previously saved gathering
 // ---- navigating to 404 if gathering not found
-async function getItem() {
-    if (route.params.id && +route.params.id > 0) {
-        loaders.value.initial = true;
-        const findingId = +route.params.id;
-        const foundItem: Gathering = await await $fetch('/api/supabase/gathering-find', {
-            query: {
-                clubid: currentClub.value.id,
-                gatheringid: findingId,
-            }
-        });
-
-        if (!foundItem) {
-            router.replace('./not-found');
-        } else {
-            startDate.value = dateAdapter.date(foundItem.startDate) as DateIOFormats;
-            startTime.value = dateAdapter.format(startDate.value, 'fullTime24h');
-            guestsMax.value = foundItem.guestsMax + '';
-            commentOwner.value = foundItem.commentOwner;
-            commentClub.value = foundItem.commentClub;
-            gatheringId.value = foundItem.id;
-            gameboxForGathering.value = foundItem.gameboxId;
-        }
-        loaders.value.initial = false;
+const route = useRoute();
+const findingId = +route.params.id;
+const { data: foundGathering, execute: findGathering, status: findGatheringStatus } = await useLazyFetch<Gathering>(
+    '/api/supabase/gathering-find',
+    {
+        query: {
+            clubid: currentClub.value.id,
+            gatheringid: findingId,
+        },
+        deep: false,
+        immediate: false,
     }
-}
+);
+onMounted(async () => {
+    if (findingId > 0) {
+        await findGathering();
+        if (!foundGathering.value) {
+            navigateTo('./not-found');
+        } else {
+            startDate.value = dateAdapter.date(foundGathering.value.startDate) as DateIOFormats;
+            startTime.value = dateAdapter.format(startDate.value, 'fullTime24h');
+            guestsMax.value = foundGathering.value.guestsMax + '';
+            commentOwner.value = foundGathering.value.commentOwner;
+            commentClub.value = foundGathering.value.commentClub;
+            gatheringId.value = foundGathering.value.id;
+            gameboxForGathering.value = foundGathering.value.gameboxId;
+        }
+    }
+    loaders.value.initial = false;
+});
+// end ---- Checking if we should load previously saved gathering
 
-if (route.params.id) {
-    getItem();
-}
 
 // ---- gamebox selector
 
@@ -242,6 +239,7 @@ if (route.params.id) {
 
 
 // ---- action on save (so helpful comment)
+const formIsValid: Ref<boolean | null> = ref(null);
 async function saveGathering() {
     if (!formIsValid.value) {
         formIsValid.value = false;
@@ -275,7 +273,7 @@ async function saveGathering() {
 
     const lastGatheringName = useState('lastGatheringName');
     lastGatheringName.value = gameboxSource.value === 'club'
-        ? gameboxesSearchList.value.find(item => item.id === gameboxForGathering.value)?.title
+        ? gameboxesSearchList.value?.find(item => item.id === gameboxForGathering.value)?.title
         : ownGatheringName.value;
     navigateTo('./gathering-accepted');
     loaders.value.save = false;

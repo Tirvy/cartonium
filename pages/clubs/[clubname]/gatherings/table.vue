@@ -48,12 +48,11 @@ import type { Gathering, GatheringWithGuests, GatheringsWithDates, GatheringComp
 import { useDate } from 'vuetify';
 const dateAdapter = useDate();
 const currentClub: Ref<Club> = useState('club');
-const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStatus } = await useFetch<GatheringWithGuests[]>(
+const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStatus } = await useLazyFetch<GatheringWithGuests[]>(
   '/api/supabase/gatherings', {
   query: {
     clubid: currentClub.value.id,
   },
-  lazy: true
 });
 
 const clubPermissions = useClubPermissions();

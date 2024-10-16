@@ -34,6 +34,11 @@
 
 
     <template v-if="loadingList">
+      <v-row>
+        <v-col>
+          <v-skeleton-loader type="heading" width="300px" />
+        </v-col>
+      </v-row>
       <v-row v-for="n in 4">
         <v-col>
           <pages-gatherings-table-item-skeleton :view="tableView"></pages-gatherings-table-item-skeleton>
@@ -59,9 +64,9 @@
       </v-row>
     </template>
 
-    <v-empty-state v-if="gatheringsWithDates.length === 0 && user"
+    <v-empty-state v-if="gatheringsWithDates.length === 0 && user && !loadingList"
       text="Можете сами начать собирать людей кнопкой '+' снизу-справа" title="Не найдено сборов в клубе" />
-    <v-empty-state v-else-if="gatheringsWithDates.length === 0"
+    <v-empty-state v-else-if="gatheringsWithDates.length === 0 && !loadingList"
       text="Зарегистрируйтесь через телеграм, чтобы начать собирать людей" title="Не найдено сборов в клубе" />
   </v-container>
   <v-fab v-if="user" location="bottom end" icon="mdi-plus" :to="{ name: 'gathering-edit' }" app size="large"

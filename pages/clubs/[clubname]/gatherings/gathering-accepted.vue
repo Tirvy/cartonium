@@ -25,7 +25,7 @@
                 <v-list-item v-if="lastGatheringName">
                   <template v-slot:prepend>
                     <v-avatar>
-                      <v-icon color="info">mdi-hexagon-multiple-outline</v-icon>
+                      <v-icon color="info">mdi-gift-open-outline</v-icon>
                     </v-avatar>
                   </template>
                   <v-list-item-title>
