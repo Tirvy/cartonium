@@ -214,7 +214,7 @@
             </v-card-text>
         </div>
     </v-card>
-    <v-card v-if="view === 'minimal'">
+    <v-card v-if="view === 'minimal'" :loading="loading">
         <div class="d-flex flex-no-wrap justify-start">
             <div>
                 <v-avatar class="ma-3" size="50" rounded="0">

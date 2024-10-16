@@ -1,8 +1,8 @@
 <template>
   <v-main>
     <NuxtPage :gatheringsWithDates="gatheringsWithDates" :gatheringsComputedValues="gatheringsComputedValues"
-      :loadingId="loading.gatheringId" :loadingList="loading.list" @gatheringRemove="gatheringRemove"
-      @gatheringEdit="gatheringEdit" />
+      :loadingId="loading.gatheringId" :loadingList="loadingList" @gatheringRemove="gatheringRemove"
+      @gatheringEdit="gatheringEdit"  @showDialogGuests="showDialogGuests" @guestSet="guestSet"/>
 
     <v-dialog v-model="dialog.guests" width="auto">
       <v-form @submit.prevent="guestsApply">
@@ -48,7 +48,7 @@ import type { Gathering, GatheringWithGuests, GatheringsWithDates, GatheringComp
 import { useDate } from 'vuetify';
 const dateAdapter = useDate();
 const currentClub: Ref<Club> = useState('club');
-const { data: gatherings, refresh: updateGatherings } = await useFetch<GatheringWithGuests[]>(
+const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStatus } = await useFetch<GatheringWithGuests[]>(
   '/api/supabase/gatherings', {
   query: {
     clubid: currentClub.value.id,
@@ -69,11 +69,9 @@ definePageMeta({
   name: 'gatherings-public'
 });
 
-async function updateFilters() {
-  loading.value.list = true;
-  await updateGatherings();
-  loading.value.list = false;
-}
+const loadingList = computed(() => {
+  return gatheringUpdateStatus.value === 'pending' && !(loading.value.gatheringId || loading.value.removeDialogYes);
+})
 
 const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue }>(() => {
 
@@ -142,10 +140,8 @@ async function guestSet(gatheringId: number, number: number) {
       number,
     }
   });
-
   if (!data.error) {
-    loading.value.gatheringId = 0;
-    updateFilters();
+    await updateGatherings();
     // todo: add recalc on front! There is code under it!
     // const gatheringWithUser = gatherings.value.find(gathering => gathering.id === gatheringId);
     // const currentUserAsGuest = useCurrentUserAsGuest();
@@ -157,6 +153,7 @@ async function guestSet(gatheringId: number, number: number) {
     //   gatheringWithUser?.guests.push(currentUserAsGuest)
     // }
   }
+  loading.value.gatheringId = 0;
 }
 
 function gatheringEdit(gathering: Gathering) {
@@ -191,7 +188,7 @@ async function removeGatheringConfirmed() {
     }
   });
   gatheringToRemove.value = null;
-  updateFilters();
+  updateGatherings();
   loading.value.removeDialogYes = false;
 }
 

@@ -92,8 +92,8 @@ function gatheringRemove(gathering: Gathering) {
 function showDialogGuests(gathering: Gathering) {
   emits('showDialogGuests', gathering);
 }
-function guestSet() {
-  emits('guestSet');
+function guestSet(gatheringId: number, number: number) {
+  emits('guestSet', gatheringId, number);
 }
 
 
