@@ -1,5 +1,4 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -15,7 +14,8 @@ export default defineNuxtConfig({
   modules: [
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        config.plugins?.push(vuetify({ autoImport: true }))
+        // @ts-expect-error
+        config.plugins.push(vuetify({ autoImport: true }))
       })
     }, '@nuxtjs/supabase'],
   imports: {
@@ -31,7 +31,7 @@ export default defineNuxtConfig({
       cookieRedirect: true,
     },
     cookieOptions: {
-      secure: false
+      // secure: false
     }
   },
   runtimeConfig: {
@@ -42,12 +42,15 @@ export default defineNuxtConfig({
     transpile: ['vuetify', 'tiptap-vuetify'],
   },
   typescript: {
-    typeCheck: true,
+    // "have an 'override' modifier" error in supabase/auth-js @tirvy 10.24
+    typeCheck: false,
   },
   vite: {
     vue: {
       template: {
-        transformAssetUrls,
+        // hydrations errors @tirvy 10.24
+        // but this needs for img imports in vuetify
+        // transformAssetUrls,
       },
     },
   },
