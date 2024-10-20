@@ -9,7 +9,7 @@ definePageMeta({
   name: 'gatherings-root',
   middleware: [
     async function (to, from) {
-      const clubPermissions = useClubPermissions();
+      const { clubPermissions } = useClubPermissions();
 
       if (to.name === 'gatherings-root') {
         if (!clubPermissions.value) {

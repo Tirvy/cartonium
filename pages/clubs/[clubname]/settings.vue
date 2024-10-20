@@ -8,7 +8,7 @@ definePageMeta({
   middleware: [
     async function (to, from) {
       const currentClub: Ref<Club> = useState('club');
-      const clubPermissions = useClubPermissions();
+      const { clubPermissions } = useClubPermissions();
 
       if (!clubPermissions.value) {
         return navigateTo('/clubs/' + currentClub.value.urlName + '/gatherings');

@@ -89,7 +89,7 @@ definePageMeta({
     name: 'gatherings-table-admin',
     middleware: [
         async function (to, from) {
-            const clubPermissions = useClubPermissions();
+            const { clubPermissions } = useClubPermissions();
             if (!clubPermissions.value) {
                 return navigateTo(to.path + '/table', { replace: true });
             }

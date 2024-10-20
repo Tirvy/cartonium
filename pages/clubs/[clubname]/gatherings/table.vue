@@ -55,7 +55,7 @@ const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStat
   },
 });
 
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 const user = useSupabaseUser();
 
 const loading = ref({
@@ -63,10 +63,6 @@ const loading = ref({
   list: false,
   removeDialogYes: false,
 })
-
-definePageMeta({
-  name: 'gatherings-public'
-});
 
 const loadingList = computed(() => {
   return gatheringUpdateStatus.value === 'pending' && !(loading.value.gatheringId || loading.value.removeDialogYes);

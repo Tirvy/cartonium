@@ -42,7 +42,7 @@
 <script setup>
 const client = useSupabaseClient()
 const user = useSupabaseUser()
-const updateUserPermissions = useUpdateUserPermissions();
+const { update: updateUserPermissions } = useClubPermissions();
 
 const logout = async () => {
   await client.auth.signOut();

@@ -101,7 +101,7 @@ let pages = [
 ];
 
 const { mobile } = useDisplay();
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 const pagesList = computed(() => {
   return pages.filter(item => {
     if (item.permissions && !clubPermissions.value) return false;

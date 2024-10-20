@@ -1,26 +1,28 @@
-let permissionsRet: Ref<{ relation_type: string, club_id: string } | undefined> = ref(undefined);
+interface ClubPermission {
+  relation_type: string,
+  club_id: string,
+}
 
-export const useClubPermissions = (): Ref<{ relation_type: string, club_id: string } | undefined> => {
-  const clubPermissions: Ref<{ relation_type: string, club_id: string }[]> = useState('clubPermissions');
+export const useClubPermissions = () => {
+  const clubPermissions = useState<ClubPermission[]>('clubPermissions', () => []);
   const currentClub: Ref<Club> = useState('club');
 
-  // --- if you want to override permissions guest/admin on frontend ---
-  // const forcedPermissions = false;//localStorage.getItem('forcePermissions');
-  // if (forcedPermissions && currentClub.value) {
-  //   switch (forcedPermissions) {
-  //     case 'admin':
-  //     case 'owner':
-  //       permissionsRet.value = {
-  //         relation_type: forcedPermissions,
-  //         club_id: currentClub.value.id
-  //       };
-  //       break;
-  //     case 'guest':
-  //       permissionsRet.value = undefined;
-  //   }
-  // } else {
-  //   permissionsRet.value = clubPermissions?.value?.find(item => item.club_id === currentClub.value.id);
-  // }
+  async function update() {
+    const user = useSupabaseUser()
+    const currentClub: Ref<Club | null> = useState('club');
 
-  return permissionsRet;
+    const clubs = await $fetch<ClubPermission[]>('/api/supabase/my-clubs-permissions', {
+      query: {
+        userid: user?.value?.id,
+        clubid: currentClub.value?.id,
+      }
+    });
+    // console.log('permissions updated', clubs);
+    clubPermissions.value = clubs;
+  }
+
+  return {
+    clubPermissions,
+    update
+  };
 }
