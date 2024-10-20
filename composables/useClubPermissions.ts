@@ -4,7 +4,7 @@ interface ClubPermission {
 }
 
 export const useClubPermissions = () => {
-  const clubPermissions = useState<ClubPermission[]>('clubPermissions', () => []);
+  const permissions = useState<ClubPermission[]>('clubPermissions', () => []);
   const currentClub: Ref<Club> = useState('club');
 
   async function update() {
@@ -18,8 +18,12 @@ export const useClubPermissions = () => {
       }
     });
     // console.log('permissions updated', clubs);
-    clubPermissions.value = clubs;
+    permissions.value = clubs;
   }
+
+  const clubPermissions = computed(() => {
+    return permissions.value.find(item => item.club_id === currentClub.value.id);
+  })
 
   return {
     clubPermissions,

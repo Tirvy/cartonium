@@ -85,4 +85,9 @@ function setHead() {
     })
 }
 
+
+
+definePageMeta({
+  name: 'gatherings-linked-item',
+});
 </script>

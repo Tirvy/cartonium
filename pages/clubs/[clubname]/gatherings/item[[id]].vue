@@ -1,9 +1,9 @@
 <template>
     <v-main>
         <v-container class="d-flex justify-center">
-            <v-skeleton-loader type="text,list-item,list-item, text, paragraph, actions" width="600px" height="400px"
-                :loading="findGatheringStatus === 'pending' || loaders.initial">
-                <v-card flat max-width="600px" width="600px">
+            <v-skeleton-loader type="text,list-item,list-item, text, paragraph, actions" width="400px" max-width="100vw"
+                height="400px" :loading="findGatheringStatus === 'pending' || loaders.initial">
+                <v-card flat width="400px" max-width="100vw">
                     <v-form @submit.prevent="saveGathering" v-model="formIsValid">
                         <v-row>
                             <v-col>
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 const currentClub: Ref<Club> = useState('club');
 const reservingAvailable = currentClub.value.guestCanReserve;
 const ownGatheringNameAvailable = currentClub.value.guestCanGatherOwn;

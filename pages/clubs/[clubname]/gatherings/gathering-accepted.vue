@@ -23,6 +23,7 @@
                 </v-list-item>
 
                 <v-list-item v-if="lastGatheringName">
+
                   <template v-slot:prepend>
                     <v-avatar>
                       <v-icon color="info">mdi-gift-open-outline</v-icon>
@@ -37,6 +38,7 @@
                 </v-list-item>
 
                 <v-list-item v-if="lastGathering.guestsMax">
+
                   <template v-slot:prepend>
                     <v-avatar>
                       <v-icon color="info">mdi-account-group-outline</v-icon>
@@ -50,7 +52,25 @@
                   </v-list-item-subtitle>
                 </v-list-item>
 
+                <v-list-item>
+
+                  <template v-slot:prepend>
+                    <v-avatar>
+                      <v-icon color="info">mdi-cellphone-sound</v-icon>
+                    </v-avatar>
+                  </template>
+                  <v-list-item-title>
+                    Ссылка на сбор
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    <v-textarea @click="copyLink" readonly :value="generatedLink" append-inner-icon="mdi-content-copy"
+                      rows="3">
+                    </v-textarea>
+                  </v-list-item-subtitle>
+                </v-list-item>
+
                 <v-list-item v-if="lastGathering.commentOwner">
+
                   <template v-slot:prepend>
                     <v-avatar>
                       <v-icon color="info">mdi-note</v-icon>
@@ -116,6 +136,8 @@
 
 <script lang="ts" setup>
 const currentClub: Ref<Club> = useState('club');
+const route = useRoute();
+const router = useRouter();
 
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
@@ -123,10 +145,22 @@ const dateAdapter = useDate()
 const lastGathering = useState('lastGathering') as Ref<Gathering>;
 const lastGatheringName = useState('lastGatheringName') as Ref<string>;
 
+const generatedLink = computed(() => {
+  const linkedItemRoute = router.getRoutes().find(item => item.name === 'gatherings-linked-item');
+  const linkedRoute = router.resolve({ ...linkedItemRoute, params: { id: lastGathering.value.id } });
+  const absoluteURL = new URL(linkedRoute.href, window.location.origin).href;
+  return absoluteURL;
+});
+
+function copyLink() {
+
+  navigator.clipboard.writeText(generatedLink.value);
+  console.log(route);
+}
+
 if (!lastGathering.value) {
   navigateTo('./item');
 }
-
 </script>
 
 <style scoped></style>
