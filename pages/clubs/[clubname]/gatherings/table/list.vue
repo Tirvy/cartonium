@@ -48,10 +48,8 @@
 
     <template v-else>
       <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
-        <v-col v-if="gathwd.type === 'date'">
-          <v-list-subheader>
-            {{ gathwd.date }}
-          </v-list-subheader>
+        <v-col v-if="gathwd.type === 'date'" class="mt-4">
+          <common-week-indicator :date="gathwd.dateObj"></common-week-indicator>
         </v-col>
 
         <v-col v-else-if="gathwd.gathering">

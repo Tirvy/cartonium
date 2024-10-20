@@ -111,6 +111,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
     ret.push({
       type: 'date',
       date: dateAdapter.format(dateAdapter.date(key), 'normalDateWithWeekday'),
+      dateObj: new Date(key),
       gathering: undefined,
     });
 
@@ -118,6 +119,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
       ret.push({
         type: 'gathering',
         date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime24h').slice(0, 5),
+        dateObj: new Date(key),
         gathering: gathering
       });
     })
