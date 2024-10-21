@@ -62,19 +62,4 @@ const isDarkTheme = computed({
     localStorage.setItem('theme', newTheme);
   }
 })
-
-const localIsAdminValue = ref(localStorage.getItem('forcePermissions'));
-if (!localIsAdminValue) {
-  localIsAdminValue.value = useClubPermissions();
-}
-const forcePermissionsAdmin = computed({
-  get() {
-    return localIsAdminValue.value != 'guest';
-  },
-  set(value) {
-    const newValue = value ? 'admin' : 'guest';
-    localStorage.setItem('forcePermissions', newValue);
-    localIsAdminValue.value = newValue;
-  }
-})
 </script>
