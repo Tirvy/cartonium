@@ -63,31 +63,37 @@ function guestSet() {
 
 function setHead() {
     if (!gathwd.value) {
+        console.log('no');
         return;
+    }
+    console.log('yes');
+    if (document?.head) {
+        console.log(document.head.innerHTML);
     }
     const gathering = gathwd.value;
     const ogTitle = `Собираю "${gathering.gamebox?.title || gathering.ownTitle}"`;
-    const ogDescription = `Присоединяйтесь ${gathering.startDate} в клубе ${currentClub.value.title}`;
+    const date = new Date(gathering.startDate).toLocaleDateString('ru');
+    const ogDescription = `Присоединяйтесь ${date} в клубе ${currentClub.value.title}`;
     const ogImage = gathering.gamebox?.photoUrl;
     const ogUrl = `${route.fullPath}`;
+    // const ogUrl = new URL(route.fullPath, window?.location.origin).href;
 
-    useHead({
-        meta: [
-            { hid: 'og:type', name: 'og:type', content: 'website' },
-            { hid: 'og:site_name', property: 'og:site_name', content: 'Cartonis' },
-            { hid: 'og:locale', property: 'og:locale', content: 'ru_RU' },
-            { hid: 'description', name: 'description', content: ogDescription },
-            { hid: 'og:title', property: 'og:title', content: ogTitle },
-            { hid: 'og:url', property: 'og:url', content: ogUrl },
-            { hid: 'og:description', property: 'og:description', content: ogDescription },
-            { hid: 'og:image', property: 'og:image', content: ogImage },
-        ]
+    useSeoMeta({
+        ogType: 'website',
+        ogSiteName: 'Cartonis',
+        ogLocale: 'ru',
+        description: ogDescription,
+        ogTitle: ogTitle,
+        ogUrl: ogUrl,
+        ogDescription: ogDescription,
+        ogImage: ogImage,
     })
 }
 
+setHead();
 
 
 definePageMeta({
-  name: 'gatherings-linked-item',
+    name: 'gatherings-linked-item',
 });
 </script>

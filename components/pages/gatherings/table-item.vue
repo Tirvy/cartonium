@@ -334,7 +334,7 @@
             </div>
             <v-spacer></v-spacer>
             <div>
-                <v-menu location="bottom end">
+                <v-menu v-if="user?.id" location="bottom end">
 
                     <template v-slot:activator="{ props }">
                         <v-card-actions>
