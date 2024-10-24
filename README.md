@@ -21,6 +21,11 @@ yarn install
 npx supabase login
 ```
 
+## Supabase Login
+
+Copy .env.dist as .env
+Fill out all fields in .env
+
 ## Supabase autotypes (login requiered)
 
 ```bash
