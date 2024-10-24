@@ -157,8 +157,9 @@ definePageMeta({
   middleware: [
     () => {
       const lastGathering = useState<Gathering | undefined>('lastGathering');
-      if (!lastGathering.value) {
-        navigateTo('./item');
+      console.log(lastGathering.value?.id);
+      if (!lastGathering.value?.id) {
+        return navigateTo({name: 'gatherings-table-list'});
       }
     }
   ]

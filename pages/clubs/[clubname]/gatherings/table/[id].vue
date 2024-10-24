@@ -67,7 +67,7 @@ function setHead() {
     }
     const gathering = gathwd.value;
     const ogTitle = `Собираю "${gathering.gamebox?.title || gathering.ownTitle}"`;
-    const date = new Date(gathering.startDate).toLocaleDateString('ru');
+    const date = new Date(gathering.startDate).toLocaleString('ru');
     const ogDescription = `Присоединяйтесь ${date} в клубе ${currentClub.value.title}`;
     const ogImage = gathering.gamebox?.photoUrl;
     const ogUrl = `${route.fullPath}`;

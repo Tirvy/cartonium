@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   devServer: {
+    // port is important for telegram-bot login feature with local dev server
     host: '0.0.0.0',
     port: 80,
   },
