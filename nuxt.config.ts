@@ -2,15 +2,18 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
   devServer: {
     host: '0.0.0.0',
     port: 80,
   },
+
   app: {
     head: {
       title: 'Cartonis',
     }
   },
+
   modules: [
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
@@ -18,9 +21,11 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }))
       })
     }, '@nuxtjs/supabase'],
+
   imports: {
     dirs: ['types/*.ts'],
   },
+
   supabase: {
     redirect: true,
     redirectOptions: {
@@ -31,20 +36,25 @@ export default defineNuxtConfig({
       cookieRedirect: true,
     },
     cookieOptions: {
-      // secure: false
+      secure: true
     }
   },
+
   runtimeConfig: {
     clubId: 2,
   },
+
   css: ['vuetify/lib/styles/main.sass'],
+
   build: {
     transpile: ['vuetify', 'tiptap-vuetify'],
   },
+
   typescript: {
     // "have an 'override' modifier" error in supabase/auth-js @tirvy 10.24
     typeCheck: false,
   },
+
   vite: {
     vue: {
       template: {
@@ -54,4 +64,14 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  $development: {
+    supabase: {
+      cookieOptions: {
+        secure: false
+      }
+    },
+  },
+
+  compatibilityDate: '2024-10-24',
 })

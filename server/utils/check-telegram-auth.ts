@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import telegramLoginButton from '~/components/common/telegramLoginButton.vue';
 
 // TODO: check auth_date to be not more than 6 month ago
 
@@ -12,6 +11,8 @@ export default function (tgData: TelegramLoginPayload): boolean {
     const secretKey = crypto.createHash('sha256').update(botToken).digest();
     const hash = crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
     const checkHash = tgData.hash as string;
+
+
 
     // debug let it be here
     // if (true) {

@@ -63,12 +63,7 @@ function guestSet() {
 
 function setHead() {
     if (!gathwd.value) {
-        console.log('no');
         return;
-    }
-    console.log('yes');
-    if (document?.head) {
-        console.log(document.head.innerHTML);
     }
     const gathering = gathwd.value;
     const ogTitle = `Собираю "${gathering.gamebox?.title || gathering.ownTitle}"`;
@@ -89,7 +84,6 @@ function setHead() {
         ogImage: ogImage,
     })
 }
-
 setHead();
 
 
