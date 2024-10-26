@@ -29,8 +29,9 @@ onMounted(() => {
       script.setAttribute('data-onauth', 'onTelegramAuth(user)');
     }
     else {
-      const nextRoute = props.next || '/';
-      script.setAttribute('data-auth-url', '/auth/telegram-callback?next=' + nextRoute);
+      const route = useRoute();
+      const nextRoute = props.next || route.fullPath;
+      script.setAttribute('data-auth-url', '/auth/telegram-callback-page?next=' + nextRoute);
     }
     script.setAttribute('data-request-access', 'write');
     telegramLoginButton.value.appendChild(script);
