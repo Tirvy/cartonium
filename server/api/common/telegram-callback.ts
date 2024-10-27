@@ -56,8 +56,11 @@ export default defineEventHandler(async (event) => {
       telegram_refresh_token: sessionSource.refresh_token,
     });
     console.log(8);
-    return { url: query.next + '?' + urlParams };
-    console.log(9);
+    console.log(query.next + '?' + urlParams);
+    const returnValue = query.next + '?' + urlParams;
+    console.log(9, returnValue);
+    return { url: returnValue };
+    console.log(10);
   }
 
   console.log(10);
