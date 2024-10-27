@@ -21,17 +21,17 @@ export default defineEventHandler(async (event) => {
     email: `${tgData.id}@tgauth-happens.com`,
     password: imagineryPassword,
   });
-  console.timeLog('register ' + query.username);
-  if (!singInRes.error) {
-    const updateRes = await client.auth.updateUser({
-      data: getMetadataObject(tgData),
-    })
-  } else {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Error loggin in',
-    });
-  }
+  // console.timeLog('register ' + query.username);
+  // if (!singInRes.error) {
+  //   const updateRes = await client.auth.updateUser({
+  //     data: getMetadataObject(tgData),
+  //   })
+  // } else {
+  //   throw createError({
+  //     statusCode: 500,
+  //     statusMessage: 'Error loggin in',
+  //   });
+  // }
 
   console.timeLog('register ' + query.username);
   const sessionSource = singInRes?.data?.session;
