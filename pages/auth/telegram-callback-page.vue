@@ -11,7 +11,7 @@ const query = route.query;
 onMounted(async () => {
 
 
-  const result = await $fetch<{ url: string }>('/api/common/telegram-callback', {
+  const result = await $fetch<{ url: string }>('/api/common/try-login', {
     query
   });
   const url = result?.url;

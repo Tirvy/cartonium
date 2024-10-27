@@ -12,17 +12,14 @@ const emit = defineEmits(['auth']);
 
 onMounted(() => {
   const defaultPage = useDefaultPage();
-  if (telegramLoginButton.value) {
+  const config = useRuntimeConfig()
+  const botName = config.public.botLogin;
+  if (telegramLoginButton.value && botName) {
     const useCallback = false;
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.src = "https://telegram.org/js/telegram-widget.js?22";
-    // possible import.meta.dev or process.dev
-    if (import.meta.dev) {
-      script.setAttribute('data-telegram-login', 'cartonis_dev_bot');
-    } else {
-      script.setAttribute('data-telegram-login', 'emarena_bot');
-    }
+    script.setAttribute('data-telegram-login', botName);
     script.setAttribute('data-size', 'medium');
     script.setAttribute('data-userpic', 'false');
     if (useCallback) {

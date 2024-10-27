@@ -42,7 +42,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    clubId: 2,
+    public: {
+      botLogin: '',
+    }
   },
 
   css: ['vuetify/lib/styles/main.sass'],
