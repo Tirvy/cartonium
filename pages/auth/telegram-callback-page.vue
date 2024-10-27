@@ -15,7 +15,6 @@ onMounted(async () => {
     query
   });
   const url = result?.url;
-  console.log(url)
   if (url) {
     navigateTo(url, {
       replace: true,

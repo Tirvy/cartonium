@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Not authed',
     });
   }
+  return 'good';
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
   console.timeLog('register ' + query.username);
