@@ -48,14 +48,19 @@ export default defineEventHandler(async (event) => {
 
   console.log(5);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
+  console.log(6);
   if (sessionSource) {
+    console.log(7);
     const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
     });
+    console.log(8);
     return { url: query.next + '?' + urlParams };
+    console.log(9);
   }
 
+  console.log(10);
   throw createError({
     statusCode: 400,
     statusMessage: 'No user',
