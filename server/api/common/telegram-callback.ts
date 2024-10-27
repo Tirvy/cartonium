@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
-  console.log(1);
+  console.timeLog('register ' + query.id);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
-  console.log(2);
+  console.timeLog('register ' + query.id);
   let singInRes = null;
   let signUpRes = await client.auth.signUp(
     {
@@ -26,14 +26,13 @@ export default defineEventHandler(async (event) => {
       }
     }
   );
-  console.log(3);
-  return "good";
+  console.timeLog('register ' + query.id);
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
       password: imagineryPassword,
     });
-    console.log(4);
+    console.timeLog('register ' + query.id);
     if (!singInRes.error) {
       const updateRes = await client.auth.updateUser({
         data: getMetadataObject(tgData),
@@ -46,24 +45,22 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  console.log(5);
+  console.timeLog('register ' + query.id);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
-  console.log(6);
+  console.timeLog('register ' + query.id);
   if (sessionSource) {
-    console.log(7);
+    console.timeLog('register ' + query.id);
     const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
     });
-    console.log(8);
-    console.log(query.next + '?' + urlParams);
+    console.timeLog('register ' + query.id);
     const returnValue = query.next + '?' + urlParams;
-    console.log(9, returnValue);
+    console.timeEnd('register ' + query.id);
     return { url: returnValue };
-    console.log(10);
   }
 
-  console.log(10);
+  console.timeLog('register ' + query.id);
   throw createError({
     statusCode: 400,
     statusMessage: 'No user',
