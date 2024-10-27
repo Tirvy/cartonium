@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
-  console.timeLog('register ' + query.id);
+  console.time('register ' + query.id);
   if (!authed) {
     throw createError({
       statusCode: 400,
