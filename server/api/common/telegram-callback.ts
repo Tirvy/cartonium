@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
     console.log(query.next + '?' + urlParams);
     const returnValue = query.next + '?' + urlParams;
     console.log(9, returnValue);
+    return "good";
     return { url: returnValue };
     console.log(10);
   }
