@@ -8,15 +8,19 @@
 const route = useRoute();
 const query = route.query;
 
-const result = await useLazyFetch<{ url: string }>('/api/common/telegram-callback', {
-  query
+onMounted(async () => {
+
+
+  const result = await $fetch<{ url: string }>('/api/common/telegram-callback', {
+    query
+  });
+  const url = result?.url;
+  if (url) {
+    navigateTo(url, {
+      replace: true,
+    })
+  }
 });
-const url = result.data.value?.url;
-if (url) {
-  navigateTo(url, {
-    replace: true,
-  })
-}
 
 </script>
 

@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
+  console.log(1);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -14,6 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
+  console.log(2);
   let singInRes = null;
   let signUpRes = await client.auth.signUp(
     {
@@ -24,11 +26,13 @@ export default defineEventHandler(async (event) => {
       }
     }
   );
+  console.log(3);
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
       password: imagineryPassword,
     });
+    console.log(4);
     if (!singInRes.error) {
       const updateRes = await client.auth.updateUser({
         data: getMetadataObject(tgData),
@@ -42,6 +46,7 @@ export default defineEventHandler(async (event) => {
   }
 
 
+  console.log(5);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
   if (sessionSource) {
     const urlParams = new URLSearchParams({
