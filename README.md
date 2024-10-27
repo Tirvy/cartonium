@@ -80,7 +80,7 @@ yarn preview
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 docker build . -t cartonis -f Dockerfile
-docker run -d cartonis
+docker run -p 80:80 --env-file .env -d cartonis
 
 # build Docker localy (mac)
 sh execs/docker-builder.sh

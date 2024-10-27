@@ -9,7 +9,8 @@ ARG SUPABASE_KEY
 ARG SUPABASE_ACCESS_TOKEN
 ARG NUXT_BOT_TOKEN
 ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
-ARG NITRO_PORT
+ARG NITRO_PORT=80
+ARG PORT=80
 
 # Set the working directory in the container
 WORKDIR /app
@@ -31,6 +32,10 @@ COPY . .
 
 # Build the Next.js application for production
 RUN npm run build
+
+
+ENV PORT=$PORT
+ENV NODE_ENV=production
 
 #EXPOSE 3000
 #EXPOSE 80

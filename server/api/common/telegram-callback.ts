@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
     }
   );
   console.log(3);
+  return "good";
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
@@ -45,7 +46,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-
   console.log(5);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
   console.log(6);
@@ -59,7 +59,6 @@ export default defineEventHandler(async (event) => {
     console.log(query.next + '?' + urlParams);
     const returnValue = query.next + '?' + urlParams;
     console.log(9, returnValue);
-    return "good";
     return { url: returnValue };
     console.log(10);
   }
