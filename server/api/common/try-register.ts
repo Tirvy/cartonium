@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
   console.timeLog('register ' + query.username);
   const sessionSource = signUpRes?.data?.session;
   console.timeLog('register ' + query.username);
+  console.log(signUpRes);
   if (sessionSource) {
     console.log(7);
     const urlParams = new URLSearchParams({
@@ -44,7 +45,7 @@ export default defineEventHandler(async (event) => {
   console.log(10);
   throw createError({
     statusCode: 400,
-    statusMessage: 'No user',
+    statusMessage: signUpRes.error?.code || 'No user',
   });
 })
 

@@ -5,6 +5,7 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
+  console.timeEnd('logister ' + query.username);
   console.time('logister ' + query.username);
   const authed = checkTelegramAuth(tgData);
   console.timeLog('logister ' + query.username);
