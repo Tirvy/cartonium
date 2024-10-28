@@ -3,7 +3,14 @@ import telegramPasswordGenerator from '~/server/utils/telegram-password-generato
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
-  const query = getQuery(event);
+  const query: { timeout: string } = getQuery(event);
+
+
+
+  await new Promise(r => setTimeout(r, +query.timeout));
+  return 'good'
+
+
   const tgData = query as unknown as TelegramLoginPayload;
   console.time('register ' + query.username);
   const authed = checkTelegramAuth(tgData);
@@ -14,7 +21,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Not authed',
     });
   }
-  return 'good';
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
   console.timeLog('register ' + query.username);
