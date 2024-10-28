@@ -5,17 +5,19 @@
         <v-col>
 
           <table>
-            <tr>
-              <td v-for="variant in buttonVaritants">
-                {{ variant }}
-              </td>
+            <tbody>
+              <tr>
+                <td v-for="variant in buttonVaritants">
+                  {{ variant }}
+                </td>
 
-            </tr>
-            <tr>
-              <td v-for="variant in buttonVaritants">
-                <v-btn :variant="variant">котики</v-btn>
-              </td>
-            </tr>
+              </tr>
+              <tr>
+                <td v-for="variant in buttonVaritants">
+                  <v-btn :variant="variant">котики</v-btn>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </v-col>
       </v-row>

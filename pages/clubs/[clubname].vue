@@ -33,8 +33,6 @@ definePageMeta({
         const newClubData = await clubDataUpdate(clubname);
         currentClub.value = newClubData;
 
-        const updateUserPermissions = useUpdateUserPermissions();
-        await updateUserPermissions();
       }
 
     },
@@ -44,13 +42,6 @@ definePageMeta({
 const currentClub: Ref<Club> = useState('club');
 
 const head = useHead({
-  title: `${currentClub.value?.title}`,
-  meta: [
-    {
-      name: 'description',
-      content: currentClub.value?.title,
-    },
-  ],
   link: [
     {
       rel: 'icon',
@@ -59,6 +50,11 @@ const head = useHead({
     },
   ],
 });
+
+useSeoMeta({
+  title: () => `${currentClub.value?.title}`,
+  description: () => currentClub.value?.title,
+})
 
 </script>
 

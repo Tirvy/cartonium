@@ -233,7 +233,6 @@ export interface Gathering {
     commentClub: string
     commentOwner: string
     guestsMax: number
-    contact: string
     gameboxId: number
     tableId: number | null
     id: number
@@ -266,6 +265,7 @@ export interface GatheringWithGuests extends Gathering {
 export interface GatheringsWithDates {
     type: 'date' | 'gathering'
     date: string
+    dateObj: Date
     gathering?: GatheringWithGuests
 }
 

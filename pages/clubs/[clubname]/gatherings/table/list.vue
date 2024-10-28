@@ -15,7 +15,7 @@
     </v-row>
 
     <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
-      text="Залогиньтесь через телеграм, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
+      text="Залогиньтесь через телеграм справа-сверху, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
 
     <v-row v-if="user && gatheringsWithDates.length > 0" dense>
       <v-col cols="12">
@@ -34,18 +34,22 @@
 
 
     <template v-if="loadingList">
+      <v-row>
+        <v-col>
+          <v-skeleton-loader type="heading" width="300px" />
+        </v-col>
+      </v-row>
       <v-row v-for="n in 4">
         <v-col>
           <pages-gatherings-table-item-skeleton :view="tableView"></pages-gatherings-table-item-skeleton>
         </v-col>
       </v-row>
     </template>
+
     <template v-else>
       <v-row v-for="gathwd in gatheringsWithDates" :key="gathwd.date">
-        <v-col v-if="gathwd.type === 'date'">
-          <v-list-subheader>
-            {{ gathwd.date }}
-          </v-list-subheader>
+        <v-col v-if="gathwd.type === 'date'" class="mt-4">
+          <common-week-indicator :date="gathwd.dateObj"></common-week-indicator>
         </v-col>
 
         <v-col v-else-if="gathwd.gathering">
@@ -58,12 +62,14 @@
       </v-row>
     </template>
 
-    <v-empty-state v-if="gatheringsWithDates.length === 0 && user"
+    <v-empty-state v-if="gatheringsWithDates.length === 0 && user && !loadingList"
       text="Можете сами начать собирать людей кнопкой '+' снизу-справа" title="Не найдено сборов в клубе" />
-    <v-empty-state v-else-if="gatheringsWithDates.length === 0"
-      text="Зарегистрируйтесь через телеграм, чтобы начать собирать людей" title="Не найдено сборов в клубе" />
+    <v-empty-state v-else-if="gatheringsWithDates.length === 0 && !loadingList"
+      text="Зарегистрируйтесь через телеграм справа-сверху, чтобы начать собирать людей"
+      title="Не найдено сборов в клубе" />
   </v-container>
-  <v-fab v-if="user" location="bottom end" icon="mdi-plus" to="../item" app size="large" variant="outlined" order="1">
+  <v-fab v-if="user" location="bottom end" icon="mdi-plus" :to="{ name: 'gathering-edit' }" app size="large"
+    variant="outlined" order="1">
     <v-icon icon="mdi-plus"></v-icon>
     <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
   </v-fab>
@@ -71,7 +77,7 @@
 
 <script lang="ts" setup>
 const user = useSupabaseUser();
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 
 const props = defineProps<{
   loadingId: number,
@@ -91,18 +97,19 @@ function gatheringRemove(gathering: Gathering) {
 function showDialogGuests(gathering: Gathering) {
   emits('showDialogGuests', gathering);
 }
-function guestSet() {
-  emits('guestSet');
+function guestSet(gatheringId: number, number: number) {
+  emits('guestSet', gatheringId, number);
 }
 
 
 // ---- view -----
-let stored = localStorage.getItem('gatherings-view');
-let initialViewValue: 'minimal' | 'compact' | 'full' = 'minimal'
-if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
-  initialViewValue = stored;
-}
-const tableView = ref<'minimal' | 'compact' | 'full'>(initialViewValue);
+onBeforeMount(() => {
+  let stored = localStorage.getItem('gatherings-view');
+  if (stored && (stored === 'minimal' || stored === 'compact' || stored === 'full')) {
+    tableView.value = stored;
+  }
+})
+const tableView = ref<'minimal' | 'compact' | 'full'>('minimal');
 
 function saveViewPreferance(value: string) {
   localStorage.setItem('gatherings-view', value);

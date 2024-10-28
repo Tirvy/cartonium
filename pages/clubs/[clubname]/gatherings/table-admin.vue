@@ -89,7 +89,7 @@ definePageMeta({
     name: 'gatherings-table-admin',
     middleware: [
         async function (to, from) {
-            const clubPermissions = useClubPermissions();
+            const { clubPermissions } = useClubPermissions();
             if (!clubPermissions.value) {
                 return navigateTo(to.path + '/table', { replace: true });
             }
@@ -146,6 +146,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
         ret.push({
             type: 'date',
             date: dateAdapter.format(dateAdapter.date(key), 'normalDateWithWeekday'),
+            dateObj: new Date(key),
             gathering: undefined,
         });
 
@@ -153,6 +154,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
             ret.push({
                 type: 'gathering',
                 date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime'),
+                dateObj: new Date(key),
                 gathering: gathering
             });
         })

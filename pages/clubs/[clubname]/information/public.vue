@@ -19,7 +19,7 @@ const editPath = `/clubs/${clubName}/information/edit`;
 
 const infoData = ref('');
 const currentClub: Ref<Club> = useState('club');
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 
 async function getInfo() {
     // todo make fine handling

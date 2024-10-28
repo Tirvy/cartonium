@@ -18,14 +18,15 @@
                     Дата и время
                   </v-list-item-title>
                   <v-list-item-subtitle>
-                    {{ dateAdapter.format(lastGathering.startDate, 'fullDateTime') }}
+                    {{ dateAdapter.format(lastGathering?.startDate, 'fullDateTime') }}
                   </v-list-item-subtitle>
                 </v-list-item>
 
                 <v-list-item v-if="lastGatheringName">
+
                   <template v-slot:prepend>
                     <v-avatar>
-                      <v-icon color="info">mdi-hexagon-multiple-outline</v-icon>
+                      <v-icon color="info">mdi-gift-open-outline</v-icon>
                     </v-avatar>
                   </template>
                   <v-list-item-title>
@@ -36,7 +37,8 @@
                   </v-list-item-subtitle>
                 </v-list-item>
 
-                <v-list-item v-if="lastGathering.guestsMax">
+                <v-list-item v-if="lastGathering?.guestsMax">
+
                   <template v-slot:prepend>
                     <v-avatar>
                       <v-icon color="info">mdi-account-group-outline</v-icon>
@@ -50,21 +52,29 @@
                   </v-list-item-subtitle>
                 </v-list-item>
 
-                <v-list-item v-if="lastGathering.contact">
+                <v-list-item>
 
                   <template v-slot:prepend>
                     <v-avatar>
-                      <v-icon color="info">mdi-cellphone-message</v-icon>
+                      <v-icon color="info">mdi-cellphone-sound</v-icon>
                     </v-avatar>
                   </template>
                   <v-list-item-title>
-                    Контакт обратной связи
+                    Ссылка на сбор
                   </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ lastGathering.contact }}
+                  <v-list-item-subtitle class="cursor-pointer" @click="copyLink">
+                    <div class="text-caption pa-2 bg-grey-lighten-2 d-flex justify-space-between">
+                      <div style="max-width: 90%;">
+                        {{ generatedLink }}
+                      </div>
+                      <div>
+                        <v-icon>mdi-content-copy</v-icon>
+                      </div>
+                    </div>
                   </v-list-item-subtitle>
                 </v-list-item>
-                <v-list-item v-if="lastGathering.commentOwner">
+
+                <v-list-item v-if="lastGathering?.commentOwner">
 
                   <template v-slot:prepend>
                     <v-avatar>
@@ -125,23 +135,52 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <v-snackbar v-model="snackbar" timeout="3000">
+      Ссылка скопирована
+    </v-snackbar>
   </v-main>
 
 </template>
 
 <script lang="ts" setup>
-const currentClub: Ref<Club> = useState('club');
+const currentClub = useState<Club>('club');
+const router = useRouter();
 
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
 
-const lastGathering = useState('lastGathering') as Ref<Gathering>;
-const lastGatheringName = useState('lastGatheringName') as Ref<string>;
+const lastGathering = useState<Gathering | undefined>('lastGathering');
+const lastGatheringName = useState<string>('lastGatheringName');
 
-if (!lastGathering.value) {
-  navigateTo('./item');
+definePageMeta({
+  middleware: [
+    () => {
+      const lastGathering = useState<Gathering | undefined>('lastGathering');
+      console.log(lastGathering.value?.id);
+      if (!lastGathering.value?.id) {
+        return navigateTo({name: 'gatherings-table-list'});
+      }
+    }
+  ]
+})
+
+onBeforeRouteLeave(() => {
+  lastGathering.value = undefined;
+  lastGatheringName.value = '';
+})
+
+const snackbar = ref(false);
+const generatedLink = computed(() => {
+  const linkedItemRoute = router.getRoutes().find(item => item.name === 'gatherings-linked-item');
+  const linkedRoute = router.resolve({ ...linkedItemRoute, params: { id: lastGathering.value?.id } });
+  const absoluteURL = new URL(linkedRoute.href, window.location.origin).href;
+  return absoluteURL;
+});
+function copyLink() {
+  navigator.clipboard.writeText(generatedLink.value);
+  snackbar.value = true;
 }
-
 </script>
 
 <style scoped></style>

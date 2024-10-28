@@ -101,7 +101,7 @@ let pages = [
 ];
 
 const { mobile } = useDisplay();
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 const pagesList = computed(() => {
   return pages.filter(item => {
     if (item.permissions && !clubPermissions.value) return false;
@@ -117,13 +117,20 @@ const showAdminMobileWarning = computed(() => {
 
 import { useDisplay, useTheme } from 'vuetify'
 const theme = useTheme()
-
-const storedTheme = localStorage.getItem('theme');
-if (storedTheme && theme.themes.value[storedTheme]) {
-  theme.global.name.value = storedTheme;
-} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  theme.global.name.value = 'themeInitialDark';
+const storedThemeCookie = useCookie('theme');
+if (storedThemeCookie.value && theme.themes.value[storedThemeCookie.value]) {
+  theme.global.name.value = storedThemeCookie.value;
 }
+onMounted(() => {
+  if (!storedThemeCookie.value && window.matchMedia) {
+    let newTheme = 'themeInitialLight'
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      newTheme = 'themeInitialDark'
+    }
+    theme.global.name.value = newTheme;
+    storedThemeCookie.value = newTheme;
+  }
+});
 
 // club avatar
 const clubAvatar = computed(() => {

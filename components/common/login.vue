@@ -93,7 +93,7 @@ const loaders: Ref<Loaders> = ref({
 
 const user = useSupabaseUser()
 const { auth } = useSupabaseClient()
-const updateUserPermissions = useUpdateUserPermissions();
+const { update: updateUserPermissions } = useClubPermissions();
 
 const redirectPath = useCookie('sb-redirect-path');
 const defaultRedirectPath = useDefaultPage().path;

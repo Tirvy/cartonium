@@ -41,8 +41,8 @@
         </v-form>
     </v-navigation-drawer>
 
-    <v-fab v-if="!drawerState" location="top end" icon="mdi-filter-outline" app size="large" variant="elevated" order="1"
-        @click="drawerState = true">
+    <v-fab v-if="!drawerState" location="top end" icon="mdi-filter-outline" app size="large" variant="elevated"
+        order="1" @click="drawerState = true">
     </v-fab>
 
     <v-fab v-if="clubPermissions && !mobile" location="bottom end" icon="mdi-plus" to="./collection/add-games" app
@@ -57,7 +57,7 @@ import type { Ref, ComputedRef } from 'vue'
 import type { GameBox } from '~/types/frontend.js';
 import { ruleIsNumber } from '@/utils/rules.js';
 
-const clubPermissions = useClubPermissions();
+const { clubPermissions } = useClubPermissions();
 
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()

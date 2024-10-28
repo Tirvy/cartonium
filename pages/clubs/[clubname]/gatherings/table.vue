@@ -1,7 +1,8 @@
 <template>
   <v-main>
     <NuxtPage :gatheringsWithDates="gatheringsWithDates" :gatheringsComputedValues="gatheringsComputedValues"
-      :loadingId="loading.gatheringId" :loadingList="loading.list" />
+      :loadingId="loading.gatheringId" :loadingList="loadingList" @gatheringRemove="gatheringRemove"
+      @gatheringEdit="gatheringEdit" @showDialogGuests="showDialogGuests" @guestSet="guestSet" />
 
     <v-dialog v-model="dialog.guests" width="auto">
       <v-form @submit.prevent="guestsApply">
@@ -27,7 +28,10 @@
     <v-dialog v-model="removaGatheringModal" width="auto">
       <v-card>
         <v-card-title>
-          Вы уверены что хотите отменить сбор на "ХХХ"?
+          Вы уверены что хотите отменить сбор на
+          <p>
+            "{{ gatheringToRemove?.ownName || gatheringToRemove?.gamebox.title }}"?
+          </p>
         </v-card-title>
         <v-card-actions class="justify-end">
           <v-btn @click="removeGatheringConfirmed" :loading="loading.removeDialogYes">Да</v-btn>
@@ -43,9 +47,15 @@
 import type { Gathering, GatheringWithGuests, GatheringsWithDates, GatheringComputedValue } from '~/types/frontend'
 import { useDate } from 'vuetify';
 const dateAdapter = useDate();
-const gatherings: Ref<GatheringWithGuests[]> = ref([]);
 const currentClub: Ref<Club> = useState('club');
-const clubPermissions = useClubPermissions();
+const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStatus } = await useLazyFetch<GatheringWithGuests[]>(
+  '/api/supabase/gatherings', {
+  query: {
+    clubid: currentClub.value.id,
+  },
+});
+
+const { clubPermissions } = useClubPermissions();
 const user = useSupabaseUser();
 
 const loading = ref({
@@ -54,27 +64,13 @@ const loading = ref({
   removeDialogYes: false,
 })
 
-definePageMeta({
-  name: 'gatherings-public'
-});
-
-async function updateFilters() {
-  loading.value.list = true;
-  const data = await $fetch('/api/supabase/gatherings', {
-    query: {
-      clubid: currentClub.value.id,
-    }
-  });
-  if (Array.isArray(data)) {
-    gatherings.value = data;
-  }
-  loading.value.list = false;
-}
-updateFilters();
+const loadingList = computed(() => {
+  return gatheringUpdateStatus.value === 'pending' && !(loading.value.gatheringId || loading.value.removeDialogYes);
+})
 
 const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue }>(() => {
 
-  return gatherings.value.reduce((acc: any, item) => {
+  return gatherings.value?.reduce((acc: any, item) => {
     const userGathering = item.guests.find(guest => guest.id === user.value?.id);
     const userIsInThisGathering = !!userGathering && userGathering.totalGuests > 0;
     const notMax = item.guestsMax > item.slotsFilled;
@@ -88,14 +84,14 @@ const gatheringsComputedValues = computed<{ [id: string]: GatheringComputedValue
     }
 
     return acc;
-  }, {});
+  }, {}) || [];
 });
 
 interface gatheringsHash {
   [key: string]: GatheringWithGuests[]
 }
 const gatheringsHashedByDate = computed<gatheringsHash>(() => {
-  if (gatherings.value.length > 0) {
+  if (gatherings.value?.length) {
     let hashedByDate: gatheringsHash = {};
     gatherings.value.forEach(gathering => {
       const key = dateAdapter.toISO(dateAdapter.startOfDay(dateAdapter.date(gathering.startDate)));
@@ -115,6 +111,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
     ret.push({
       type: 'date',
       date: dateAdapter.format(dateAdapter.date(key), 'normalDateWithWeekday'),
+      dateObj: new Date(key),
       gathering: undefined,
     });
 
@@ -122,6 +119,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
       ret.push({
         type: 'gathering',
         date: dateAdapter.format(dateAdapter.date(gathering.startDate), 'fullTime24h').slice(0, 5),
+        dateObj: new Date(key),
         gathering: gathering
       });
     })
@@ -139,10 +137,8 @@ async function guestSet(gatheringId: number, number: number) {
       number,
     }
   });
-
   if (!data.error) {
-    loading.value.gatheringId = 0;
-    updateFilters();
+    await updateGatherings();
     // todo: add recalc on front! There is code under it!
     // const gatheringWithUser = gatherings.value.find(gathering => gathering.id === gatheringId);
     // const currentUserAsGuest = useCurrentUserAsGuest();
@@ -154,38 +150,50 @@ async function guestSet(gatheringId: number, number: number) {
     //   gatheringWithUser?.guests.push(currentUserAsGuest)
     // }
   }
+  loading.value.gatheringId = 0;
 }
 
 function gatheringEdit(gathering: Gathering) {
-  navigateTo('./item' + gathering.id);
+  navigateTo(
+    {
+      name: 'gathering-edit',
+      params: {
+        clubname: currentClub.value.urlName,
+        id: gathering.id,
+      }
+    }
+  );
 }
 
 
-const gatheringRemoveId = ref<number | null>(null);
+const gatheringToRemove = ref<GatheringWithGuests | null>(null);
 const removaGatheringModal = computed({
   get() {
-    return !!gatheringRemoveId.value
+    return !!gatheringToRemove.value
   },
   set(value) {
     if (!value) {
-      gatheringRemoveId.value = null;
+      gatheringToRemove.value = null;
     }
   }
 })
-function gatheringRemove(gathering: Gathering) {
-  gatheringRemoveId.value = gathering.id;
+function gatheringRemove(gathering: GatheringWithGuests) {
+  gatheringToRemove.value = gathering;
+  console.log(gatheringToRemove.value);
 }
 
 async function removeGatheringConfirmed() {
+  if (!gatheringToRemove.value) return;
+
   loading.value.removeDialogYes = true;
   let res = await $fetch('/api/supabase/gathering-remove', {
     method: 'POST',
     body: {
-      gathering_id: gatheringRemoveId.value,
+      gathering_id: gatheringToRemove.value.id,
     }
   });
-  gatheringRemoveId.value = null;
-  updateFilters();
+  gatheringToRemove.value = null;
+  updateGatherings();
   loading.value.removeDialogYes = false;
 }
 

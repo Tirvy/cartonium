@@ -5,7 +5,9 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
+  console.time('register ' + query.username);
   const authed = checkTelegramAuth(tgData);
+  console.timeLog('register ' + query.username);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -14,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
-  let singInRes = null;
+  console.timeLog('register ' + query.username);
   let signUpRes = await client.auth.signUp(
     {
       email: `${tgData.id}@tgauth-happens.com`,
@@ -24,35 +26,26 @@ export default defineEventHandler(async (event) => {
       }
     }
   );
-  if (signUpRes.error?.message === 'User already registered') {
-    singInRes = await client.auth.signInWithPassword({
-      email: `${tgData.id}@tgauth-happens.com`,
-      password: imagineryPassword,
-    });
-    if (!singInRes.error) {
-      const updateRes = await client.auth.updateUser({
-        data: getMetadataObject(tgData),
-      })
-    } else {
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Error loggin in',
-      });
-    }
-  }
 
-
-  const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
+  console.timeLog('register ' + query.username);
+  const sessionSource = signUpRes?.data?.session;
+  console.timeLog('register ' + query.username);
+  console.log(signUpRes);
   if (sessionSource) {
-    await sendRedirect(event, getNextRoute(query.next as string, {
+    console.log(7);
+    const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
-    }));
+    });
+    console.timeEnd('register ' + query.username);
+    return { url: query.next + '?' + urlParams };
+    console.log(10);
   }
 
+  console.log(10);
   throw createError({
     statusCode: 400,
-    statusMessage: 'No user',
+    statusMessage: signUpRes.error?.code || 'No user',
   });
 })
 

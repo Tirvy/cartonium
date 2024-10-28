@@ -8,8 +8,6 @@ import * as directives from 'vuetify/directives'
 import { VDateInput } from 'vuetify/labs/VDateInput'
 
 import DayJsAdapter  from '@date-io/dayjs'
-import ruDayjs from 'dayjs/locale/ru'
-import enDayjs from 'dayjs/locale/en'
 
 import { ru } from 'vuetify/locale'
 

@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
+  console.time('register ' + query.id);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -14,6 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
+  console.timeLog('register ' + query.id);
   let singInRes = null;
   let signUpRes = await client.auth.signUp(
     {
@@ -24,11 +26,13 @@ export default defineEventHandler(async (event) => {
       }
     }
   );
+  console.timeLog('register ' + query.id);
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
       password: imagineryPassword,
     });
+    console.timeLog('register ' + query.id);
     if (!singInRes.error) {
       const updateRes = await client.auth.updateUser({
         data: getMetadataObject(tgData),
@@ -41,15 +45,22 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-
+  console.timeLog('register ' + query.id);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
+  console.timeLog('register ' + query.id);
   if (sessionSource) {
-    await sendRedirect(event, getNextRoute(query.next as string, {
+    console.timeLog('register ' + query.id);
+    const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
-    }));
+    });
+    console.timeLog('register ' + query.id);
+    const returnValue = query.next + '?' + urlParams;
+    console.timeEnd('register ' + query.id);
+    return { url: returnValue };
   }
 
+  console.timeLog('register ' + query.id);
   throw createError({
     statusCode: 400,
     statusMessage: 'No user',

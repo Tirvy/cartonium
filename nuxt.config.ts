@@ -1,27 +1,32 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  ssr: false,
   devtools: { enabled: true },
+
   devServer: {
+    // port is important for telegram-bot login feature with local dev server
     host: '0.0.0.0',
     port: 80,
   },
+
   app: {
     head: {
       title: 'Cartonis',
     }
   },
+
   modules: [
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        config.plugins?.push(vuetify({ autoImport: true }))
+        // @ts-expect-error
+        config.plugins.push(vuetify({ autoImport: true }))
       })
     }, '@nuxtjs/supabase'],
+
   imports: {
     dirs: ['types/*.ts'],
   },
+
   supabase: {
     redirect: true,
     redirectOptions: {
@@ -32,24 +37,44 @@ export default defineNuxtConfig({
       cookieRedirect: true,
     },
     cookieOptions: {
-      secure: false
+      secure: true
     }
   },
+
   runtimeConfig: {
-    clubId: 2,
+    public: {
+      botLogin: '',
+    }
   },
+
   css: ['vuetify/lib/styles/main.sass'],
+
   build: {
     transpile: ['vuetify', 'tiptap-vuetify'],
   },
+
   typescript: {
-    typeCheck: true,
+    // "have an 'override' modifier" error in supabase/auth-js @tirvy 10.24
+    typeCheck: false,
   },
+
   vite: {
     vue: {
       template: {
-        transformAssetUrls,
+        // hydrations errors @tirvy 10.24
+        // but this needs for img imports in vuetify
+        // transformAssetUrls,
       },
     },
   },
+
+  $development: {
+    supabase: {
+      cookieOptions: {
+        secure: false
+      }
+    },
+  },
+
+  compatibilityDate: '2024-10-24',
 })
