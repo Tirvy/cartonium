@@ -16,7 +16,7 @@ ARG PORT=80
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the container
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
