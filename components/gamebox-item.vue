@@ -36,9 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { compileAsync } from 'sass';
 import { useDisplay } from 'vuetify';
-import { gameBoxFromSupabase } from '~/server/transformers';
 import type { GameBox } from '~/types/frontend.js';
 import { gameboxPictureGet } from '~/utils/gamebox-picture-get';
 import { computedAsync } from '@vueuse/core';
