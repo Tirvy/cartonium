@@ -12,7 +12,7 @@
     "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts"
   },
   "devDependencies": {
-    "@nuxtjs/supabase": "^1.4.1",
+    "@nuxtjs/supabase": "1.1.7",
     "nuxt": "^3.13.2",
     "typescript": "^5.6.3",
     "vite-plugin-vuetify": "^2.0.4",
