@@ -1,5 +1,9 @@
-export function gameboxPictureGet(gamebox: GameBox) {
+export async function gameboxPictureGet(gamebox: GameBox) {
     const client = useSupabaseClient();
     const { data } = client.storage.from('gamebox-pics').getPublicUrl(gamebox.id.toString());
-    return data.publicUrl ?? gamebox.photoUrl;
+    const resp = await fetch(data.publicUrl);
+    if (!resp.ok) {
+        return gamebox.photoUrl;
+    }
+    return data.publicUrl;
 }
