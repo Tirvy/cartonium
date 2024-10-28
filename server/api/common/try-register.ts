@@ -5,8 +5,9 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
+  console.time('register ' + query.username);
   const authed = checkTelegramAuth(tgData);
-  console.time('register ' + query.id);
+  console.timeLog('register ' + query.username);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
-  console.timeLog('register ' + query.id);
+  console.timeLog('register ' + query.username);
   let signUpRes = await client.auth.signUp(
     {
       email: `${tgData.id}@tgauth-happens.com`,
@@ -26,20 +27,17 @@ export default defineEventHandler(async (event) => {
     }
   );
 
-  console.timeLog('register ' + query.id);
+  console.timeLog('register ' + query.username);
   const sessionSource = signUpRes?.data?.session;
-  console.timeLog('register ' + query.id);
+  console.timeLog('register ' + query.username);
   if (sessionSource) {
     console.log(7);
     const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
     });
-    console.log(8);
-    console.log(query.next + '?' + urlParams);
-    const returnValue = query.next + '?' + urlParams;
-    console.log(9, returnValue);
-    return { url: returnValue };
+    console.timeEnd('register ' + query.username);
+    return { url: query.next + '?' + urlParams };
     console.log(10);
   }
 

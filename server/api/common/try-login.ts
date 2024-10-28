@@ -3,18 +3,11 @@ import telegramPasswordGenerator from '~/server/utils/telegram-password-generato
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
-  const query: { timeout: string } = getQuery(event);
-
-
-
-  await new Promise(r => setTimeout(r, +query.timeout));
-  return 'good'
-
-
+  const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
-  console.time('register ' + query.username);
+  console.time('logister ' + query.username);
   const authed = checkTelegramAuth(tgData);
-  console.timeLog('register ' + query.username);
+  console.timeLog('logister ' + query.username);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -23,12 +16,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
-  console.timeLog('register ' + query.username);
+  console.timeLog('logister ' + query.username);
   let singInRes = await client.auth.signInWithPassword({
     email: `${tgData.id}@tgauth-happens.com`,
     password: imagineryPassword,
   });
-  // console.timeLog('register ' + query.username);
+  // console.timeLog('logister ' + query.username);
   // if (!singInRes.error) {
   //   const updateRes = await client.auth.updateUser({
   //     data: getMetadataObject(tgData),
@@ -40,7 +33,7 @@ export default defineEventHandler(async (event) => {
   //   });
   // }
 
-  console.timeLog('register ' + query.username);
+  console.timeLog('logister ' + query.username);
   const sessionSource = singInRes?.data?.session;
   if (sessionSource) {
     console.log(7);
@@ -48,7 +41,7 @@ export default defineEventHandler(async (event) => {
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
     });
-    console.timeEnd('register ' + query.username);
+    console.timeEnd('logister ' + query.username);
     return { url: query.next + '?' + urlParams };
   }
 
