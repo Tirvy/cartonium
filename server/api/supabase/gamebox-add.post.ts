@@ -15,5 +15,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusMessage: error.message })
   }
 
-  return data
+  gameboxes.forEach(async (gamebox: GameBox)=> {
+    const supaPicUrl = await $fetch('/api/supabase/gamebox-picture',
+      { method: 'post', body: { gamebox: gamebox } }
+    );
+  });
+
+  return data;
 })

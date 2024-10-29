@@ -7,3 +7,10 @@ export function listToHashed(sortSource: { id?: number | undefined }[]) {
         return total;
     }, {})
 }
+
+export function blobToFile(theBlob: Blob, fileName: string): File {
+    const b: any = theBlob;
+    b.lastModifiedDate = new Date();
+    b.name = fileName;
+    return theBlob as File;
+  }
