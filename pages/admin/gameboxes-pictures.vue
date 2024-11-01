@@ -26,7 +26,8 @@ const gameboxes: Ref<GameBoxWithClub[]> = ref(data.value.items);
 
 const columns = useConstants('columns');
 
-const selected: Ref<number[]> = ref(gameboxes.value.map((item: GameBoxWithClub) => item.id));
+// const selected: Ref<number[]> = ref(gameboxes.value.map((item: GameBoxWithClub) => item.id));
+const selected: Ref<number[]> = ref([]);
 
 async function getNewPictures() {
   const ret = await $fetch('/api/common/add-pictures',
