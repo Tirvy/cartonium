@@ -38,13 +38,15 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
 import type { GameBox } from '~/types/frontend.js';
+import { gameboxPictureGet } from '~/utils/gamebox-picture-get';
+import { computedAsync } from '@vueuse/core';
 const { mobile } = useDisplay();
 
 const props = defineProps<{
     value: GameBox
 }>();
 
-const imageURL = computed(() => {
-    return props.value.photoUrl || `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/gamebox-pics/${props.value.id}`;
-})
+const imageURL = computedAsync(async () => {
+    return await gameboxPictureGet(props.value);
+});
 </script>
