@@ -423,12 +423,9 @@ const linkToItem = computed(() => {
 const dayjs = useDayjs()
 const date = computed(() => {
     const value = dayjs(props.gathering.startDate);
-    const hours = value.format('HH');
-    const minutes = value.format('mm');
     const time = value.format('HH:mm');
     return {
         time,
-        date: value.format('fullDateWithWeekday'),
         full: `${time}, ${value.format('dddd, D MMMM')}`,
         short: `${time} | ${value.format('D MMM')}`,
         dateObj: new Date(value.toISOString()),
