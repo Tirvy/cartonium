@@ -23,6 +23,7 @@
 <script setup lang="ts">
 const props = defineProps<{
     loadingId: number,
+    loadingList: boolean,
     gatheringsWithDates: GatheringsWithDates[],
     gatheringsComputedValues: { [id: string]: GatheringComputedValue }
 }>();
@@ -32,20 +33,25 @@ const currentClub: Ref<Club> = useState('club');
 
 const route = useRoute();
 const gatheringId = +route.params.id;
-const gathwd: Ref<GatheringWithGuests | undefined> = ref(undefined);
 
-watch(() => props.gatheringsWithDates, () => {
+const gathwd = computed<GatheringWithGuests | undefined>(() => {
     const found = props.gatheringsWithDates.find((gathwd: any) => gathwd.gathering?.id === gatheringId);
     if (found && found.type === 'gathering') {
-        gathwd.value = found.gathering;
+        return found.gathering;
     }
-    if (props.gatheringsWithDates.length && !gathwd) {
-        throw new Error('gathering not found');
+    return undefined;
+})
+
+watch(() => props.loadingList, () => {
+    if (!props.loadingList) {
+        if (!gathwd.value) {
+            navigateTo('../table/list', { replace: true });
+        }
+        if (gathwd) {
+            setHead();
+        }
     }
-    if (gathwd) {
-        setHead();
-    }
-}, { immediate: true })
+}, { immediate: true });
 
 function gatheringEdit(gathering: Gathering) {
     emits('gatheringEdit', gathering);
@@ -56,8 +62,8 @@ function gatheringRemove(gathering: Gathering) {
 function showDialogGuests(gathering: Gathering) {
     emits('showDialogGuests', gathering);
 }
-function guestSet() {
-    emits('guestSet');
+function guestSet(gatheringId: number, number: number) {
+    emits('guestSet', gatheringId, number);
 }
 
 

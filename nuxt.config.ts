@@ -74,6 +74,7 @@ export default defineNuxtConfig({
         secure: false
       }
     },
+    ssr: false,
   },
 
   compatibilityDate: '2024-10-24',
