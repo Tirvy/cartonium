@@ -45,15 +45,15 @@ const showEndMonthName = computed(() => {
 const days = computed(() => {
   const days = [];
   for (let i = 0; i < 7; i++) {
-    const day = dayjs(startDate.value).add(i, 'day');
+    const dayToAdd = dayjs(startDate.value).add(i, 'day');
     days.push({
-      date: day,
-      number: day.format('D'),
-      isWeekend: day.day() === 6 || day.day() === 0,
+      date: dayToAdd,
+      number: dayToAdd.format('D'),
+      isWeekend: dayToAdd.day() === 6 || dayToAdd.day() === 0,
       i: i,
       // isCurrentMonth: day.getMonth() === startDate.value.getMonth(),
-      isToday: day.isSame(dayjs(), 'day'),
-      isTarget: day.isSame(props.date, 'day'),
+      isToday: dayToAdd.isSame(dayjs(), 'day'),
+      isTarget: dayToAdd.isSame(props.date, 'day'),
     });
   }
   return days;
