@@ -6,7 +6,7 @@
           <v-icon icon="mdi-calendar-range" class="mr-1"></v-icon>
           {{ startMonthName }}
         </div>
-        <div v-if="endMonthName !== startMonthName">
+        <div v-if="showEndMonthName">
           {{ endMonthName }}
         </div>
       </div>
@@ -23,21 +23,20 @@
 const props = defineProps<{
   date: Date
 }>();
+const dayjs = useDayjs()
 
 const startDate = computed(() => {
-  const startDate = new Date(props.date);
-  startDate.setDate(startDate.getDate() - startDate.getDay());
+  const startDate = dayjs(props.date).weekday(0);
   return startDate;
 })
 
 const startMonthName = computed(() => {
-  return startDate.value.toLocaleDateString('ru-RU', { month: 'long' });
+  return startDate.value.format('MMMM');
 })
 
 const endMonthName = computed(() => {
-  const endDate = new Date(props.date);
-  endDate.setDate(endDate.getDate() + 6);
-  return endDate.toLocaleDateString('ru-RU', { month: 'long' });
+  const endDate = dayjs(props.date).weekday(6);
+  return endDate.format('MMMM');
 })
 const showEndMonthName = computed(() => {
   return startMonthName.value !== endMonthName.value;
@@ -46,16 +45,15 @@ const showEndMonthName = computed(() => {
 const days = computed(() => {
   const days = [];
   for (let i = 0; i < 7; i++) {
-    const day = new Date(startDate.value);
-    day.setDate(day.getDate() + i);
+    const day = dayjs(startDate.value).add(i, 'day');
     days.push({
       date: day,
-      number: day.getDate(),
-      isWeekend: day.getDay() === 5 || day.getDay() === 6,
+      number: day.format('D'),
+      isWeekend: day.day() === 6 || day.day() === 0,
       i: i,
-      isCurrentMonth: day.getMonth() === startDate.value.getMonth(),
-      isToday: day.toDateString() === new Date().toDateString(),
-      isTarget: day.toDateString() === props.date.toDateString(),
+      // isCurrentMonth: day.getMonth() === startDate.value.getMonth(),
+      isToday: day.isSame(dayjs(), 'day'),
+      isTarget: day.isSame(props.date, 'day'),
     });
   }
   return days;
