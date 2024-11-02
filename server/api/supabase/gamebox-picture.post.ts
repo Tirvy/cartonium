@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const resp: any = await $fetch(gamebox.photoUrl);
   const image = blobToFile(resp, gamebox.id);
+
   const { data, error } = await client.storage.from('gamebox-pics').upload(
     gamebox.id.toString(), 
     image, 

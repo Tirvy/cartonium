@@ -79,7 +79,8 @@ export function gameBoxToSupabase(gameBox: GameBoxWithClub): Tables<'gameboxes'>
         title: gameBox.title,
         titles: gameBox.titles,
         year: gameBox.year || null,
-        id: gameBox.id,
+        // If id is null error: 500 column "id" of relation "gameboxes" violates not-null constraint
+        // id: gameBox.id, 
     };
 }
 
