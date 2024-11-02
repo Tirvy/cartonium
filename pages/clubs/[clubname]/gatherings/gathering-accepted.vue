@@ -165,7 +165,7 @@ definePageMeta({
   ]
 })
 
-onBeforeRouteLeave(() => {
+onBeforeUnmount(() => {
   lastGathering.value = undefined;
   lastGatheringName.value = '';
 })

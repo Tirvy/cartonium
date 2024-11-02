@@ -21,8 +21,13 @@ export default defineNuxtConfig({
         // @ts-expect-error
         config.plugins.push(vuetify({ autoImport: true }))
       })
-    }, '@nuxtjs/supabase'],
-
+    }, '@nuxtjs/supabase', 'dayjs-nuxt'
+  ],
+  dayjs: {
+    plugins: ['weekday'],
+    locales: ['ru'],
+    defaultLocale: 'ru',
+  },
   imports: {
     dirs: ['types/*.ts'],
   },
@@ -74,6 +79,7 @@ export default defineNuxtConfig({
         secure: false
       }
     },
+    ssr: false,
   },
 
   compatibilityDate: '2024-10-24',

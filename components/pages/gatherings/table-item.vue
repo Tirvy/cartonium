@@ -420,18 +420,15 @@ const linkToItem = computed(() => {
 })
 
 // -- date calculation start
-import { useDate } from 'vuetify';
-const dateAdapter = useDate();
+const dayjs = useDayjs()
 const date = computed(() => {
-    const value = props.gathering.startDate;
-    const hours = dateAdapter.format(value, 'hours24h');
-    const minutes = dateAdapter.format(value, 'minutes');
+    const value = dayjs(props.gathering.startDate);
+    const time = value.format('HH:mm');
     return {
-        time: `${hours}:${minutes}`,
-        date: dateAdapter.format(value, 'fullDateWithWeekday'),
-        full: `${hours}:${minutes}` + '  -  ' + dateAdapter.format(value, 'fullDateWithWeekday'),
-        short: `${hours}:${minutes} | ${dateAdapter.format(value, 'shortDate')}`,
-        dateObj: new Date(value),
+        time,
+        full: `${time}, ${value.format('dddd, D MMMM')}`,
+        short: `${time} | ${value.format('D MMM')}`,
+        dateObj: new Date(value.toISOString()),
     }
 })
 // -- date calculation end
