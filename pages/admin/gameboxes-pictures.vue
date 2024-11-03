@@ -25,7 +25,6 @@ const { data, status, error, refresh, clear } = await useFetch('/api/supabase/ga
 const gameboxes: Ref<GameBoxWithClub[]> = ref(data.value.items);
 
 const columns = useConstants('columns');
-
 // const selected: Ref<number[]> = ref(gameboxes.value.map((item: GameBoxWithClub) => item.id));
 const selected: Ref<number[]> = ref([]);
 

@@ -20,7 +20,7 @@
                         Участники ({{ slots }}):
                     </div>
                     <p v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
-                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <user-avatar :value="guest" class="mb-1 select-none"></user-avatar>
                         <span class="ms-2">{{ guest.title }}</span>
                         <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
                             @{{ guest.telegramUsername }}
@@ -111,7 +111,7 @@
             <div class="d-flex justify-space">
                 <v-card-text>
                     <div v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
-                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <user-avatar :value="guest" class="mb-1 select-none"></user-avatar>
                         <span class="ms-1">{{ guest.title }}</span>
                         <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
                             @{{ guest.telegramUsername }}
@@ -171,7 +171,7 @@
                 </v-card-subtitle>
                 <v-card-text>
                     <p v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
-                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <user-avatar :value="guest" class="mb-1 select-none"></user-avatar>
                         <span class="ms-2">{{ guest.title }}</span>
                         <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
                             @{{ guest.telegramUsername }}
@@ -264,7 +264,7 @@
             <div class="d-flex justify-space">
                 <v-card-text>
                     <div v-for="guest in props.gathering.guests" :key="guest.imageUrl" class="mb-2">
-                        <user-avatar :value="guest" class="mb-1"></user-avatar>
+                        <user-avatar :value="guest" class="mb-1 select-none"></user-avatar>
                         <span class="ms-1">{{ guest.title }}</span>
                         <nuxt-link v-if="guest.telegramUsername" :to="guest.telegramLink" class="user-link">
                             @{{ guest.telegramUsername }}
@@ -462,6 +462,9 @@ const date = computed(() => {
 
 .link-icon {
     opacity: 0.8;
+}
 
+.select-none {
+    user-select: none;
 }
 </style>
