@@ -11,6 +11,7 @@ import type { Club } from '~/types/frontend';
 
 
 definePageMeta({
+  name: 'club-root',
   layout: 'in-da-club',
   validate: async (to) => {
     const currentClub: Ref<Club | null> = useState('club');
@@ -32,9 +33,12 @@ definePageMeta({
         const clubDataUpdate = useUpdateClubData();
         const newClubData = await clubDataUpdate(clubname);
         currentClub.value = newClubData;
-
       }
-
+    },
+    function (to, from) {
+      if (to.name === 'club-root') {
+        return navigateTo('./gatherings')
+      }
     },
   ],
 });
