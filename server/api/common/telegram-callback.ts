@@ -1,12 +1,13 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server';
+import { serverSupabaseClient } from '#supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import telegramPasswordGenerator from '~/server/utils/telegram-password-generator';
+import type { User } from '@supabase/auth-js';
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
-  console.time('register ' + query.id);
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -15,27 +16,25 @@ export default defineEventHandler(async (event) => {
   }
 
   const imagineryPassword = telegramPasswordGenerator(tgData);
-  console.timeLog('register ' + query.id);
+  const metaData = getMetadataObject(tgData);
   let singInRes = null;
   let signUpRes = await client.auth.signUp(
     {
       email: `${tgData.id}@tgauth-happens.com`,
       password: imagineryPassword,
       options: {
-        data: getMetadataObject(tgData),
+        data: metaData
       }
     }
   );
-  console.timeLog('register ' + query.id);
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
       password: imagineryPassword,
     });
-    console.timeLog('register ' + query.id);
     if (!singInRes.error) {
-      const updateRes = await client.auth.updateUser({
-        data: getMetadataObject(tgData),
+      await client.auth.updateUser({
+        data: metaData,
       })
     } else {
       throw createError({
@@ -45,41 +44,22 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  console.timeLog('register ' + query.id);
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
-  console.timeLog('register ' + query.id);
   if (sessionSource) {
-    console.timeLog('register ' + query.id);
+    updateUserData(client, sessionSource.user, tgData);
     const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
     });
-    console.timeLog('register ' + query.id);
     const returnValue = query.next + '?' + urlParams;
-    console.timeEnd('register ' + query.id);
     return { url: returnValue };
   }
 
-  console.timeLog('register ' + query.id);
   throw createError({
     statusCode: 400,
     statusMessage: 'No user',
   });
 })
-
-function getNextRoute(next: string, queryParams: any): string {
-  let ret = `${next}`;
-  if (ret[0] !== '/') {
-    ret = `/${ret}`;
-  }
-  if (ret.includes('?')) {
-    ret += '&';
-  } else {
-    ret += '?';
-  }
-  ret += Object.entries(queryParams).map(([key, value]) => `${key}=${value}`).join('&');
-  return ret;
-}
 
 function getMetadataObject(tgData: TelegramLoginPayload) {
   return {
@@ -91,4 +71,17 @@ function getMetadataObject(tgData: TelegramLoginPayload) {
     telegram_username: tgData.username,
     is_imaginery: true,
   }
+}
+
+async function updateUserData(client: SupabaseClient, user: User, tgData: TelegramLoginPayload) {
+  const ret = await client.from('profiles').upsert({
+    id: user.id,
+    updated_at: new Date(),
+    full_name: [tgData.first_name, tgData.last_name].filter(Boolean).join(' '),
+    avatar_url: tgData.photo_url,
+    telegram_username: tgData.username,
+    bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
+    chat_id: tgData.id,
+  }, { onConflict: 'id' }).select();
+  console.log(ret);
 }

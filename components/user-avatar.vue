@@ -1,6 +1,6 @@
 <template>
   <v-avatar :image="avatar.pictureUrl" color="yellow" size="18" class="avatar-root">
-    <v-img :alt="avatar.name" v-if="avatar.pictureUrl" :src="avatar.pictureUrl"></v-img>
+    <v-img :alt="avatar.initials" v-if="avatar.pictureUrl" :src="avatar.pictureUrl"></v-img>
     <template v-else>
       {{ avatar.initials }}
     </template>
