@@ -371,6 +371,12 @@ async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
                 return;
             }
 
+            ret.forEach(async (gamebox)=> {
+                await $fetch('/api/supabase/gamebox-picture',
+                    { method: 'post', body: {gamebox: {id: gamebox.id, photoUrl: gamebox.photo_url}} }
+                )
+            });
+
             loaders.value.gettingData = true;
             await $fetch('/api/supabase/add-games-to-club',
                 {
