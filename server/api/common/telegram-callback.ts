@@ -2,12 +2,21 @@ import { serverSupabaseClient } from '#supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import telegramPasswordGenerator from '~/server/utils/telegram-password-generator';
 import type { User } from '@supabase/auth-js';
+import telegramBots from '~/server/utils/telegram-bots';
+
+const techChatId = 327078611;
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const query = getQuery(event);
   const tgData = query as unknown as TelegramLoginPayload;
   const authed = checkTelegramAuth(tgData);
+
+  telegramBots.botLogger?.sendMessage({
+    chat_id: techChatId,
+    text: `login attempt from tgData:\n${JSON.stringify(tgData)}`
+  })
+
   if (!authed) {
     throw createError({
       statusCode: 400,
@@ -27,6 +36,14 @@ export default defineEventHandler(async (event) => {
       }
     }
   );
+
+  if (!signUpRes.error) {
+    telegramBots.botLogger?.sendMessage({
+      chat_id: techChatId,
+      text: `signup of ${tgData.id} is successfull`
+    })
+  }
+
   if (signUpRes.error?.message === 'User already registered') {
     singInRes = await client.auth.signInWithPassword({
       email: `${tgData.id}@tgauth-happens.com`,
@@ -35,6 +52,10 @@ export default defineEventHandler(async (event) => {
     if (!singInRes.error) {
       await client.auth.updateUser({
         data: metaData,
+      })
+      telegramBots.botLogger?.sendMessage({
+        chat_id: techChatId,
+        text: `login of ${tgData.id} is successfull`
       })
     } else {
       throw createError({
@@ -83,5 +104,4 @@ async function updateUserData(client: SupabaseClient, user: User, tgData: Telegr
     bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
     chat_id: tgData.id,
   }, { onConflict: 'id' }).select();
-  console.log(ret);
 }

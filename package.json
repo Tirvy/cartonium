@@ -15,6 +15,7 @@
     "@nuxtjs/supabase": "^1.4.1",
     "dayjs-nuxt": "^2.1.11",
     "nuxt": "^3.13.2",
+    "prettier": "^3.3.3",
     "typescript": "^5.6.3",
     "vite-plugin-vuetify": "^2.0.4",
     "vue": "latest",
@@ -29,6 +30,7 @@
     "maska": "^2.1.11",
     "quill": "^2.0.2",
     "sass": "^1.66.1",
-    "type-fest": "^4.26.1"
+    "type-fest": "^4.26.1",
+    "typescript-telegram-bot-api": "^0.4.0"
   }
 }
