@@ -28,7 +28,7 @@ onMounted(() => {
     else {
       const route = useRoute();
       const nextRoute = props.next || route.fullPath;
-      script.setAttribute('data-auth-url', '/auth/telegram-callback-page?next=' + nextRoute);
+      script.setAttribute('data-auth-url', '/auth/telegram-callback?next=' + nextRoute);
     }
     script.setAttribute('data-request-access', 'write');
     telegramLoginButton.value.appendChild(script);

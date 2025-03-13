@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   if (!signUpRes.error) {
     telegramBots.botLogger?.sendMessage({
       chat_id: techChatId,
-      text: `signup of ${tgData.id} is successfull`
+      text: `signup of ${tgData.id}${tgData.username ? ' - @'+tgData.username : ''} is successfull`
     })
   }
 
