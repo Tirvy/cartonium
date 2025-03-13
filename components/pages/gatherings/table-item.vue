@@ -320,7 +320,7 @@
                             size="16"></v-icon>
                         Вы записаны
                         <span v-if="gatheringComputedValue.myGuests > 1">
-                            (+ {{ gatheringComputedValue.myGuests - 1 }} ваших гостя)
+                            (+ {{ gatheringComputedValue.myGuests - 1 }} ваш(их) гост(ь/ей))
                         </span>
                     </span>
                 </v-card-subtitle>

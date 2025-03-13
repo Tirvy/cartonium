@@ -1,6 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
-import { gatheringFromSupabase } from '~/server/transformers'
+import { gatheringFromSupabase } from '~/server/transformers';
+import telegramBots from '~/server/utils/telegram-bots';
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event)
@@ -17,6 +18,12 @@ export default defineEventHandler(async (event) => {
       user_id: body.guest_id,
       guests_number: body.number,
     }, { onConflict: 'gathering_id, user_id' }).select().single();
+
+  telegramBots.botPublic?.sendMessage({
+    chat_id: 327078611,
+    text: `Успешно записались на игру`
+  });
+
   if (error) {
     throw createError({ statusMessage: error.message })
   }
