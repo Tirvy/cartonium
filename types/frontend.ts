@@ -289,3 +289,11 @@ export interface Table {
     description: string;
     peopleMax: number | string;
 }
+
+export interface TelegramNotification {
+    to: number,
+    type: 'gathering-player-change',
+    why: string,
+    what: string,
+    bot_name: string | undefined,
+}
