@@ -1,15 +1,9 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
 import { gatheringFromSupabase } from '~/server/transformers';
-import telegramBots from '~/server/utils/telegram-bots';
 import sendTelegramMessage from '~/server/utils/messages-store';
 
 import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
-  // Provide a custom schema. Defaults to "public".
-  db: { schema: 'other_schema' }
-})
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event)

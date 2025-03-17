@@ -46,6 +46,17 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    experimental: {
+      tasks: true
+    },
+    scheduledTasks: {
+      // Run `cms:update` task every minute
+      // Change to at least 5 minutes
+      '* * * * *': ['telegram:send-messages']
+    }
+  },
+
   runtimeConfig: {
     public: {
       botLogin: '',

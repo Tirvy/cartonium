@@ -295,5 +295,5 @@ export interface TelegramNotification {
     type: 'gathering-player-change',
     why: string,
     what: string,
-    bot_name: string | undefined,
+    bot_name: string,
 }
