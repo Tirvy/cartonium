@@ -2,7 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server';
 import type { H3Event, EventHandlerRequest } from 'h3';
 import type { TelegramNotification } from "~/types/frontend.js";
 
-export default async function sendTelegramMessage(event: H3Event<EventHandlerRequest>, message: TelegramNotification) {
+export default async function storeMessage(event: H3Event<EventHandlerRequest>, message: TelegramNotification) {
   const client = serverSupabaseServiceRole(event);
 
   const result = await client.schema('pgmq_public').rpc('send', {

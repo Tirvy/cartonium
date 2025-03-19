@@ -1,4 +1,4 @@
-export interface GameboxAddData{
+export interface GameboxAddData {
     name: string
     preciseSearch?: string
     foundGamebox: GameBox | null,
@@ -295,5 +295,5 @@ export interface TelegramNotification {
     type: 'gathering-player-change',
     why: string,
     what: string,
-    bot_name: string,
+    bot_name: string | undefined,
 }

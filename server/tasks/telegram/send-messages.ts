@@ -1,10 +1,10 @@
 import telegramBots from '~/server/utils/telegram-bots';
 import { serverSupabaseServiceRole } from '#supabase/server';
 import { type H3Event } from 'h3';
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 const supabaseClient = createClient<Database, 'pgmq_public'>(process.env.SUPABASE_URL + '', process.env.SUPABASE_SERVICE_KEY + '', {
   db: { schema: 'pgmq_public' }
-})
+});
 
 export default defineTask({
   meta: {
