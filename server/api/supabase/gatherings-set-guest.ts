@@ -1,9 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
-import { gatheringFromSupabase } from '~/server/transformers';
 import telegramNotify from '~/server/utils/telegram-notify';
-import { H3Event } from 'h3';
-import type { PostgrestResponse, PostgrestSingleResponse } from '@supabase/postgrest-js';
 import type { User } from '@supabase/auth-js';
 
 export default defineEventHandler(async (event) => {
@@ -46,23 +43,23 @@ export default defineEventHandler(async (event) => {
 
 function creatMessage(user: User, newData: Database['public']['Tables']['gatherings_guests']['Row'], previousData: Database['public']['Views']['gatherings_with_guests']['Row'][]) {
   let message = 'Gathering for ';
-  let username = user.user_metadata.full_name;
-  if (user.user_metadata.telegram_username) {
-    username += ` @${user.user_metadata.telegram_username}`;
-  }
-
+  
   const userPrevData = previousData.find(item => item.user_id === user.id);
   const userPrevGuests = userPrevData?.guests_number;
   const userNewGuests = newData.guests_number;
   const gatheringData: Database['public']['Views']['gatherings_with_guests']['Row'] = previousData[0];
 
-  message += (gatheringData.gamebox?.title || gatheringData.own_name);
+  message += `*${(gatheringData.gamebox?.title || gatheringData.own_name)}*`;
   if (gatheringData.start_date) {
     const date = (new Date(gatheringData.start_date)).toLocaleDateString();
     message += ' at ' + date;
   }
   message += ':\n';
 
+  let username = user.user_metadata.full_name;
+  if (user.user_metadata.telegram_username) {
+    username += ` @${user.user_metadata.telegram_username}`;
+  }
   if (!userPrevData || userPrevGuests === 0) {
     message += `${username} joined`
     if (userNewGuests > 1) {

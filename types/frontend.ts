@@ -292,7 +292,7 @@ export interface Table {
 
 export interface TelegramNotification {
     to: number,
-    type: 'gathering-player-change',
+    type: 'gathering-player-change' | 'gathering-removed',
     why: string,
     what: string,
     bot_name: string | undefined,
