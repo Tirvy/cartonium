@@ -41,7 +41,10 @@ export default defineEventHandler(async (event) => {
 
 function getMessage(gatheringData: Database['public']['Views']['gatherings_with_guests']['Row']) {
     let message = 'Gathering for ';
-    message += `*${(gatheringData.gamebox?.title || gatheringData.own_name)}*`;
+
+    const gamebox = gatheringData.gamebox as Database['public']['Tables']['gameboxes']['Row'];
+    message += `*${(gamebox?.title || gatheringData.own_name)}*`;
+    
     if (gatheringData.start_date) {
         const date = (new Date(gatheringData.start_date)).toLocaleDateString();
         message += ' at ' + date;

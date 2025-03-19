@@ -43,13 +43,15 @@ export default defineEventHandler(async (event) => {
 
 function creatMessage(user: User, newData: Database['public']['Tables']['gatherings_guests']['Row'], previousData: Database['public']['Views']['gatherings_with_guests']['Row'][]) {
   let message = 'Gathering for ';
-  
+
   const userPrevData = previousData.find(item => item.user_id === user.id);
   const userPrevGuests = userPrevData?.guests_number;
   const userNewGuests = newData.guests_number;
   const gatheringData: Database['public']['Views']['gatherings_with_guests']['Row'] = previousData[0];
 
-  message += `*${(gatheringData.gamebox?.title || gatheringData.own_name)}*`;
+  const gamebox = gatheringData.gamebox as Database['public']['Tables']['gameboxes']['Row'];
+  message += `*${(gamebox?.title || gatheringData.own_name)}*`;
+
   if (gatheringData.start_date) {
     const date = (new Date(gatheringData.start_date)).toLocaleDateString();
     message += ' at ' + date;
