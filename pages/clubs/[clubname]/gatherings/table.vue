@@ -12,7 +12,7 @@
             Гости - это люди, которые придут с вами на сбор, но которые не хотят (или не могут) зайти в приложение и
             присоединиться сами
             <v-text-field :rules="[ruleIsNumber, ruleIsNotNegative, ruleLessThanMaxGuests]"
-              v-model="guestsDialogNumber">
+              v-model="guestsDialogNumber" autofocus>
 
             </v-text-field>
           </template>

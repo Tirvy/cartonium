@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusMessage: error.message })
   }
 
-  if (previousDataResponse?.data) {
+  if (previousDataResponse.data?.length) {
     const message = creatMessage(user, data, previousDataResponse?.data);
 
     telegramNotify(event, {
@@ -46,21 +46,32 @@ export default defineEventHandler(async (event) => {
 
 function creatMessage(user: User, newData: Database['public']['Tables']['gatherings_guests']['Row'], previousData: Database['public']['Views']['gatherings_with_guests']['Row'][]) {
   let message = 'Gathering for ';
-  const username = user.user_metadata.full_name;
+  let username = user.user_metadata.full_name;
+  if (user.user_metadata.telegram_username) {
+    username += ` @${user.user_metadata.telegram_username}`;
+  }
 
-  const userPrevData = previousData.find(item => { item.user_id === user.id });
+  const userPrevData = previousData.find(item => item.user_id === user.id);
   const userPrevGuests = userPrevData?.guests_number;
   const userNewGuests = newData.guests_number;
+  const gatheringData: Database['public']['Views']['gatherings_with_guests']['Row'] = previousData[0];
+
+  message += (gatheringData.gamebox?.title || gatheringData.own_name);
+  if (gatheringData.start_date) {
+    const date = (new Date(gatheringData.start_date)).toLocaleDateString();
+    message += ' at ' + date;
+  }
+  message += ':\n';
 
   if (!userPrevData || userPrevGuests === 0) {
-    message = `${username} joined`
+    message += `${username} joined`
     if (userNewGuests > 1) {
       message += ` with ${userNewGuests - 1} guests`;
     }
   } else if (newData?.guests_number === 0) {
-    message = `${username} left`
+    message += `${username} left`
   } else if (userPrevGuests) {
-    message = `${username} has changed number of guests from ${userPrevGuests - 1} to ${userNewGuests - 1}`
+    message += `${username} has changed number of their guests from ${userPrevGuests - 1} to ${userNewGuests - 1}`
   }
   return message
 }
