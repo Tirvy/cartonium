@@ -1,10 +1,14 @@
 <template>
-  <v-card @mousedown="checkMousedown" @mouseup="checkMouseup">
+  <v-card @mousedown="checkMousedown" @touchstart="checkMousedown" @mouseup="checkMouseup" @mouseexit="checkMouseup"
+    @touchend="checkMouseup">
     <v-row>
-      <v-col v-for="(day, dayIndex) in days" :key="dayIndex">
-        <v-btn-toggle :model-value="day" hide-details multiple class="flex-column" style="height: auto">
+      <v-col v-for="(day, dayIndex) in days" :key="dayIndex" class="d-flex flex-column align-center">
+        <div class="text-center">
+          {{ dayNames[dayIndex] }}
+        </div>
+        <v-btn-toggle :model-value="day" hide-details multiple class="flex-column" style="height: auto;" @touchmove.prevent>
           <v-btn v-for="(timeName, timeIndex) in timeNames" :key="timeIndex" :value="timeIndex" :day-index="dayIndex"
-            :time-index="timeIndex" @mouseenter="checkMouseenter">
+            :time-index="timeIndex" @mousemove="checkMouseenter" @touchmove="checkMouseenter">
             {{ timeName }}
           </v-btn>
         </v-btn-toggle>
@@ -34,6 +38,15 @@ const timeNames = computed(() => {
   }
   return ret;
 });
+const dayNames = computed(() => {
+  let iteratingDatetime = dayjs(props.startDate).startOf('day');
+  let ret = [];
+  for (let i = 0; i < defaultWeekLength; ++i) {
+    ret.push(iteratingDatetime.format('dd'));
+    iteratingDatetime = iteratingDatetime.add(1, 'day');
+  }
+  return ret;
+});
 
 const mouseDownBorders = ref<{ start: number | null, end: number | null }[] | null>(null)
 function checkMousedown(event: MouseEvent) {
@@ -49,12 +62,24 @@ function checkMouseup() {
   updateSegments();
   mouseDownBorders.value = null;
 }
-function checkMouseenter(event: MouseEvent) {
+function checkMouseenter(event: MouseEvent | TouchEvent) {
   if (mouseDownBorders.value) {
-    const targetElement = event.target as HTMLElement;
+    const targetElement = (() => {
+      if (event.type.includes('touch')) {
+        const touchEvent = event as TouchEvent;
+        const xcoord = touchEvent.touches ? touchEvent.touches[0].clientX : touchEvent.targetTouches[0].clientX;
+        const ycoord = touchEvent.touches ? touchEvent.touches[0].clientY : touchEvent.targetTouches[0].clientY;
+        // get element in coordinates:
+        const targetElement = document.elementFromPoint(xcoord, ycoord);
+        return targetElement as HTMLElement;
+      }
+      return event.target as HTMLElement;
+    })();
+
+
     const buttonElement = targetElement.closest('[day-index]');
     if (!buttonElement) {
-      console.warn('egor');
+      // its a touch action out of bounds, so no action required
       return;
     }
     const dayIndex = +(buttonElement.getAttribute('day-index') as string);
@@ -118,7 +143,6 @@ const days = computed<boolean[][]>(() => {
 });
 
 function invertSegment(dayIndex: number, timeIndex: number) {
-  console.log(dayIndex, timeIndex);
   const segmentIndex = dayIndex * segmentsInDay + timeIndex;
   const ret = [...segmentsSource.value];
   ret[segmentIndex] = !ret[segmentIndex];
