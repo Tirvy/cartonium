@@ -32,7 +32,7 @@
           {{ dayNames[dayIndex] }}
         </div>
         <v-btn-toggle :model-value="day" hide-details multiple class="flex-column" style="height: auto;"
-          @touchmove.prevent>
+          @touchmove.prevent @update:model-value="updateModelValue(dayIndex, $event)">
           <v-btn v-for="(timeName, timeIndex) in timeNames" :key="timeIndex" :value="timeIndex" :day-index="dayIndex"
             :time-index="timeIndex" @mousemove="checkMouseenter" @touchmove="checkMouseenter">
             {{ timeName }}
@@ -46,11 +46,12 @@
 <script lang="ts" setup>
 const props = defineProps<{
   loading?: boolean,
-  startDate?: Date,
+  startDate: Dayjs,
   // segmentSize: number,
   segments?: boolean[]
 }>();
 import { useDisplay } from 'vuetify';
+import type { Dayjs } from 'dayjs';
 const { mobile } = useDisplay();
 const daySlideNumber = ref(0);
 const dayjs = useDayjs();
@@ -62,7 +63,7 @@ const timeNames = computed(() => {
   let iteratingDatetime = dayjs(props.startDate).startOf('day');
   let ret = [];
   for (let i = 0; i < segmentsInDay; ++i) {
-    ret.push(iteratingDatetime.format('hh:mm'));
+    ret.push(iteratingDatetime.format('HH:mm'));
     iteratingDatetime = iteratingDatetime.add(defaultSegmentSize, 'minutes');
   }
   return ret;
@@ -119,8 +120,8 @@ function checkMouseenter(event: MouseEvent | TouchEvent) {
     const start = mouseDownBorders.value[dayIndex].start;
     if (!start) {
       mouseDownBorders.value[dayIndex].start = timeIndex;
-    } else if (start === timeIndex) {
-      mouseDownBorders.value[dayIndex].start = null;
+      // } else if (start === timeIndex) {
+      //   mouseDownBorders.value[dayIndex].start = null;
     } else {
       mouseDownBorders.value[dayIndex].end = timeIndex;
     }
@@ -146,7 +147,20 @@ function calcSourceSegments() {
   return initSegments;
 }
 function updateSegments() {
+  if (mouseDownBorders.value?.every(day => {
+    return !day.start || !day.end || day.start === day.end;
+  })) {
+    return;
+  }
   const newSegments = calcSourceSegments();
+  emit('change', newSegments);
+}
+function updateModelValue(dayIndex: number, value: number[]) {
+  const newSegments = calcSourceSegments();
+  const dayStartIndex = dayIndex * segmentsInDay;
+  for (let i = 0; i < segmentsInDay; ++i) {
+    newSegments[i + dayStartIndex] = value.includes(i);
+  }
   emit('change', newSegments);
 }
 
@@ -156,14 +170,14 @@ const startDate = computed(() => {
   return startDate;
 })
 
-const segmentsSource = computed(() => {
+const segmentsSource = computed<boolean[]>(() => {
   if (props.segments && props.segments.length === defaultSegmentsLength) {
     return props.segments;
   }
   return new Array(defaultSegmentsLength).fill(false)
 });
 
-const days = computed<boolean[][]>(() => {
+const days = computed<number[][]>(() => {
   let ret = [];
   const segments = calcSourceSegments();
   for (let i = 0; i < segments.length; i += segmentsInDay) {
