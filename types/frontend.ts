@@ -297,3 +297,16 @@ export interface TelegramNotification {
     what: string,
     bot_name: string | undefined,
 }
+
+export interface Schedule {
+    history: ScheduleHistoryItem[]
+    title: string
+    id: number
+    visibility: 'hidden'
+}
+export interface ScheduleHistoryItem {
+    created: Date
+    segmentSize: number
+    segments: boolean[]
+    id: number
+}

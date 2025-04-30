@@ -4,6 +4,12 @@
       <template v-if="user">
         <v-row>
           <v-col>
+            <v-btn :to="{ name: 'schedules' }" variant="plain" v-bind:append-icon="'mdi-arrow-right-thin'">
+              График свободного времени</v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
             <v-switch v-model="isDarkTheme" label="Включить ночную тему"></v-switch>
           </v-col>
         </v-row>

@@ -51,9 +51,8 @@ export default defineNuxtConfig({
       tasks: true
     },
     scheduledTasks: {
-      // Run `cms:update` task every minute
-      // Change to at least 5 minutes
-      '* * * * *': ['telegram:send-messages']
+      // Running `telegram messages` task every minute
+      // '* * * * *': ['telegram:send-messages']
     }
   },
 

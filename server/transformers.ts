@@ -1,4 +1,4 @@
-import type { ClubCollection, ClubInfo, Club, GameBox, Gathering, GatheringWithGuests } from '~/types/frontend.js';
+import type { ClubCollection, ClubInfo, Club, GameBox, Gathering, GatheringWithGuests, Schedule } from '~/types/frontend.js';
 
 // clubs
 export function clubFromSupabase(data: any, clubSettingsData: any): Club {
@@ -141,5 +141,18 @@ export function tablesFromSupabase(data: any): Table {
         title: data.title,
         description: data.description,
         peopleMax: data.people_max,
+    };
+}
+
+export function scheduleFromSupabase(data: any): Schedule {
+    return {
+        id: data.id,
+        title: data.title,
+        visibility: data.visibility,
+        history: data?.history?.map((item: any) => {
+            return {
+                segments: item.segments
+            }
+        }) || []
     };
 }
