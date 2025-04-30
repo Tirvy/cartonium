@@ -17,17 +17,17 @@
         <v-form @submit.prevent="applyFilter">
             <v-list density="compact" nav>
                 <v-list-item>
-                    Фильтры
+                    {{ $t('filters') }}
                 </v-list-item>
                 <v-list-item>
-                    <v-text-field v-model="filter.title" label="Название" clearable></v-text-field>
+                    <v-text-field v-model="filter.title" :label="$t('title')" clearable></v-text-field>
                 </v-list-item>
                 <v-list-item v-if="settings.collectionSearchRating">
                     <v-text-field v-model="filter.minRating" :rules="[ruleIsNumber]" label="Рейтинг, min, 0 - 10"
                         clearable></v-text-field>
                 </v-list-item>
                 <v-list-item v-if="settings.collectionSearchPlayers">
-                    <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" label="Кол-во игроков"
+                    <v-text-field v-model="filter.playerCount" :rules="[ruleIsNumber]" :label="$t('player_number')"
                         clearable></v-text-field>
                 </v-list-item>
                 <v-list-item v-if="settings.collectionSearchDuration">
@@ -35,7 +35,7 @@
                         clearable></v-text-field>
                 </v-list-item>
                 <v-list-item>
-                    <v-btn type="submit">Искать</v-btn>
+                    <v-btn type="submit">{{ $t('to_search') }}</v-btn>
                 </v-list-item>
             </v-list>
         </v-form>

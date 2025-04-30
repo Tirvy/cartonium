@@ -21,8 +21,15 @@ export default defineNuxtConfig({
         // @ts-expect-error
         config.plugins.push(vuetify({ autoImport: true }))
       })
-    }, '@nuxtjs/supabase', 'dayjs-nuxt'
+    }, '@nuxtjs/supabase', 'dayjs-nuxt', '@nuxtjs/i18n'
   ],
+  i18n: {
+    defaultLocale: 'ru',
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json', language: 'en-US' },
+      { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' }
+    ]
+  },
   dayjs: {
     plugins: ['weekday'],
     locales: ['ru'],

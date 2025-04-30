@@ -12,6 +12,7 @@
     "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts"
   },
   "devDependencies": {
+    "@nuxtjs/i18n": "^9.5.3",
     "@nuxtjs/supabase": "^1.4.1",
     "dayjs-nuxt": "^2.1.11",
     "nuxt": "^3.13.2",
