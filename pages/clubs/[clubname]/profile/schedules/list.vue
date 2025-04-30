@@ -35,7 +35,7 @@
                   Ваши расписания
                 </v-card-title>
                 <v-card-text>
-                  <nuxt-link v-for="schedule in schedules" :to="'./schedules/item/' + schedule.id">
+                  <nuxt-link v-for="schedule in schedules" :to="'./item/' + schedule.id">
                     <v-list-item link :title="schedule.title"></v-list-item>
 
                   </nuxt-link>
