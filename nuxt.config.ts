@@ -1,4 +1,3 @@
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -16,12 +15,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    (_options, nuxt) => {
-      nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
-    }, '@nuxtjs/supabase', 'dayjs-nuxt', '@nuxtjs/i18n'
+    '@nuxtjs/supabase', 'dayjs-nuxt', '@nuxtjs/i18n', 'vuetify-nuxt-module'
   ],
   i18n: {
     defaultLocale: 'ru',
@@ -69,11 +63,6 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['vuetify/lib/styles/main.sass'],
-
-  build: {
-    transpile: ['vuetify', 'tiptap-vuetify'],
-  },
 
   typescript: {
     // "have an 'override' modifier" error in supabase/auth-js @tirvy 10.24

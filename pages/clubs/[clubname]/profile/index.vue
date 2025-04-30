@@ -4,8 +4,8 @@
       <template v-if="user">
         <v-row>
           <v-col>
-            <v-btn :to="{ name: 'schedules' }" variant="plain" v-bind:append-icon="'mdi-arrow-right-thin'">
-              График свободного времени</v-btn>
+            <!-- <v-btn :to="{ name: 'schedules' }" variant="plain" v-bind:append-icon="'mdi-arrow-right-thin'">
+              График свободного времени</v-btn> -->
           </v-col>
         </v-row>
         <v-row>
