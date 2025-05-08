@@ -1,11 +1,11 @@
-Key,"en","ru","de"
-nav.gatherings,"Events","Сборы","Hallo"
-nav.club_info,Club info,,
-nav.profile,Profile,,
-nav.collection,Collection,,
-nav.club_settings,Club settings,,
-filters,Filters,,
-title,Title,,
-player_number,Players number,,
-to_search,Find,,
-schedules_list,Schedules list,,
+Key,"en","ru","ka"
+nav.gatherings,"Events","Сборы","შეკრებები"
+nav.club_info,Club info,О клубе,
+nav.profile,Profile,Профиль,
+nav.collection,Collection,Коллекция,
+nav.club_settings,Club settings,Настройки клуба,
+filters,Filters,Фильтры,
+title,Title,Название,
+player_number,Players number,Кол-во игроков,
+to_search,Find,Найти,
+schedules_list,Schedules list,Список расписаний,
