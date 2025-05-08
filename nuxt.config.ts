@@ -15,8 +15,15 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@nuxtjs/supabase', 'dayjs-nuxt', '@nuxtjs/i18n', 'vuetify-nuxt-module'
+    '@nuxtjs/supabase',
+    'dayjs-nuxt',
+    '@nuxtjs/i18n',
+    'vuetify-nuxt-module',
+    'nuxt-translation-manager',
   ],
+  'translation-manager': {
+    langDir: 'i18n/locales',
+  },
   i18n: {
     defaultLocale: 'ru',
     detectBrowserLanguage: {
@@ -24,7 +31,8 @@ export default defineNuxtConfig({
     },
     locales: [
       { code: 'en', name: 'English', file: 'en.json', language: 'en-US' },
-      { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' }
+      { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' },
+      { code: 'ka', name: 'ქართული', file: 'ka.json', language: 'ka-GE'}
     ]
   },
   dayjs: {
