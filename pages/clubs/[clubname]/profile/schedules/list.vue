@@ -32,7 +32,7 @@
             <v-col>
               <v-card>
                 <v-card-title>
-                  Ваши расписания
+                  {{ $t('schedules_list') }}
                 </v-card-title>
                 <v-card-text>
                   <nuxt-link v-for="schedule in schedules" :to="'./item/' + schedule.id">

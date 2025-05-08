@@ -2,5 +2,16 @@
     "filters": "Filters",
     "title": "Title",
     "player_number": "Player number",
-    "to_search": "find"
+    "to_search": "find",
+    "schedules_list": "Your Schedules",
+    "input": {
+        "clear": "clear"
+    },
+    "nav": {
+        "gatherings": "Events",
+        "club_info": "Club info",
+        "profile": "Profile",
+        "collection": "Collection",
+        "club_settings": "Club Settings"
+    }
 }

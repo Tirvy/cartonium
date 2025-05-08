@@ -1,6 +1,14 @@
 {
-  "filters": "Фильтры",
-  "title": "Название",
-  "player_number": "Кол-во игроков",
-  "to_search": "Искать"
+    "filters": "Фильтры",
+    "title": "Название",
+    "player_number": "Кол-во игроков",
+    "to_search": "Искать",
+    "schedules_list": "Ваши расписания",
+    "input": {
+        "clear": "Очистить"
+    },
+    "nav": {
+        "gatherings": "Сборы",
+        "club_info": "О клубе"
+    }
 }

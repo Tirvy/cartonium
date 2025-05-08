@@ -11,7 +11,26 @@
         </nuxt-link>
       </template>
 
-      <v-app-bar-title>{{ currentClub?.title }}</v-app-bar-title>
+      <template v-slot:title>
+        <v-app-bar-title>{{ currentClub?.title }}</v-app-bar-title>
+      </template>
+
+      <template v-slot:default>
+
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn color="primary" v-bind="props">
+              {{ locale }}
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item v-for="(item, index) in locales" :key="index" :value="index" @click="setLocale(item.code)">
+              <v-list-item-title>{{ item.name }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
 
       <template v-slot:append>
         <NuxtLink v-if="avatar.show" :to="profileLink">
@@ -32,7 +51,7 @@
     <v-bottom-navigation grow color="grey" height="44" fixed>
       <v-btn v-for="page in pagesList" :to="page.path">
         <v-icon :icon="page.icon"></v-icon>
-        <span>{{ page.title }}</span>
+        <span>{{ pagesTitles[page.alias] }}</span>
       </v-btn>
     </v-bottom-navigation>
 
@@ -50,6 +69,10 @@
 
 const redirectPath = useCookie('sb-redirect-path');
 const currentClub: Ref<Club> = useState('club');
+
+
+// locales
+const { locales, locale, setLocale, t } = useI18n();
 
 const lastClub = computed(() => {
   const path = redirectPath.value || "";
@@ -69,31 +92,41 @@ const profileLink = `/clubs/${clubName.value}/profile`;
 const adminLoginLink = `/clubs/${clubName.value}/admin-login`;
 const clubSettings = `/clubs/${clubName.value}/settings`;
 
+const pagesTitles = computed<{[k: string]: string}>(() => {
+  return {
+    gatherings: t('nav.gatherings'),
+    clubInfo: t('nav.club_info'),
+    collection: t('nav.collection'),
+    clubSettings: t('nav.club_settings'),
+    profile: t('nav.profile'),
+  }
+});
+
 let pages = [
   {
-    title: 'Сборы',
+    alias: 'gatherings',
     path: `/clubs/${clubName.value}/gatherings/table`,
     icon: 'mdi-table-furniture',
   },
   {
-    title: 'О клубе',
+    alias: 'clubInfo',
     path: `/clubs/${clubName.value}/information/public`,
     icon: 'mdi-information',
   },
   {
-    title: 'Коллекция',
+    alias: 'collection',
     path: `/clubs/${clubName.value}/collection`,
     icon: 'mdi-list-box',
   },
   {
-    title: 'Настройки клуба',
+    alias: 'clubSettings',
     path: `/clubs/${clubName.value}/settings`,
     icon: 'mdi-cog-outline',
     permissions: true,
     mobile: false,
   },
   {
-    title: 'Профиль',
+    alias: 'profile',
     path: `/clubs/${clubName.value}/profile`,
     icon: 'mdi-account',
     mobile: false,
@@ -160,5 +193,6 @@ const avatar = computed(() => {
     initials: initials.value,
   }
 });
+
 
 </script>
