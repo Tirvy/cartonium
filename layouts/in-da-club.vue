@@ -19,7 +19,8 @@
 
         <v-menu>
           <template v-slot:activator="{ props }">
-            <v-btn color="primary" v-bind="props">
+            <v-btn variant="tonal" v-bind="props" prepend-icon="mdi-web">
+
               {{ locale }}
             </v-btn>
           </template>
