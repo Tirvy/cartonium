@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', name: 'English', file: 'en.json', language: 'en-US' },
       { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' },
-      { code: 'ka', name: 'ქართული', file: 'ka.json', language: 'ka-GE'}
+      // { code: 'ka', name: 'ქართული', file: 'ka.json', language: 'ka-GE'},
     ]
   },
   dayjs: {
