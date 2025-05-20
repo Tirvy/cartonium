@@ -30,3 +30,6 @@ supabase
 
 # generated translations
 i18n/locales/*.json
+
+# cred files
+creds.json
