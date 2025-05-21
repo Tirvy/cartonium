@@ -1,15 +1,15 @@
-import type { phasesResponse, competition, rosterResponse, teamInfo } from "./types";
+import type { PhasesResponse, CompetitionBloodBowl, RosterResponse, TeamBloodBowl } from "./types";
 import dataStorage from './storage';
 
 const leagueName = process.env.NUXT_BOT_BLOODBOWL_LEAGUE || ''
 
-export async function getCurrentFixtures(): Promise<competition> {
-    const fixturesCached = await dataStorage.getItem<{ data: competition }>('fixtures');
+export async function getCurrentFixtures(): Promise<CompetitionBloodBowl> {
+    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl }>('fixtures');
     if (fixturesCached && fixturesCached.data) {
         return fixturesCached.data;
     }
 
-    const response = await $fetch<phasesResponse>(`https://tourplay.net/api/tournament/${leagueName}/phases?type=COACH`, {
+    const response = await $fetch<PhasesResponse>(`https://tourplay.net/api/tournament/${leagueName}/phases?type=COACH`, {
         "headers": {
             "accept": "application/json, text/plain, */*",
             "accept-language": "en",
@@ -29,7 +29,7 @@ export async function getCurrentFixtures(): Promise<competition> {
 
 
     const competitionInfo = responseToCompetition(response);
-    dataStorage.setItem<{ data: competition }>('fixtures', { data: competitionInfo });
+    dataStorage.setItem<{ data: CompetitionBloodBowl }>('fixtures', { data: competitionInfo });
     return competitionInfo;
 }
 
@@ -37,7 +37,7 @@ export function getLeagueLink() {
     return `https://tourplay.net/en/blood-bowl/${leagueName}/scores`
 }
 
-function responseToCompetition(phaseData: phasesResponse): competition {
+function responseToCompetition(phaseData: PhasesResponse): CompetitionBloodBowl {
     const seasonId = Math.max(...Object.keys(phaseData).map(e => +e));
     const seasonData = phaseData[seasonId];
     const roundData = seasonData.rounds[seasonData.rounds.length - 1];
@@ -55,7 +55,7 @@ function responseToCompetition(phaseData: phasesResponse): competition {
     }
 }
 
-function teamFromResponse(roster: rosterResponse): teamInfo {
+function teamFromResponse(roster: RosterResponse): TeamBloodBowl {
     return {
         teamName: roster.teamName,
         teamRace: roster.teamRace,

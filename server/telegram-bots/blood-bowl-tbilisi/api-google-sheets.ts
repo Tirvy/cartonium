@@ -1,4 +1,4 @@
-import type { competition, matchDataToSheet, telegramChatData, BloodBowlVote, HashedVotes } from "./types";
+import type { CompetitionBloodBowl, MatchDataToSheet, TelegramChatData, BloodBowlVote, HashedVotes } from "./types";
 
 
 import { google } from "googleapis";
@@ -13,7 +13,7 @@ const auth = new google.auth.GoogleAuth({
 });
 const sheets = google.sheets({ version: "v4", auth });
 
-export async function saveFixtures(competition: competition) {
+export async function saveFixtures(competition: CompetitionBloodBowl) {
     const dataToSave = {
         data: [{
             range: "fixtures!A2",
@@ -30,7 +30,7 @@ export async function saveFixtures(competition: competition) {
     });
 }
 
-function competitionToSheet(competition: competition): matchDataToSheet[] {
+function competitionToSheet(competition: CompetitionBloodBowl): MatchDataToSheet[] {
     return competition.matches.map(match => {
         return {
             matchId: match.matchId,
@@ -50,7 +50,7 @@ function competitionToSheet(competition: competition): matchDataToSheet[] {
     })
 }
 
-export async function updateTelegramChatsStore() {
+export async function fetchChatsToStore() {
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
         range: "chats names!A:D",
@@ -65,10 +65,10 @@ export async function updateTelegramChatsStore() {
             }
         }) || [],
     };
-    dataStorage.setItem('telegramChats', dataToSend);
+    await dataStorage.setItem('telegramChats', dataToSend);
 }
 
-export async function uploadNewTelegramChat(data: telegramChatData[], lengthToUpdate?: number) {
+export async function uploadNewTelegramChat(data: TelegramChatData[], lengthToUpdate?: number) {
     const values = data.map(item => Object.values(item)) as string[][];
     values.forEach(arr => arr[2] = JSON.stringify(arr[2]));
 

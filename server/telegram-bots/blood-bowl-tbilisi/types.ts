@@ -1,41 +1,41 @@
-export interface matchDataToSheet {
+export interface MatchDataToSheet {
     matchId: number,
     round: number,
     Local: string,
     Visitor: string,
-    result: teamPosition | undefined
+    result: VoteVariants
 }
 
-export interface telegramChatData {
+export interface TelegramChatData {
     chatId: number,
     tourplayName: string,
     meta: any,
     isAdmin: boolean
 }
 
-export interface match {
+export interface MatchBloodBowl {
     roundNumber: number,
     matchId: number,
     scoreResume: {
         totalScoreLocal: number,
         totalScoreVisitor: number,
-        winner: teamPosition
+        winner: TeamPosition
     } | undefined,
-    teamLocal: teamInfo
-    teamVisitor: teamInfo
+    teamLocal: TeamBloodBowl
+    teamVisitor: TeamBloodBowl
 }
 
-export interface competition {
-    matches: match[]
+export interface CompetitionBloodBowl {
+    matches: MatchBloodBowl[]
 }
 
-export interface teamInfo {
+export interface TeamBloodBowl {
     teamName: string,
     teamRace: string,
     userNameToShow: string,
 }
 
-export interface phasesResponse {
+export interface PhasesResponse {
     [competition_id: string]: {
         state: number,
         rounds: {
@@ -51,17 +51,17 @@ export interface phasesResponse {
                     scoreResume: {
                         totalScoreLocal: number,
                         totalScoreVisitor: number,
-                        winner: teamPosition
+                        winner: TeamPosition
                     } | undefined,
-                    rosterLocal: rosterResponse,
-                    rosterVisitor: rosterResponse,
+                    rosterLocal: RosterResponse,
+                    rosterVisitor: RosterResponse,
                 }[]
             }[]
         }[]
     }
 }
 
-export interface rosterResponse {
+export interface RosterResponse {
     teamName: string,
     teamRace: string,
     inscription: {
@@ -74,14 +74,15 @@ export interface rosterResponse {
 export interface BloodBowlVote {
     chatId: number,
     matchId: number,
-    choise: teamPosition | undefined,
+    choise: VoteVariants,
     date: number
 }
 
-export type teamPosition = "Local" | "Visitor"
+export type TeamPosition = "Local" | "Visitor"
+export type VoteVariants = "Local" | "Visitor" | "draw" | undefined
 
 export type HashedVotes = {
     [chatId: number]: {
-        [matchId: number]: teamPosition | undefined
+        [matchId: number]: VoteVariants
     }
 }
