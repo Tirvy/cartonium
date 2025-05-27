@@ -2,7 +2,7 @@ import type { CompetitionBloodBowl, MatchDataToSheet, TelegramChatData, BloodBow
 
 
 import { google } from "googleapis";
-import credentials from './creds.json';
+import credentials from '@/creds.json';
 import dataStorage from './storage';
 
 const spreadsheetId = process.env.NUXT_BOT_BLOODBOWL_SPREADSHEET || '';
