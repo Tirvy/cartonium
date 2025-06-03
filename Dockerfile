@@ -24,7 +24,8 @@ RUN mkdir .generated
 RUN npm run type
 
 # Getting gcreds
-ADD ${GOOGLE_CREDS_URL}
+ADD ${GOOGLE_CREDS_URL} /tmp
+COPY /tmp/creds.json /app/creds.json
 RUN ls
 
 # Install dependencies
