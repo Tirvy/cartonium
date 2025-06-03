@@ -23,6 +23,10 @@ RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
 RUN mkdir .generated
 RUN npm run type
 
+# Getting gcreds
+ADD ${GOOGLE_CREDS_URL}
+RUN ls
+
 # Install dependencies
 RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 
