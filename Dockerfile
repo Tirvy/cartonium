@@ -19,9 +19,9 @@ WORKDIR /app
 COPY package.json ./
 
 # Getting gcreds
-RUN ls
+RUN ls /app
 ADD ${GOOGLE_CREDS_URL} /tmp
-RUN ls
+RUN ls /tmp
 COPY /tmp/creds.json /app/creds.json
 RUN ls
 
