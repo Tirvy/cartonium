@@ -9,6 +9,7 @@ ARG SUPABASE_KEY
 ARG SUPABASE_ACCESS_TOKEN
 ARG NUXT_BOT_TOKEN
 ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
+ARG GOOGLE_CREDS_URL
 ARG NITRO_PORT=80
 ARG PORT=80
 
@@ -19,10 +20,8 @@ WORKDIR /app
 COPY package.json ./
 
 # Getting gcreds
-RUN ls /app
-ADD ${GOOGLE_CREDS_URL} /tmp
-RUN ls /tmp
-COPY /tmp/creds.json /app/creds.json
+ADD ${GOOGLE_CREDS_URL} ./creds.json
+COPY ./creds.json /app/creds.json
 RUN ls
 
 # Setup local supabase
