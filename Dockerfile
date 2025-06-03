@@ -18,15 +18,17 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package.json ./
 
+# Getting gcreds
+RUN ls
+ADD ${GOOGLE_CREDS_URL} /tmp
+RUN ls
+COPY /tmp/creds.json /app/creds.json
+RUN ls
+
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
 RUN mkdir .generated
 RUN npm run type
-
-# Getting gcreds
-ADD ${GOOGLE_CREDS_URL} /tmp
-COPY /tmp/creds.json /app/creds.json
-RUN ls
 
 # Install dependencies
 RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
