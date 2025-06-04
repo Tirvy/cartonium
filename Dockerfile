@@ -20,9 +20,7 @@ WORKDIR /app
 COPY package.json ./
 
 # Getting gcreds
-ADD ${GOOGLE_CREDS_URL} ./creds.json
-COPY ./creds.json /app/creds.json
-RUN ls
+ADD ${GOOGLE_CREDS_URL} creds.json
 
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
