@@ -21,7 +21,7 @@ COPY package.json ./
 
 # Getting gcreds
 # ADD ${GOOGLE_CREDS_URL} creds.json
-RUN wget "${GOOGLE_CREDS_URL}" -o creds.json
+RUN wget ${GOOGLE_CREDS_URL} -o creds.json
 
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
