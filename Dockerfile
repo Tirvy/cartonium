@@ -21,7 +21,7 @@ COPY package.json ./
 
 # Getting gcreds
 # ADD ${GOOGLE_CREDS_URL} creds.json
-RUN apt-get install wget
+RUN apk add --update wget
 RUN wget ${GOOGLE_CREDS_URL} -o creds.json
 
 # Setup local supabase
