@@ -21,9 +21,8 @@ COPY package.json ./
 
 # Getting gcreds
 # ADD ${GOOGLE_CREDS_URL} creds.json
-RUN ["sh", "-c", "wget ${GOOGLE_CREDS_URL} -O creds.json"]
-RUN apk add --update wget && \
-    wget ${GOOGLE_CREDS_URL} -O creds.json
+RUN apk add --update curl && \
+    curl -O creds.json ${GOOGLE_CREDS_URL} 
 
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
