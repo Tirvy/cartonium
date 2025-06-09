@@ -19,10 +19,6 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package.json ./
 
-RUN echo ${GOOGLE_CREDS_URL}
-RUN echo ${GOOGLE_CREDS_URL} | tr -d \'
-RUN echo ${SUPABASE_URL}
-
 # Getting gcreds
 # ADD ${GOOGLE_CREDS_URL} creds.json
 RUN apk add --update wget && \
@@ -41,7 +37,7 @@ RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 COPY . .
 
 # Build the Next.js application for production
-RUN npm run build
+RUN NODE_OPTIONS=--max-old-space-size=1000 npm run build
 
 
 ENV PORT=$PORT

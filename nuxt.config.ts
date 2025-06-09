@@ -33,7 +33,10 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json', language: 'en-US' },
       { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' },
       // { code: 'ka', name: 'ქართული', file: 'ka.json', language: 'ka-GE'},
-    ]
+    ],
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   },
   dayjs: {
     plugins: ['weekday'],
@@ -51,7 +54,7 @@ export default defineNuxtConfig({
       callback: '/confirm',
       include: ['/clubs/*/information/edit', '/clubs(/*)/settings(/*)?', '/admin(/*)?'],
       exclude: ['users/*'],
-      cookieRedirect: true,
+      saveRedirectToCookie: true,
     },
     cookieOptions: {
       secure: true
