@@ -39,7 +39,7 @@ RUN mkdir .generated
 RUN npm run type
 
 # Install dependencies
-RUN NODE_OPTIONS=--max_old_space_size=100 npm install
+RUN NODE_OPTIONS=--max_old_space_size=1100 npm install
 
 
 # Copy the rest of the application files to the container
