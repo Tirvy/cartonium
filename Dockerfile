@@ -20,6 +20,7 @@ WORKDIR /app
 COPY package.json ./
 
 RUN echo ${GOOGLE_CREDS_URL}
+RUN echo "${${GOOGLE_CREDS_URL}//'}"
 RUN echo ${SUPABASE_URL}
 
 # Getting gcreds
