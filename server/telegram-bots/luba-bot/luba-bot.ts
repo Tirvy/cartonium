@@ -13,6 +13,14 @@ if (botLuba) {
     checkStoredState();
 
     botLuba.on('message', async function (message) {
+        if (message.text === '/start') {
+            botLuba.sendMessage({
+                chat_id: message.chat.id,
+                text: 'Hi!',
+            })
+            return;
+        }
+
         if (message.text === '/update_questions') {
             getQuestionsHashed();
             return;
