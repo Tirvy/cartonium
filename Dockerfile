@@ -26,7 +26,7 @@ RUN echo ${SUPABASE_URL}
 # Getting gcreds
 # ADD ${GOOGLE_CREDS_URL} creds.json
 RUN apk add --update wget && \
-    wget `echo ${GOOGLE_CREDS_URL} | tr -d \'`
+    wget -O creds.json `echo ${GOOGLE_CREDS_URL} | tr -d \'`
 
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
