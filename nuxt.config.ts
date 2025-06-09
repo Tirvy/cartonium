@@ -60,7 +60,7 @@ export default defineNuxtConfig({
       secure: true
     }
   },
-
+  sourcemap: false,
   nitro: {
     experimental: {
       tasks: true
