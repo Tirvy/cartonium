@@ -3,13 +3,22 @@
 # Use an official Node.js runtime as the base image
 FROM node:20-alpine
 
-# ARGS
+# ARGS for js usage
 ARG SUPABASE_URL
 ARG SUPABASE_KEY
-ARG SUPABASE_ACCESS_TOKEN
 ARG NUXT_BOT_TOKEN
 ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
+ARG NUXT_BOT_LOGER_TOKEN
+ARG NUXT_BOT_LUBA_TOKEN
+ARG NUXT_BOT_LUBA_SPREADSHEET
+ARG NUXT_BOT_BLOODBOWL_TOKEN
+ARG NUXT_BOT_BLOODBOWL_SPREADSHEET
+ARG NUXT_BOT_BLOODBOWL_LEAGUE
+ARG NUXT_BOT_BLOODBOWL_SUPPORT_ID
+
+# ARGS for docker build
 ARG GOOGLE_CREDS_URL
+ARG SUPABASE_ACCESS_TOKEN
 ARG NITRO_PORT=80
 ARG PORT=80
 
@@ -30,7 +39,7 @@ RUN mkdir .generated
 RUN npm run type
 
 # Install dependencies
-RUN NODE_OPTIONS=--max_old_space_size=1100 npm install
+RUN NODE_OPTIONS=--max_old_space_size=100 npm install
 
 
 # Copy the rest of the application files to the container
