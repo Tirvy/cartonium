@@ -35,6 +35,7 @@ RUN mkdir .generated
 RUN npm run type
 
 # Install dependencies
+# limited to 1000 cuz current hosting is this much powerfull @tirvy
 RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 
 
@@ -42,6 +43,7 @@ RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 COPY . .
 
 # Build the Next.js application for production
+# limited to 1000 cuz current hosting is this much powerfull @tirvy
 RUN NODE_OPTIONS=--max-old-space-size=1000 npm run build
 
 
