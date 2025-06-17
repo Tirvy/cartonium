@@ -3,12 +3,18 @@
 # Use an official Node.js runtime as the base image
 FROM node:20-alpine
 
-# ARGS
+# ARGS for js usage
 ARG SUPABASE_URL
 ARG SUPABASE_KEY
-ARG SUPABASE_ACCESS_TOKEN
 ARG NUXT_BOT_TOKEN
 ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
+ARG NUXT_BOT_LOGER_TOKEN
+ARG NUXT_BOT_LUBA_TOKEN
+ARG NUXT_BOT_LUBA_SPREADSHEET
+
+# ARGS for docker build
+ARG GOOGLE_CREDS_URL
+ARG SUPABASE_ACCESS_TOKEN
 ARG NITRO_PORT=80
 ARG PORT=80
 
@@ -18,12 +24,18 @@ WORKDIR /app
 # Copy package.json and package-lock.json to the container
 COPY package.json ./
 
+# Getting gcreds
+# ADD ${GOOGLE_CREDS_URL} creds.json
+RUN apk add --update wget && \
+    wget -O creds.json `echo ${GOOGLE_CREDS_URL} | tr -d \'`
+
 # Setup local supabase
 RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
 RUN mkdir .generated
 RUN npm run type
 
 # Install dependencies
+# limited to 1000 cuz current hosting is this much powerfull @tirvy
 RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 
 
@@ -31,7 +43,8 @@ RUN NODE_OPTIONS=--max_old_space_size=1000 npm install
 COPY . .
 
 # Build the Next.js application for production
-RUN npm run build
+# limited to 1000 cuz current hosting is this much powerfull @tirvy
+RUN NODE_OPTIONS=--max-old-space-size=1000 npm run build
 
 
 ENV PORT=$PORT
