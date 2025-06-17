@@ -32,6 +32,7 @@
     "@mdi/font": "^7.3.67",
     "fast-xml-parser": "^4.2.7",
     "googleapis": "^105.0.0",
+    "howlongtobeat": "^1.8.0",
     "maska": "^2.1.11",
     "quill": "^2.0.2",
     "sass": "^1.66.1",
