@@ -7,7 +7,7 @@
       <v-col>
         <NuxtLink to="./table-admin">
           <v-list-item :link="true">
-            К виду для админов
+            {{ $t('to_admin_view') }}
 
           </v-list-item>
         </NuxtLink>
@@ -15,7 +15,7 @@
     </v-row>
 
     <v-empty-state v-if="!user && gatheringsWithDates.length > 0"
-      text="Залогиньтесь через телеграм справа-сверху, чтобы присоединяться к сборам" title="Регистрация бесплатна" />
+      :text="$t('gatherings.login_to_join')" :title="$t('gatherings.registration_is_free')" />
 
     <v-row v-if="user && gatheringsWithDates.length > 0" dense>
       <v-col cols="12">
@@ -63,15 +63,15 @@
     </template>
 
     <v-empty-state v-if="gatheringsWithDates.length === 0 && user && !loadingList"
-      text="Можете сами начать собирать людей кнопкой '+' снизу-справа" title="Не найдено сборов в клубе" />
+      :text="$t('gatherings.use_button_to_create_gathering')" :title="$t('gatherings.gatherings_not_found')" />
     <v-empty-state v-else-if="gatheringsWithDates.length === 0 && !loadingList"
-      text="Зарегистрируйтесь через телеграм справа-сверху, чтобы начать собирать людей"
-      title="Не найдено сборов в клубе" />
+      :text="$t('gatherings.login_to_join')"
+      :title="$t('gatherings.gatherings_not_found')" />
   </v-container>
   <v-fab v-if="user" location="bottom end" icon="mdi-plus" :to="{ name: 'gathering-edit' }" app size="large"
     variant="outlined" order="1">
     <v-icon icon="mdi-plus"></v-icon>
-    <v-tooltip activator="parent" location="start">Создать сбор</v-tooltip>
+    <v-tooltip activator="parent" location="start">{{$t('gathering.create_gathering')}}</v-tooltip>
   </v-fab>
 </template>
 
