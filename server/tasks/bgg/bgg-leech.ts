@@ -14,7 +14,7 @@ export default defineTask({
   },
   async run({ payload, context }) {
 
-    const leechQueue = await dataStorage.getItem<number[]>('leech queue');
+    const leechQueue = await dataStorage.getItem<number[]>('queue');
     if (!leechQueue?.length) {
       updateQueue();
       return { result: "Wait" };
