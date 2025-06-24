@@ -84,3 +84,14 @@ docker run -p 80:80 --env-file .env -d cartonis
 
 # build Docker localy (mac)
 sh execs/docker-builder.sh
+
+# i18n
+Translations use nuxt-translation-manager. To edit/add translations edit file "i18n/locales/translations.csv". Im using vscode extension to do it easier.
+
+To use translation texts in pages use 
+```
+{{ $t('greet.hello_world')}}
+
+```javascript
+
+And remember! If you use translations inside <script> - make them computable so they change when user switches locale.
