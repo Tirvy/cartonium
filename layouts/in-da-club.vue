@@ -91,7 +91,7 @@ const clubName = computed(() => {
 
 const profileLink = `/clubs/${clubName.value}/profile`;
 const adminLoginLink = `/clubs/${clubName.value}/admin-login`;
-const clubSettings = `/clubs/${clubName.value}/settings`;
+const clubSettings = `/clubs/${clubName.value}/club-master`;
 
 const pagesTitles = computed<{[k: string]: string}>(() => {
   return {
@@ -121,7 +121,7 @@ let pages = [
   },
   {
     alias: 'clubSettings',
-    path: `/clubs/${clubName.value}/settings`,
+    path: `/clubs/${clubName.value}/club-master`,
     icon: 'mdi-cog-outline',
     permissions: true,
     mobile: false,

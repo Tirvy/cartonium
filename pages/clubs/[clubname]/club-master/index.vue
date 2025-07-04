@@ -4,12 +4,12 @@
       <v-sheet>
         <v-list>
           <v-list-item>
-            <NuxtLink to="./settings/themes">
+            <NuxtLink to="./club-master/themes">
               Настройка цветовой темы
             </NuxtLink>
           </v-list-item>
           <v-list-item>
-            <NuxtLink to="./settings/tables">
+            <NuxtLink to="./club-master/tables">
               Настройка столов в клубе
             </NuxtLink>
           </v-list-item>

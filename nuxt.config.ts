@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     langDir: 'i18n/locales',
   },
   i18n: {
+    strategy: 'no_prefix',
     defaultLocale: 'ru',
     detectBrowserLanguage: {
       fallbackLocale: 'en',
@@ -52,7 +53,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/',
       callback: '/confirm',
-      include: ['/clubs/*/information/edit', '/clubs(/*)/settings(/*)?', '/admin(/*)?'],
+      include: ['/clubs/*/information/edit', '/clubs(/*)/club-master(/*)?', '/admin(/*)?'],
       exclude: ['users/*'],
       saveRedirectToCookie: true,
     },
