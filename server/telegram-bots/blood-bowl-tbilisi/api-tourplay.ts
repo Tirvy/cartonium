@@ -40,7 +40,12 @@ export function getLeagueLink() {
 function responseToCompetition(phaseData: PhasesResponse): CompetitionBloodBowl {
     const seasonId = Math.max(...Object.keys(phaseData).map(e => +e));
     const seasonData = phaseData[seasonId];
-    const roundData = seasonData.rounds[seasonData.rounds.length - 1];
+    let roundData = seasonData.rounds.find(round => {
+        return round.roundProgresion.finishedCount === 0;
+    });
+    if (!roundData) {
+        roundData = seasonData.rounds[seasonData.rounds.length - 1];
+    }
     const groupData = roundData.groups[0];
     return {
         matches: groupData.matches.map(match => {
