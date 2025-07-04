@@ -1,7 +1,7 @@
 import { getTelegramChatsFromStore, getVotes } from './common';
 import type { TeamBloodBowl, MatchBloodBowl } from './types';
 import type { CallbackQuery } from 'typescript-telegram-bot-api/dist/types';
-import { getCurrentFixtures } from './api-tourplay';
+import { getCurrentFixtures, getCurrentWeekNumber, getAllFixtures } from './api-tourplay';
 import botBloodBowl from './blood-bowl-predicter';
 import sendBloodBowlError from './error';
 
@@ -11,15 +11,17 @@ export async function sendVotesToEveryone() {
         return chat.tourplayName !== '' && chat.chatId;
     })
 
+    const weekNumber = await getCurrentWeekNumber();
     chats?.forEach(chat => {
-        sendVotesTo(chat.chatId);
+        sendVotesTo(chat.chatId, weekNumber);
     })
 }
 
-export async function sendVotesTo(chatId: number) {
-    const messageText = await getVotesMessage();
+export async function sendVotesTo(chatId: number, weekNumber: number) {
 
-    const inlineKeyboard = await getInlineKeyboard(chatId);
+    const messageText = await getVotesMessage(weekNumber);
+
+    const inlineKeyboard = await getInlineKeyboard(chatId, weekNumber);
     botBloodBowl.sendMessage({
         chat_id: chatId,
         text: messageText,
@@ -29,10 +31,9 @@ export async function sendVotesTo(chatId: number) {
     });
 }
 
-async function getVotesMessage() {
-    const fixtures = await getCurrentFixtures();
-
-    const messageText = 'Матчи этой недели:\n' + fixtures.matches.map(match => {
+async function getVotesMessage(weekNumber: number) {
+    const fixtures = await getCurrentFixtures(weekNumber);
+    const messageText = `Матчи этой недели (№${weekNumber + 1}):\n` + fixtures.matches.map(match => {
         let retString = `${getTeamString(match.teamLocal)} vs ${getTeamString(match.teamVisitor)}`
         if (match.scoreResume) {
             let winnerteam = match.scoreResume.winner === 'Local' ? match.teamLocal : match.teamVisitor;
@@ -43,8 +44,8 @@ async function getVotesMessage() {
     return messageText;
 }
 
-async function getInlineKeyboard(chatId: number) {
-    const fixtures = await getCurrentFixtures();
+async function getInlineKeyboard(chatId: number, weekNumber: number) {
+    const fixtures = await getCurrentFixtures(weekNumber);
     const votes = await getVotes();
 
     return fixtures.matches.map(match => {
@@ -82,7 +83,7 @@ function getTeamVoteString(team: TeamBloodBowl): string {
     return `${team.teamName}`;
 }
 
-export async function updateMessageButtons(query: CallbackQuery) {
+export async function updateMessageButtons(query: CallbackQuery, matchId: number) {
     const chat = query.from;
 
     let creds = getCredsFromCallbackQuery(query);
@@ -95,7 +96,17 @@ export async function updateMessageButtons(query: CallbackQuery) {
         sendBloodBowlError(chat.id, 'Ошибка кредов');
         return;
     }
-    const keyboard = await getInlineKeyboard(chat.id);
+    const fixtures = await getCurrentFixtures();
+    let weekNumber: number;
+    if (fixtures.matches.find(match => matchId === match.matchId)) {
+        weekNumber = await getCurrentWeekNumber();
+    } else {
+        const allFixtures = await getAllFixtures();
+        weekNumber = allFixtures.findIndex(item => {
+            return item.matches.some(match => matchId === match.matchId);
+        });
+    }
+    const keyboard = await getInlineKeyboard(chat.id, weekNumber);
     botBloodBowl.editMessageReplyMarkup({
         ...creds,
         reply_markup: {
