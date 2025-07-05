@@ -50,18 +50,23 @@ async function getInlineKeyboard(chatId: number, weekNumber: number) {
 
     return fixtures.matches.map(match => {
         return [
-            getKeyboardKey(match.teamLocal, 'Local', match),
-            getKeyboardKey(match.teamVisitor, 'Visitor', match),
+            getKeyboardKey(match, 'Local', match.teamLocal),
+            getKeyboardKey(match, 'Draw'),
+            getKeyboardKey(match, 'Visitor', match.teamVisitor),
         ]
     });
 
-    function getKeyboardKey(team: TeamBloodBowl, teamPosition: 'Local' | 'Visitor', match: MatchBloodBowl) {
+    function getKeyboardKey(match: MatchBloodBowl, teamPosition: 'Local' | 'Visitor' | 'Draw', team?: TeamBloodBowl) {
         const hasVote = votes[chatId]?.[match.matchId] === teamPosition;
         const callbackData = `${match.matchId}|${teamPosition}`
-        let retString = getTeamVoteString(team);
+        let retString = team ? getTeamVoteString(team) : 'Draw';
         if (match.scoreResume) {
-            let winnerteam = match.scoreResume.winner === 'Local' ? match.teamLocal : match.teamVisitor;
-            if (team === winnerteam) {
+            if (match.scoreResume.winner === 'Local' || match.scoreResume.winner === 'Visitor') {
+                let winnerteam = match.scoreResume.winner === 'Local' ? match.teamLocal : match.teamVisitor;
+                if (team === winnerteam) {
+                    retString = ['**', retString, '** 🏆'].join('');
+                }
+            } else {
                 retString = ['**', retString, '** 🏆'].join('');
             }
         }
