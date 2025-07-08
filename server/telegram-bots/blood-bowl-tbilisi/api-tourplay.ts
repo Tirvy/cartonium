@@ -3,10 +3,23 @@ import dataStorage from './storage';
 
 const leagueName = process.env.NUXT_BOT_BLOODBOWL_LEAGUE || ''
 
-export async function getCurrentFixtures(): Promise<CompetitionBloodBowl> {
-    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl }>('fixtures');
+export async function getCurrentWeekNumber(): Promise<number> {
+    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
+    if (fixturesCached && fixturesCached.data?.length) {
+        return fixturesCached.data.findIndex(item => {
+            return item.matches.some(match => !match.scoreResume)
+        });
+    }
+    return 0;
+}
+
+export async function getCurrentFixtures(weekNumber?: number): Promise<CompetitionBloodBowl> {
+    if (weekNumber === undefined) {
+        weekNumber = await getCurrentWeekNumber();
+    }
+    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
     if (fixturesCached && fixturesCached.data) {
-        return fixturesCached.data;
+        return fixturesCached.data[weekNumber];
     }
 
     const response = await $fetch<PhasesResponse>(`https://tourplay.net/api/tournament/${leagueName}/phases?type=COACH`, {
@@ -29,30 +42,42 @@ export async function getCurrentFixtures(): Promise<CompetitionBloodBowl> {
 
 
     const competitionInfo = responseToCompetition(response);
-    dataStorage.setItem<{ data: CompetitionBloodBowl }>('fixtures', { data: competitionInfo });
-    return competitionInfo;
+    dataStorage.setItem<{ data: CompetitionBloodBowl[] }>('fixtures', { data: competitionInfo });
+    return competitionInfo[weekNumber];
+}
+
+export async function getAllFixtures(): Promise<CompetitionBloodBowl[]> {
+    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
+    if (fixturesCached && fixturesCached.data) {
+        return fixturesCached.data;
+    }
+
+    await getCurrentFixtures(0);
+    const fixturesCachedTrue = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures') as { data: CompetitionBloodBowl[] };
+    return fixturesCachedTrue.data;
 }
 
 export function getLeagueLink() {
     return `https://tourplay.net/en/blood-bowl/${leagueName}/scores`
 }
 
-function responseToCompetition(phaseData: PhasesResponse): CompetitionBloodBowl {
+function responseToCompetition(phaseData: PhasesResponse): CompetitionBloodBowl[] {
     const seasonId = Math.max(...Object.keys(phaseData).map(e => +e));
     const seasonData = phaseData[seasonId];
-    const roundData = seasonData.rounds[seasonData.rounds.length - 1];
-    const groupData = roundData.groups[0];
-    return {
-        matches: groupData.matches.map(match => {
-            return {
-                roundNumber: roundData.roundNumber,
-                matchId: match.matchId,
-                scoreResume: undefined,
-                teamLocal: teamFromResponse(match.rosterLocal),
-                teamVisitor: teamFromResponse(match.rosterVisitor),
-            }
-        })
-    }
+    return seasonData.rounds.map(roundData => {
+        const groupData = roundData.groups[0];
+        return {
+            matches: groupData.matches.map(match => {
+                return {
+                    roundNumber: roundData.roundNumber,
+                    matchId: match.matchId,
+                    scoreResume: undefined,
+                    teamLocal: teamFromResponse(match.rosterLocal),
+                    teamVisitor: teamFromResponse(match.rosterVisitor),
+                }
+            })
+        }
+    })
 }
 
 function teamFromResponse(roster: RosterResponse): TeamBloodBowl {

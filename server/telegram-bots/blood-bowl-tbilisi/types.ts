@@ -42,7 +42,7 @@ export interface PhasesResponse {
             roundNumber: number,
             roundProgresion: {
                 totalCount: number,
-                finishedCound: number
+                finishedCount: number
             }
             groups: {
                 name: string,
