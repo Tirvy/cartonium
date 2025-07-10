@@ -13,6 +13,12 @@ export async function getCurrentWeekNumber(): Promise<number> {
     return 0;
 }
 
+export async function updateFixtures() {
+    dataStorage.setItem<{ data: CompetitionBloodBowl[] }>('fixtures', { data: [] });
+    await getCurrentFixtures();
+    return;
+}
+
 export async function getCurrentFixtures(weekNumber?: number): Promise<CompetitionBloodBowl> {
     if (weekNumber === undefined) {
         weekNumber = await getCurrentWeekNumber();
