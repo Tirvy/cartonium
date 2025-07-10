@@ -4,6 +4,11 @@
       <v-sheet>
         <v-list>
           <v-list-item>
+            <NuxtLink to="./club-master/add-game-to-collection">
+              Добавить игру в коллекцию
+            </NuxtLink>
+          </v-list-item>
+          <v-list-item>
             <NuxtLink to="./club-master/themes">
               Настройка цветовой темы
             </NuxtLink>
@@ -87,7 +92,7 @@ async function saveChanges() {
     body: {
       club_id: currentClub.value.id,
       reservation_links: reservationLinks.value.split(',').map((s: string) => s.trim()),
-      reservation_phones: reservationPhones.value.split(',').map((s: string) => s.replace(/[^\d]/g,'')),
+      reservation_phones: reservationPhones.value.split(',').map((s: string) => s.replace(/[^\d]/g, '')),
       gathering_warning: gatheringWarning.value,
       guest_can_gather_own: guestCanGatherOwn.value,
       themes: currentClub.value.themes,

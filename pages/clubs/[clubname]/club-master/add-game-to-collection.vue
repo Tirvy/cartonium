@@ -5,7 +5,7 @@
         <v-col>
           <v-card>
             <v-card-title>
-              Добавление игры
+                {{ $t('add_game.add_game_title') }}
             </v-card-title>
             <v-card-text>
               <v-form @submit="searchForGame">
@@ -18,10 +18,16 @@
                 </v-btn>
               </v-form>
             </v-card-text>
-            <v-divider />
+          </v-card>
+          <v-card>
             <v-card-text v-if="gotBggData">
               {{ bggData.title }}
             </v-card-text>
+            <v-card-actions>
+              <v-btn @click="addGameToCollection">
+                {{ $t('add_game.add_to_bd') }}
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -33,6 +39,9 @@
 const gameToSearch = ref('');
 const gotBggData = ref(false);
 const bggData = { title: 'abc' };
+const loaders = ref({
+  addingToBd: false
+});
 
 const stringIsBggLink = computed(() => {
   const regexResult = gameToSearch.value.match(/https:\/\/boardgamegeek\.com\/boardgame\/\d+\/[\w-]+/);
@@ -45,6 +54,12 @@ function searchForGame() {
 
   const bggId = gameToSearch.value.match(/\d+/);
   console.log('fetch', bggId, stringIsBggLink.value);
+}
+
+const addGameToCollection = async () => {
+  loaders.value.addingToBd = true;
+
+  loaders.value.addingToBd = false;
 }
 
 </script>

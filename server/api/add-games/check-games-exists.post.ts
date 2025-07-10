@@ -1,7 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/supabase.js'
 import { gameBoxFromSupabase } from '~/server/transformers';
-import { formatDiagnosticsWithColorAndContext } from 'typescript';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);

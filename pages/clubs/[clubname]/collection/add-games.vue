@@ -352,14 +352,14 @@ async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
     if (gameboxesData.length) {
         try {
             const titles = gameboxesData.map(item => item.title);
-            const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: titles } });
+            const gameboxesFound: GameBox[] = await $fetch('/api/add-games/check-games-exists', { method: 'POST', body: { titles: titles } });
 
             let toSend = gameboxesData.filter(item => {
                 const found = gameboxesFound.find(gamebox => gamebox.title === item.title);
                 return !found;
             });
 
-            let ret: GameBox[] | unknown = await $fetch('/api/supabase/gamebox-add', {
+            let ret: GameBox[] | unknown = await $fetch('/api/add-games/gamebox-add', {
                 method: "POST", body: toSend
             }).catch(error => {
                 console.log(error)
@@ -372,7 +372,7 @@ async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
             }
 
             loaders.value.gettingData = true;
-            await $fetch('/api/supabase/add-games-to-club',
+            await $fetch('/api/add-games/add-games-to-club',
                 {
                     method: 'post',
                     query: { clubid: currentClub.value.id },
