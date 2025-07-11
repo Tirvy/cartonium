@@ -18,7 +18,6 @@ export async function sendVotesToEveryone() {
 }
 
 export async function sendVotesTo(chatId: number, weekNumber: number) {
-
     const messageText = await getVotesMessage(weekNumber);
 
     const inlineKeyboard = await getInlineKeyboard(chatId, weekNumber);
@@ -37,7 +36,7 @@ async function getVotesMessage(weekNumber: number) {
         let retString = `${getTeamString(match.teamLocal)} vs ${getTeamString(match.teamVisitor)}`
         if (match.scoreResume) {
             let winnerteam = match.scoreResume.winner === 'Local' ? match.teamLocal : match.teamVisitor;
-            retString += `**Winner**: ${winnerteam.teamName}!\n`
+            retString += `\nWinner: ${winnerteam.teamName}!\n`
         }
         return retString
     }).join('\n');

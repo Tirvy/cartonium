@@ -101,7 +101,7 @@ if (botBloodBowl) {
             const textWeekNumber = message.text.slice(commandGimmeVotes.length);
             let weekNumber = +(textWeekNumber.trim()) - 1;
             const maxWeekNumber = (await getAllFixtures()).length;
-            if (!weekNumber || weekNumber < 0 || weekNumber > maxWeekNumber - 1) {
+            if (isNaN(weekNumber) || weekNumber < 0 || weekNumber > maxWeekNumber - 1) {
                 weekNumber = await getCurrentWeekNumber();
             }
             sendVotesTo(chatInfo.chatId, weekNumber);

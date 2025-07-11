@@ -19,15 +19,7 @@ export async function updateFixtures() {
     return;
 }
 
-export async function getCurrentFixtures(weekNumber?: number): Promise<CompetitionBloodBowl> {
-    if (weekNumber === undefined) {
-        weekNumber = await getCurrentWeekNumber();
-    }
-    const fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
-    if (fixturesCached && fixturesCached.data) {
-        return fixturesCached.data[weekNumber];
-    }
-
+async function fetchFixtures() {
     const response = await $fetch<PhasesResponse>(`https://tourplay.net/api/tournament/${leagueName}/phases?type=COACH`, {
         "headers": {
             "accept": "application/json, text/plain, */*",
@@ -46,10 +38,25 @@ export async function getCurrentFixtures(weekNumber?: number): Promise<Competiti
         },
     });
 
-
     const competitionInfo = responseToCompetition(response);
     dataStorage.setItem<{ data: CompetitionBloodBowl[] }>('fixtures', { data: competitionInfo });
-    return competitionInfo[weekNumber];
+}
+
+export async function getCurrentFixtures(weekNumber?: number): Promise<CompetitionBloodBowl> {
+    let fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
+    if (!fixturesCached || !fixturesCached.data) {
+        await fetchFixtures();
+        fixturesCached = await dataStorage.getItem<{ data: CompetitionBloodBowl[] }>('fixtures');
+    }
+
+    if (weekNumber === undefined) {
+        weekNumber = await getCurrentWeekNumber();
+    }
+
+    if (!fixturesCached || !fixturesCached.data) {
+        throw 'no fixtures'
+    }
+    return fixturesCached.data[weekNumber];
 }
 
 export async function getAllFixtures(): Promise<CompetitionBloodBowl[]> {
@@ -77,7 +84,7 @@ function responseToCompetition(phaseData: PhasesResponse): CompetitionBloodBowl[
                 return {
                     roundNumber: roundData.roundNumber,
                     matchId: match.matchId,
-                    scoreResume: undefined,
+                    scoreResume: match.scoreResume,
                     teamLocal: teamFromResponse(match.rosterLocal),
                     teamVisitor: teamFromResponse(match.rosterVisitor),
                 }
