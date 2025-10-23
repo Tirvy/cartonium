@@ -3,7 +3,7 @@ export default botBloodBowl;
 
 import dataStorage from './storage';
 
-import { getCurrentFixtures, getLeagueLink, getCurrentWeekNumber, getAllFixtures } from './api-tourplay';
+import { getCurrentFixtures, getLeagueLink, getCurrentWeekNumber, getAllFixtures, updateFixtures } from './api-tourplay';
 import { fetchChatsToStore, saveFixtures, saveVoteToGoogle } from './api-google-sheets';
 import type { TeamPosition } from './types'
 
@@ -101,7 +101,7 @@ if (botBloodBowl) {
             const textWeekNumber = message.text.slice(commandGimmeVotes.length);
             let weekNumber = +(textWeekNumber.trim()) - 1;
             const maxWeekNumber = (await getAllFixtures()).length;
-            if (!weekNumber || weekNumber < 0 || weekNumber > maxWeekNumber - 1) {
+            if (isNaN(weekNumber) || weekNumber < 0 || weekNumber > maxWeekNumber - 1) {
                 weekNumber = await getCurrentWeekNumber();
             }
             sendVotesTo(chatInfo.chatId, weekNumber);
@@ -116,9 +116,9 @@ if (botBloodBowl) {
                 });
                 return;
             }
-            const competition = await getCurrentFixtures();
-            saveFixtures(competition);
-            dataStorage.setItem('fixtures', competition);
+            const competition = await updateFixtures();
+            // saveFixtures(competition);
+            // dataStorage.setItem('fixtures', competition);
             return;
         }
 
