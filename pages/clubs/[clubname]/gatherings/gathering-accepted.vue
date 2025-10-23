@@ -4,7 +4,7 @@
         <v-col style="max-width: 600px;">
           <v-card>
             <v-card-title class="bg-surface">
-              Сбор создан
+              {{ $t('gatherings.gathering_created') }}
             </v-card-title>
             <v-card-text>
               <v-list lines="two">
@@ -15,7 +15,7 @@
                     </v-avatar>
                   </template>
                   <v-list-item-title>
-                    Дата и время
+                    {{ $t('gatherings.data_time') }}
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     {{ dateAdapter.format(lastGathering?.startDate, 'fullDateTime') }}
@@ -30,7 +30,7 @@
                     </v-avatar>
                   </template>
                   <v-list-item-title>
-                    Что собираете
+                    {{ $t('gatherings.creation_title') }}
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     {{ lastGatheringName }}
@@ -45,7 +45,7 @@
                     </v-avatar>
                   </template>
                   <v-list-item-title>
-                    Сколько собираете людей
+                    {{ $t('gatherings.creation_max_people') }}
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     {{ lastGathering.guestsMax }}
@@ -60,7 +60,7 @@
                     </v-avatar>
                   </template>
                   <v-list-item-title>
-                    Ссылка на сбор
+                    {{ $t('gatherings.link_to_this') }}
                   </v-list-item-title>
                   <v-list-item-subtitle class="cursor-pointer" @click="copyLink">
                     <div class="text-caption pa-2 bg-grey-lighten-2 d-flex justify-space-between">
@@ -130,14 +130,14 @@
       <v-row class="justify-center align-center">
         <v-col class="d-flex justify-center">
           <v-btn @click="navigateTo('./table')">
-            Обратно к списку
+            {{ $t('gatherings.back_to_list') }}
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
 
     <v-snackbar v-model="snackbar" timeout="3000">
-      Ссылка скопирована
+      {{ $t('link_copied') }}
     </v-snackbar>
   </v-main>
 
@@ -147,6 +147,7 @@
 const currentClub = useState<Club>('club');
 const router = useRouter();
 
+import { translate } from 'googleapis/build/src/apis/translate';
 import { useDate } from 'vuetify';
 const dateAdapter = useDate()
 
@@ -159,7 +160,7 @@ definePageMeta({
       const lastGathering = useState<Gathering | undefined>('lastGathering');
       console.log(lastGathering.value?.id);
       if (!lastGathering.value?.id) {
-        return navigateTo({name: 'gatherings-table-list'});
+        return navigateTo({ name: 'gatherings-table-list' });
       }
     }
   ]
