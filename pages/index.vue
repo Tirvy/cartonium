@@ -85,6 +85,11 @@
                 </v-card>
               </v-col>
             </v-row>
+            <v-row class="mt-5 justify-center">
+              <v-col class="text-center">
+                Регистрируйся по кнопке вверху экрана <v-icon>mdi-arrow-top-right</v-icon>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
         <v-spacer class="my-10"></v-spacer>
@@ -141,7 +146,26 @@
       <v-spacer class="my-10"></v-spacer>
     </v-container>
     <v-footer class="bg-grey">
-      smth i dont know well
+      <v-row>
+        <v-col class="d-flex">
+          © Cartonis 2025
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col>
+          <v-row>
+            <v-col>
+              <nuxt-link to="/privacy-policy">
+                {{ $t('footer.privacy_policy') }}
+              </nuxt-link>
+            </v-col>
+            <v-col>
+              <nuxt-link to="/terms-of-service">
+                {{ $t('footer.terms_of_service') }}
+              </nuxt-link>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
     </v-footer>
   </v-main>
 </template>
