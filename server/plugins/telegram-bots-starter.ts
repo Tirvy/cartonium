@@ -6,17 +6,18 @@
 
 // botFloodReader
 
-import botLuba from '~/server/telegram-bots/luba-bot/luba-bot';
+// import botLuba from '~/server/telegram-bots/luba-bot/luba-bot';
 
-botLuba
+// botLuba
 
 
 export default defineNitroPlugin((nitroApp) => {
-    console.log("Checking bots launches...");
-    const bots = { botLuba } as { [key: string]: any };
+    console.log("tgbots: Checking bots launches...");
+    const bots = {} as { [key: string]: any };
     Object.keys(bots).forEach(botname => {
         if (bots[botname]) {
             console.log(`${botname} launch success\n`)
         }
     })
+    console.log("tgbots: done\n");
 })
