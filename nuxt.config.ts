@@ -22,7 +22,8 @@ export default defineNuxtConfig({
     'nuxt-translation-manager',
   ],
   'translation-manager': {
-    langDir: 'i18n/locales',
+    // for some reason it doesn't work with #shared/i18n/locales or in app/i18n/locales
+    langDir: '../i18n/locales',
   },
   i18n: {
     defaultLocale: 'ru',
