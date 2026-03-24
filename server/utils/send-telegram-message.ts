@@ -1,4 +1,4 @@
-import telegramBots from '~/server/utils/telegram-bots';
+import telegramBots from '#server/utils/telegram-bots';
 
 export default function sendTelegramMessage(message: TelegramNotification) {
     telegramBots.botPublic?.sendMessage({

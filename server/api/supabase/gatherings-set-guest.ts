@@ -1,6 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import telegramNotify from '~/server/utils/telegram-notify';
+import type { Database } from '#shared/types/supabase.js'
+import telegramNotify from '#server/utils/telegram-notify';
 import type { User } from '@supabase/auth-js';
 
 export default defineEventHandler(async (event) => {

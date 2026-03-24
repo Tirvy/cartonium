@@ -1,8 +1,8 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import { gatheringFromSupabase } from '~/server/transformers'
-import telegramNotify from '~/server/utils/telegram-notify';
-import { isJson } from '~/utils/helpers';
+import type { Database } from '#shared/types/supabase.js'
+import { gatheringFromSupabase } from '#server/transformers'
+import telegramNotify from '#server/utils/telegram-notify';
+import { isJson } from '#shared/utils/helpers';
 
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event)
@@ -44,7 +44,7 @@ function getMessage(gatheringData: Database['public']['Views']['gatherings_with_
 
     const gamebox = gatheringData.gamebox as Database['public']['Tables']['gameboxes']['Row'];
     message += `*${(gamebox?.title || gatheringData.own_name)}*`;
-    
+
     if (gatheringData.start_date) {
         const date = (new Date(gatheringData.start_date)).toLocaleDateString();
         message += ' at ' + date;

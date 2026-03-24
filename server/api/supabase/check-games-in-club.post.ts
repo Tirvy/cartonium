@@ -1,6 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import { gameBoxFromSupabase } from '~/server/transformers';
+import type { Database } from '#shared/types/supabase.js'
+import { gameBoxFromSupabase } from '#server/transformers';
 
 export default defineEventHandler(async (event): Promise<number[]> => {
   const query = getQuery(event);

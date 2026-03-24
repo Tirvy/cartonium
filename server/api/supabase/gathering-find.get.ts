@@ -1,7 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server';
-import type { Database } from '~/types/supabase.js';
-import { gatheringFromSupabase } from '~/server/transformers';
-import { Gathering } from '~/types/frontend';
+import type { Database } from '#shared/types/supabase.js';
+import { gatheringFromSupabase } from '#server/transformers';
+import { Gathering } from '#shared/types/frontend';
 
 export default defineEventHandler(async (event): Promise<Gathering> => {
   const client = await serverSupabaseClient<Database>(event);

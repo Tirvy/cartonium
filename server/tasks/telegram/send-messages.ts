@@ -1,4 +1,4 @@
-import telegramBots from '~/server/utils/telegram-bots';
+import telegramBots from '#server/utils/telegram-bots';
 import { serverSupabaseServiceRole } from '#supabase/server';
 import { type H3Event } from 'h3';
 import { createClient } from '@supabase/supabase-js';
@@ -12,11 +12,11 @@ export default defineTask({
   },
   async run({ payload, context }) {
     console.log("Running telegram notifications task...");
-    const readResult  = await supabaseClient.rpc('read', {
+    const readResult = await supabaseClient.rpc('read', {
       n: Infinity,
       queue_name: 'telegram-messages',
       sleep_seconds: 1,
-    }) as {data: QueueMesageType[] | null};
+    }) as { data: QueueMesageType[] | null };
 
     let sent = 0;
     if (readResult.data?.length) {

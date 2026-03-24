@@ -1,7 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '~/types/supabase.js'
-import type { GameBox, GameBoxWithClub } from "~/types/frontend.js";
-import { gameBoxFromSupabase } from '~/server/transformers.js';
+import type { Database } from '#shared/types/supabase.js'
+import type { GameBox, GameBoxWithClub } from "#shared/types/frontend.js";
+import { gameBoxFromSupabase } from '#server/transformers.js';
 
 // todo: fix next line!
 /// its a copypasta from club-collection

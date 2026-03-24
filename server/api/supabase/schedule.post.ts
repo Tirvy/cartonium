@@ -1,6 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import { gatheringFromSupabase } from '~/server/transformers'
+import type { Database } from '#shared/types/supabase.js'
+import { gatheringFromSupabase } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event)
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
                 id: scheduleId,
                 title: body.title,
             }).eq('id', scheduleId).select().single();
-            console.log(retRename);
+        console.log(retRename);
     }
 
     const { data, error } = await client.from('user_schedules_history').insert(

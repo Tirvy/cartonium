@@ -1,4 +1,4 @@
-import type { Question, Answer, QuestionsHashed } from "./types.ts";
+import type { Question, Answer, QuestionsHashed } from "./types.js";
 import dataStorage from './storage';
 
 

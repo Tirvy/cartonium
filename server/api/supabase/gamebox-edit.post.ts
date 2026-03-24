@@ -1,6 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import { gameBoxToSupabase } from '~/server/transformers';
-import type { Database } from '~/types/supabase.js'
+import { gameBoxToSupabase } from '#server/transformers';
+import type { Database } from '#shared/types/supabase.js'
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)

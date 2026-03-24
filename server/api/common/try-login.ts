@@ -1,5 +1,5 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server';
-import telegramPasswordGenerator from '~/server/utils/telegram-password-generator';
+import telegramPasswordGenerator from '#server/utils/telegram-password-generator';
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);

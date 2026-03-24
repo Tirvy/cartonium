@@ -1,6 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '~/types/supabase.js';
-import { tablesFromSupabase } from '~/server/transformers';
+import type { Database } from '#shared/types/supabase.js';
+import { tablesFromSupabase } from '#server/transformers';
 
 export default defineEventHandler(async (event): Promise<Table[]> => {
   const query = getQuery(event);

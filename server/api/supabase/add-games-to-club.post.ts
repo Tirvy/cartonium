@@ -1,5 +1,5 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import type { Database } from "~/types/supabase.js";
+import type { Database } from '#shared/types/supabase.js';
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event)
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  const { data, error } = await client.from('clubs_collections').upsert(dataToSend, {onConflict: 'game_box_id, club_id', ignoreDuplicates: true});
+  const { data, error } = await client.from('clubs_collections').upsert(dataToSend, { onConflict: 'game_box_id, club_id', ignoreDuplicates: true });
   if (error) {
     throw createError({ statusMessage: error.message })
   }

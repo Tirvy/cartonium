@@ -1,7 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import { scheduleFromSupabase } from '~/server/transformers'
-import type { Schedule } from '~/types/frontend';
+import type { Database } from '#shared/types/supabase.js'
+import { scheduleFromSupabase } from '#server/transformers'
+import type { Schedule } from '#shared/types/frontend';
 
 export default defineEventHandler(async (event): Promise<Schedule> => {
     const client = await serverSupabaseClient<Database>(event);

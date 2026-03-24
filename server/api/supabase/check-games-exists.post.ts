@@ -1,7 +1,6 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import type { Database } from '~/types/supabase.js'
-import { gameBoxFromSupabase } from '~/server/transformers';
-import { formatDiagnosticsWithColorAndContext } from 'typescript';
+import type { Database } from '#shared/types/supabase.js'
+import { gameBoxFromSupabase } from '#server/transformers';
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -28,6 +27,6 @@ export default defineEventHandler(async (event) => {
     titlesLeft = titlesLeft.slice(toSlice);
   }
 
-  
+
   return retData.map((item: Tables<'gameboxes'>) => gameBoxFromSupabase(item));
 })

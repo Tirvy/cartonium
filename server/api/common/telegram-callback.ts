@@ -1,8 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import telegramPasswordGenerator from '~/server/utils/telegram-password-generator';
+import telegramPasswordGenerator from '#server/utils/telegram-password-generator';
 import type { User } from '@supabase/auth-js';
-import telegramBots from '~/server/utils/telegram-bots';
+import telegramBots from '#server/utils/telegram-bots';
 
 const techChatId = 327078611;
 
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   if (!signUpRes.error) {
     telegramBots.botLogger?.sendMessage({
       chat_id: techChatId,
-      text: `signup of ${tgData.id}${tgData.username ? ' - @'+tgData.username : ''} is successfull`
+      text: `signup of ${tgData.id}${tgData.username ? ' - @' + tgData.username : ''} is successfull`
     })
   }
 

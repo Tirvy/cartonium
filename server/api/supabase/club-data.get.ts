@@ -1,7 +1,7 @@
 import { serverSupabaseClient } from '#supabase/server';
-import type { Database } from '~/types/supabase.js'
+import type { Database } from '#shared/types/supabase.js'
 
-import { clubFromSupabase } from '@/server/transformers';
+import { clubFromSupabase } from '#server/transformers';
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient<Database>(event);
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   if (clubSettings.error) {
     if (clubSettings.error.message !== 'JSON object requested, multiple (or no) rows returned') {
       throw createError({ statusMessage: clubSettings.error.message })
-    } 
+    }
   }
 
   return clubFromSupabase(clubData.data, clubSettings.data || baseSettings);

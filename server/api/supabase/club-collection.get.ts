@@ -1,7 +1,7 @@
 import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '~/types/supabase.js'
-import type { GameBox } from "~/types/frontend.js";
-import { gameBoxFromSupabase } from '~/server/transformers.js';
+import type { Database } from '#shared/types/supabase.js'
+import type { GameBox } from "#shared/types/frontend.js";
+import { gameBoxFromSupabase } from '#server/transformers.js';
 
 
 export default defineEventHandler(async (event): Promise<GameBox[]> => {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event): Promise<GameBox[]> => {
 
   const client = await serverSupabaseClient<Database>(event)
 
-  const { data, error } = await client.from('gameboxes_with_club_id').select('*').contains('club_id', [clubId]).ilike('title', `%${search}%`).order('rating_bgg', {ascending: false}).limit(limit);
+  const { data, error } = await client.from('gameboxes_with_club_id').select('*').contains('club_id', [clubId]).ilike('title', `%${search}%`).order('rating_bgg', { ascending: false }).limit(limit);
   if (error) {
     throw createError({ statusMessage: error.message })
   }
