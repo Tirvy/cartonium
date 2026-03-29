@@ -24,7 +24,7 @@ logs
 !.env.dist
 
 # Supabase
-supabase
+supabase/.temp
 !server/api/supabase
 .generated/supabase-database.ts
 
