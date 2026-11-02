@@ -1,0 +1,16 @@
+---
+description: Nitro API, transformers, and Telegram server rules
+globs: server/**/*.{ts,js}
+alwaysApply: false
+---
+
+# Server / API
+
+- New routes: `server/api/{supabase|bgg|tesera|common}/name.get.ts` or `.post.ts`.
+- Map DB ↔ UI in `server/transformers.ts`; do not scatter snake↔camel mapping in pages.
+- Supabase domain handlers: `throw createError({ statusCode, statusMessage })` on failure.
+- BGG/Tesera proxies: keep returning soft errors (`{ items: [], error }`) unless changing intentionally.
+- TG Login: verify with `checkTelegramAuth`; password via `telegram-password-generator`. Prefer extending existing handlers over copying a fifth auth path.
+- Notifications: `telegramNotify` / `sendTelegramMessage`; pgmq queue path exists but store is often commented — do not enable scheduled `telegram:send-messages` without ask.
+- Bots under `server/telegram-bots/*` are standalone; starter plugin currently launches none.
+- BGG rate limit plugin serializes `/api/bgg/*` — avoid bypassing it for new BGG calls.

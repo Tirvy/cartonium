@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "type": "npx supabase gen types typescript --project-id 'impmukiwmihnyyzvyjyp' --schema public,pgmq_public > .generated/supabase-database.ts",
-    "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts"
+    "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts",
+    "format": "npx prettier --write \"app/**/*.{ts,vue,js}\" \"server/**/*.{ts,js}\" \"shared/**/*.ts\" \"docs/**/*.md\" AGENTS.md CODE_MAP.md nuxt.config.ts vuetify.config.ts",
+    "format:check": "npx prettier --check \"app/**/*.{ts,vue,js}\" \"server/**/*.{ts,js}\" \"shared/**/*.ts\" \"docs/**/*.md\" AGENTS.md CODE_MAP.md nuxt.config.ts vuetify.config.ts"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^9.5.3",

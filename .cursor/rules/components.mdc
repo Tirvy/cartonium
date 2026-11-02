@@ -1,0 +1,14 @@
+---
+description: Vue component patterns for Cartonium UI
+globs: app/components/**/*.vue
+alwaysApply: false
+---
+
+# Components
+
+- Place by domain: `app/components/pages/<feature>/`, shared under `app/components/common/` or root `app/components/`.
+- Props: typed with interfaces; emit events for parent-owned mutations (see gathering `table-item.vue` → parent `guestSet`).
+- UI: Vuetify (`v-btn`, `v-card`, …) + Vuetify utility classes. Themes from `vuetify.config.ts`.
+- Prefer scoped `<style>`; avoid new global CSS.
+- Do not expand `table-item.vue` further with more duplicated view templates — extract only if explicitly asked.
+- i18n: use `$t` when the surrounding feature already does; do not leave new user-facing English/Russian mixed inconsistently within one PR without reason.

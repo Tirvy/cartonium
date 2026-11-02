@@ -1,0 +1,16 @@
+node_modules
+.nuxt
+.output
+.nitro
+.cache
+dist
+.data
+.generated
+i18n/locales/*.json
+package-lock.json
+creds.json
+supabase/.temp
+# Static / malformed HTML (pre-existing); do not auto-format
+public/**
+# Cursor rule frontmatter + large lock-adjacent noise
+.cursor/**

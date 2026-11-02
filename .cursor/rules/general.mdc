@@ -1,0 +1,16 @@
+---
+description: Core Cartonium agent instructions (always on)
+alwaysApply: true
+---
+
+# Cartonium — general
+
+- Product: Cartonis boardgame club app (Nuxt 4 + Supabase + Vuetify).
+- Read `AGENTS.md` and `CODE_MAP.md` before non-trivial changes; deep docs in `docs/`.
+- Preserve architecture: server APIs own DB; `server/transformers.ts` maps snake↔camel; UI types in `shared/types/frontend.ts`.
+- State: Nuxt `useState` only (`club`, `clubPermissions`, `lastGathering`, `lastGatheringName`) — no Pinia.
+- Prefer smallest diff; match local style; no drive-by refactors.
+- Never invent DB fields or business rules; check `supabase/migrations/` and existing APIs.
+- Do not commit secrets (`.env`, `creds.json`) or generated i18n JSON / `.generated/*`.
+- Telegram bots are disabled in `server/plugins/telegram-bots-starter.ts` — leave disabled unless asked.
+- No test suite: verify with `npm run dev` / `npm run build` as appropriate.

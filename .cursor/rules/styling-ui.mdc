@@ -1,0 +1,14 @@
+---
+description: Vuetify and styling conventions
+globs: app/**/*.{vue,scss,css},vuetify.config.ts
+alwaysApply: false
+---
+
+# Styling / UI
+
+- Primary UI system: Vuetify 3 via `vuetify-nuxt-module`; theme tokens in `vuetify.config.ts`.
+- Prefer Vuetify props + utility classes over custom CSS.
+- Club theme/avatar come from club settings (`useState('club')`); layout `in-da-club` restores theme cookie.
+- Icons: `@mdi/font` / MDI names already used in templates.
+- Rich text: Quill only on club information edit.
+- Do not add Tailwind, UnoCSS, or another component library without approval.

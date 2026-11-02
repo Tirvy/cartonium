@@ -1,0 +1,22 @@
+---
+description: Composables and useState ownership
+globs: app/composables/**/*.ts,app/pages/**/*.vue,app/layouts/**/*.vue
+alwaysApply: false
+---
+
+# Composables & state
+
+## useState keys (do not invent new globals without need)
+
+| Key | Owner / writer | Purpose |
+|-----|----------------|---------|
+| `club` | `[clubname].vue` + `useUpdateClubData` | Current club |
+| `clubPermissions` | `useClubPermissions` | Rights for current club |
+| `lastGathering` | gathering `item[[id]].vue` | Post-create payload |
+| `lastGatheringName` | same | Display name after create |
+
+- Read club via `useState<Club>('club')`; do not refetch ad hoc if parent already loaded it.
+- Permissions: `useClubPermissions().update()`, `useGetGlobalPermissions()` for `/admin`.
+- Guest mapping: `useCurrentUserAsGuest()`.
+- Default post-login club route: `useDefaultPage()` (currently club `terra`).
+- No Pinia. Cookies: `theme`, `sb-redirect-path`. localStorage: `gatherings-view`.

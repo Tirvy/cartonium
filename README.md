@@ -1,5 +1,7 @@
 # Cartonis - a site for your boardgame club to organize games and events
 
+AI / contributor docs: [AGENTS.md](AGENTS.md) · [CODE_MAP.md](CODE_MAP.md) · [docs/](docs/) · env: [docs/env.md](docs/env.md)
+
 ## Setup
 
 Make sure to install the dependencies:
@@ -34,7 +36,7 @@ sh execs/supabase-type.sh
 
 ## Development Server
 
-Start the development server on `http://localhost:3000`:
+Start the development server on `http://localhost:80` (`nuxt.config.ts` binds port 80 for Telegram Login; use admin privileges on Windows if needed):
 
 ```bash
 # npm

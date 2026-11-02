@@ -1,0 +1,125 @@
+# AGENTS.md — Cartonium (Cartonis)
+
+Concise instructions for AI coding agents. Prefer `CODE_MAP.md` for path inventories and `docs/` for deeper context.
+
+## Overview
+
+Boardgame club platform: organize gatherings (RSVP), manage game collections (Tesera/BGG), club settings/tables, user schedules, Telegram login/notifications. Product name in UI: **Cartonis**.
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| App | Nuxt 4 (`nuxt` ^4.4), Vue 3, Vuetify (`vuetify-nuxt-module`) |
+| Data | Supabase (Auth + Postgres + Storage), `@nuxtjs/supabase` |
+| i18n | `@nuxtjs/i18n` + `nuxt-translation-manager` (`i18n/locales/translations.csv`) |
+| Server | Nitro API routes, optional Nitro tasks, Telegram bots (`typescript-telegram-bot-api`) |
+| External | BoardGameGeek XML API, Tesera API, Google Sheets (bots) |
+| Package manager | npm (`package-lock.json`) |
+| Tests | none |
+
+## Architecture principles
+
+1. **File-based Nuxt routing** under `app/pages/`; club routes nest under `/clubs/[clubname]/`.
+2. **Server owns DB access** — pages call `$fetch('/api/supabase/...')`; do not query Supabase tables from the client for club domain data (Auth client is OK via `useSupabaseClient` / `useSupabaseUser`).
+3. **Transform at the boundary** — snake_case DB rows ↔ camelCase UI types in `server/transformers.ts`.
+4. **Shared types** live in `shared/types/frontend.ts` (UI) and `shared/types/supabase.ts` (DB overrides).
+5. **No Pinia** — shared UI state uses Nuxt `useState` keys: `club`, `clubPermissions`, `lastGathering`, `lastGatheringName`.
+6. **Telegram bots are optional** — `server/plugins/telegram-bots-starter.ts` currently starts none (`bots={}`).
+
+## Project structure (short)
+
+```
+app/           pages, components, composables, layouts, middleware, plugins, utils
+server/api/    Nitro handlers (bgg, tesera, common, supabase)
+server/utils/  TG auth, notify, rights
+server/telegram-bots/  optional side bots
+shared/types/  frontend + supabase types
+supabase/migrations/  schema source of truth
+i18n/locales/  translations.csv → generated *.json (gitignored)
+docs/          human/AI architecture docs
+CODE_MAP.md    path → role inventory (token-efficient)
+```
+
+## Coding conventions
+
+- Vue SFCs: `<script lang="ts" setup>`, Vuetify components, utility classes (`d-flex`, `ma-3`).
+- Files: **kebab-case** (`table-item.vue`, `gathering-remove.post.ts`). Composables: `useCamelCase.ts`.
+- Prefer Nuxt API suffixes (`.get.ts` / `.post.ts`) for new server routes.
+- UI types: camelCase. API request bodies often snake_case (`gathering_id`, `guest_id`) — match existing endpoints.
+- i18n: prefer `$t('key')` / `useI18n()`; many screens still hardcode Russian — do not mass-migrate without being asked.
+- Translations: edit `i18n/locales/translations.csv` only (not generated JSON). Script strings that use `$t` must be `computed` so locale switches work.
+- Scoped styles preferred; SCSS only where already used (e.g. schedule board).
+
+## Naming
+
+| Kind | Convention |
+|------|------------|
+| Pages / components | kebab-case Vue files |
+| Composables | `useX.ts` |
+| API routes | `/api/{supabase\|bgg\|tesera\|common}/resource` |
+| Domain types | PascalCase in `shared/types/frontend.ts` |
+| DB columns | snake_case (migrations) |
+
+## Adding features
+
+1. Read `CODE_MAP.md` + relevant `docs/features/*.md`.
+2. Types first in `shared/types/frontend.ts` (and migrations + `npm run type` if schema changes).
+3. Server: add `server/api/...` handler; transform via `server/transformers.ts` if mapping rows.
+4. Client: page under `app/pages/`, reuse components; `$fetch` existing API style.
+5. Permissions: check `profiles_club_rights` / composables (`useClubPermissions`, `useGetGlobalPermissions`) and supabase redirect includes in `nuxt.config.ts` if the route must be auth-gated.
+6. Update `CODE_MAP.md` and feature doc if the surface area changes.
+
+## Modifying features
+
+- Prefer smallest local change; match neighboring style.
+- Keep transformers and frontend types in sync when fields change.
+- Do not “fix” Telegram auth duplication or large gathering components unless asked.
+- Preserve `useState('club')` ownership: written in club parent `[clubname].vue` / `useUpdateClubData`.
+
+## API & data
+
+- Client: `$fetch('/api/supabase/...')` or `useFetch` (rare). Typing `$fetch<>` is encouraged for new calls.
+- Server: `serverSupabaseClient` / service patterns already in handlers; return transformed objects.
+- Errors: prefer `createError({ statusCode, statusMessage })`. External BGG/Tesera often return `{ items: [], error }` with HTTP 200 — preserve that pattern when extending those proxies.
+- Regenerated DB types: `npm run type` → `.generated/supabase-database.ts` (gitignored); overrides in `shared/types/supabase.ts`.
+
+## Error handling
+
+- Server domain APIs: `throw createError(...)`.
+- Avoid new string throws (`throw 'up3'`) — legacy only in schedules.
+- Client: existing pages often ignore typed errors; for new UI, surface failures to the user (snackbar/dialog) consistently with the page you edit.
+
+## Testing
+
+No test runner. Do not add a full test stack unless asked. Manually verify: `npm run dev`, affected routes, and `npm run build` for production risk.
+
+`npm run format:check` exists but the legacy tree is largely unformatted — do **not** run repo-wide `npm run format` unless asked.
+
+## Commands
+
+```bash
+npm install
+cp .env.dist .env   # fill values — see docs/env.md
+npx supabase login  # for type gen
+npm run dev         # 0.0.0.0:80 (Telegram login needs this port)
+npm run build
+node .output/server/index.mjs
+npm run preview
+npm run type        # remote Supabase types
+npm run format      # Prettier write
+npm run format:check
+```
+
+Docker: `docker build . -t cartonis -f Dockerfile` then `docker run -p 80:80 --env-file .env -d cartonis`.
+
+## Do NOT
+
+- Invent schema fields, RLS rules, or business rules not in code/migrations.
+- Query club domain tables directly from the browser when an API exists.
+- Enable Telegram bots in `telegram-bots-starter` without explicit request.
+- Commit `.env`, `creds.json`, or generated `i18n/locales/*.json` / `.generated/*`.
+- Turn on `typescript.typeCheck` in nuxt.config without fixing known supabase/auth-js issues.
+- Mass-refactor i18n, gathering UI, or TG auth duplication without approval.
+- Add Pinia or a second CSS framework without approval.
+- Push to remote or force-push unless asked.

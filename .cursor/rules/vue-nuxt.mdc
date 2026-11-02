@@ -1,0 +1,16 @@
+---
+description: Vue SFC and Nuxt page/layout conventions
+globs: app/**/*.{vue,ts}
+alwaysApply: false
+---
+
+# Vue / Nuxt
+
+- Use `<script lang="ts" setup>` and Nuxt auto-imports (`useState`, `navigateTo`, `$fetch`).
+- Club pages live under `app/pages/clubs/[clubname]/`; parent `[clubname].vue` loads club into `useState('club')` and uses layout `in-da-club`.
+- `definePageMeta` for layout, name, validate, middleware — follow neighboring pages.
+- Auth-gated paths must align with `nuxt.config.ts` `supabase.redirectOptions.include`.
+- Global middleware: `set-session` (TG tokens), `club-admin-reroute` (`/admin*`).
+- Composables go in `app/composables/useX.ts`; utils in `app/utils/`.
+- Import domain types from `~/types/frontend` (or `#shared/types/...` if already used nearby).
+- Prefer kebab-case filenames; exception already exists: `telegramLoginButton.vue`.

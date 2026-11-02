@@ -4,6 +4,7 @@
 NAME: cartonium (Cartonis) | ROLE: boardgame club site — gatherings, collections, schedules
 STACK: Nuxt 4 + Vuetify + Supabase + i18n(ru/en) + Nitro tasks + Telegram bots
 AUTH: Telegram Login Widget → HMAC verify → synthetic email/password → Supabase tokens in query
+AI_DOCS: AGENTS.md | CODE_MAP.md | docs/ | .cursor/rules/*.mdc
 
 ## COMMANDS
 DEV: npm run dev
@@ -19,6 +20,8 @@ DOCKER_BUILD: docker build . -t cartonis -f Dockerfile
 DOCKER_RUN: docker run -p 80:80 --env-file .env -d cartonis
 DOCKER_LOCAL: sh execs/docker-builder.sh
 TEST: none
+FORMAT: npm run format
+FORMAT_CHECK: npm run format:check
 
 ## CONFIG / ROOT
 FILE: nuxt.config.ts | ROLE: Nuxt modules, i18n, supabase redirects, nitro tasks, port 80

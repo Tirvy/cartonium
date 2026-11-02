@@ -1,0 +1,15 @@
+---
+description: Quality checks, formatting, and verification
+globs: "**/*.{ts,vue,js,json,md}"
+alwaysApply: false
+---
+
+# Testing & quality
+
+- No unit/e2e suite. Do not add Jest/Vitest/Playwright unless requested.
+- Format with Prettier: `npm run format` / `npm run format:check` (`.prettierrc`).
+- `typescript.typeCheck` is **false** in `nuxt.config.ts` (known supabase/auth-js issue). Do not flip it casually.
+- `vue-tsc` is installed but not wired; prefer targeted manual checks over enabling broken global typecheck.
+- Before finishing risky changes: `npm run build` (or at least `npm run dev` smoke of touched routes).
+- Schema changes: migration under `supabase/migrations/`, then `npm run type`, adjust `shared/types/supabase.ts` overrides if needed.
+- Keep `CODE_MAP.md` / `docs/` accurate when adding endpoints or major features.
