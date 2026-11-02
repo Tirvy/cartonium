@@ -8,6 +8,7 @@ Copy `.env.dist` → `.env` and fill values. Never commit `.env` or `creds.json`
 |----------|---------|
 | `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_KEY` | Supabase anon/public key used by Nuxt module |
+| `SUPABASE_SERVICE_KEY` | Service-role key (Nitro tasks, club-schedule bot DB access) |
 | `npm_config_supabase_id` | Project ref for `execs/supabase-type.sh` / type gen |
 | `NUXT_BOT_TOKEN` | Telegram bot token for Login Widget HMAC + `botPublic` |
 | `NUXT_TELEGRAM_PASSWORD_GENERATOR` | Secret for deterministic TG→Supabase passwords |
@@ -23,6 +24,7 @@ Copy `.env.dist` → `.env` and fill values. Never commit `.env` or `creds.json`
 | `NUXT_BOT_LUBA_TOKEN` | Luba quiz bot |
 | `NUXT_BOT_LUBA_SPREADSHEET` | Luba questions sheet |
 | `NUXT_BOT_FLOODREADER_TOKEN` | Flood-reader bot (if enabled) |
+| `NUXT_BOT_SCHEDULE_TOKEN` | Club-schedule bot (`/start`, `/schedule`) |
 | `GOOGLE_CREDS_URL` | Docker build fetches Google creds |
 | `SUPABASE_ACCESS_TOKEN` | Docker typegen / supabase CLI |
 | `NITRO_PORT` / `PORT` | Container listen port |

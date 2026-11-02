@@ -15,6 +15,29 @@ export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
+      Tables: {
+        telegram_bot_club_bindings: {
+          Row: {
+            chat_id: number
+            bot_name: string
+            club_id: string
+            updated_at: string
+          }
+          Insert: {
+            chat_id: number
+            bot_name: string
+            club_id: string
+            updated_at?: string
+          }
+          Update: {
+            chat_id?: number
+            bot_name?: string
+            club_id?: string
+            updated_at?: string
+          }
+          Relationships: []
+        }
+      }
       Views: {
         gameboxes_with_club_id: {
           Row: {

@@ -36,7 +36,7 @@ FILE: i18n/locales/translations.csv | ROLE: nuxt-translation-manager source stri
 FILE: public/privacy-policy.html | ROLE: static privacy page
 FILE: execs/supabase-type.sh | ROLE: gen remote Supabase types → .generated/
 FILE: execs/docker-builder.sh | ROLE: docker build with .env as build-args
-ENV_KEYS: SUPABASE_URL, SUPABASE_KEY, npm_config_supabase_id, NUXT_BOT_TOKEN, NUXT_TELEGRAM_PASSWORD_GENERATOR, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE
+ENV_KEYS: SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY, npm_config_supabase_id, NUXT_BOT_TOKEN, NUXT_TELEGRAM_PASSWORD_GENERATOR, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
 DOCKER_ARGS_EXTRA: NUXT_BOT_LOGER_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_LUBA_SPREADSHEET, GOOGLE_CREDS_URL, SUPABASE_ACCESS_TOKEN, NITRO_PORT, PORT
 
 ## SHARED TYPES
@@ -200,7 +200,7 @@ FN: storeMessage(event, message) | ....
 FILE: server/utils/profile-club-rights.ts | ROLE: session user’s club_id list
 FN: profileClubRights(event) | ....
 FILE: server/plugins/bgg-timeout.ts | ROLE: serialize /api/bgg/* 2.5s gap; 429 → 5min cooldown
-FILE: server/plugins/telegram-bots-starter.ts | ROLE: intended bot launcher — bots={} (none started)
+FILE: server/plugins/telegram-bots-starter.ts | ROLE: bot launcher — club-schedule when token set
 FILE: server/tasks/telegram/send-messages.ts | ROLE: Nitro task drain pgmq → send TG
 TASK: telegram:send-messages | ROLE: rpc read queue, send, archive
 FILE: server/routes/auth/telegram-callback.ts | ROLE: TG signup/signin then sendRedirect w/ tokens
@@ -289,8 +289,20 @@ FILE: server/api/supabase/schedule.post.ts | ROLE: create/rename schedule + hist
 ENDPOINT: POST /api/supabase/schedule | ROLE: insert/update + history segments → id
 
 ## TELEGRAM BOTS
-NOTE: telegram-bots-starter currently starts none
-TOKENS: NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_FLOODREADER_TOKEN
+NOTE: telegram-bots-starter starts club-schedule when NUXT_BOT_SCHEDULE_TOKEN is set; other bots remain commented out
+TOKENS: NUXT_BOT_SCHEDULE_TOKEN, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_FLOODREADER_TOKEN
+
+### club-schedule — club gatherings list
+FILE: server/telegram-bots/club-schedule/bot-object.ts | ROLE: TelegramBot instance
+FILE: server/telegram-bots/club-schedule/club-schedule.ts | ROLE: polling + /start + /schedule
+CMDS: /start {club_id}, /schedule
+FILE: server/telegram-bots/club-schedule/supabase.ts | ROLE: service-role Supabase client
+FILE: server/telegram-bots/club-schedule/bindings.ts | ROLE: chat→club binding CRUD
+FN: getClubBinding(chatId) / setClubBinding(chatId, clubId) / isClubId(value) | ....
+FILE: server/telegram-bots/club-schedule/gatherings.ts | ROLE: fetch + format upcoming gatherings
+FN: fetchUpcomingGatherings(clubId) / formatGatheringsMessage(...) / findProfileIdByTelegramChatId(...) | ....
+FILE: server/telegram-bots/club-schedule/types.ts | ROLE: BOT_NAME, ClubBinding
+TABLE: telegram_bot_club_bindings | ROLE: (chat_id, bot_name) → club_id
 
 ### blood-bowl-tbilisi — league match-prediction (Tourplay + Google Sheet)
 FILE: server/telegram-bots/blood-bowl-tbilisi/README.md | ROLE: RU docs
@@ -333,6 +345,7 @@ FN: quickStart() | ....
 ## DB
 FILE: supabase/migrations/20260325073214_init.sql | ROLE: core schema + RLS
 FILE: supabase/migrations/20260328234215_profile_sync.sql | ROLE: public.profile + auth.users sync triggers
+FILE: supabase/migrations/20261102150000_telegram_bot_club_bindings.sql | ROLE: telegram bot chat→club bindings
 TABLE: gameboxes | ROLE: board-game catalog (Tesera/BGG ids, ratings, players, playtime)
 TABLE: clubs | ROLE: club identity (title, url_name)
 TABLE: clubs_collections | ROLE: club ↔ gamebox membership
@@ -345,6 +358,7 @@ TABLE: profiles_club_rights | ROLE: user–club role (relation_type)
 TABLE: tables | ROLE: physical tables at a club
 TABLE: telegram_chats | ROLE: user↔bot chat mapping
 TABLE: telegram_chats_logs | ROLE: bot/admin chat log mapping
+TABLE: telegram_bot_club_bindings | ROLE: side-bot chat→club context (service role)
 TABLE: user_schedules | ROLE: named availability calendars
 TABLE: user_schedules_history | ROLE: time-segment availability snapshots
 TABLE: profile | ROLE: auth-synced profile (email, full_name, avatar_url, terms_accepted_at)
