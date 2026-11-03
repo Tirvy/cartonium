@@ -1,27 +1,24 @@
-import { serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js'
-
-import { clubFromSupabase } from '#server/transformers';
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { clubs, clubsSettings } from '#server/db/schema'
+import { clubFromSupabase } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient<Database>(event);
-  const query = getQuery(event);
+  const query = getQuery(event)
+  const clubname = query.clubname as string
 
-  const clubname = query.clubname as string;
-
-
-  const clubData = await client.from('clubs').select('*').eq('url_name', clubname).single();
-  if (clubData.error) {
-    throw createError({ statusMessage: clubData.error.message })
-  }
-  const clubSettings = await client.from('clubs_settings').select('*').eq('club_id', clubData.data.id).single();
-  if (clubSettings.error) {
-    if (clubSettings.error.message !== 'JSON object requested, multiple (or no) rows returned') {
-      throw createError({ statusMessage: clubSettings.error.message })
-    }
+  const [clubData] = await db.select().from(clubs).where(eq(clubs.url_name, clubname)).limit(1)
+  if (!clubData) {
+    throw createError({ statusMessage: 'Club not found' })
   }
 
-  return clubFromSupabase(clubData.data, clubSettings.data || baseSettings);
+  const [clubSettings] = await db
+    .select()
+    .from(clubsSettings)
+    .where(eq(clubsSettings.club_id, clubData.id))
+    .limit(1)
+
+  return clubFromSupabase(clubData, clubSettings || baseSettings)
 })
 
 const baseSettings = {

@@ -1,28 +1,35 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
+import { and, asc, eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { userSchedules, userSchedulesHistory } from '#server/db/schema'
 import { scheduleFromSupabase } from '#server/transformers'
-import type { Schedule } from '#shared/types/frontend';
+import type { Schedule } from '#shared/types/frontend'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event): Promise<Schedule> => {
-    const client = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
-    const id = +(getQuery(event).scheduleId as string);
-    if (!id || isNaN(id) || !user) {
-        throw 'up3';
-    }
-    const scheduleRet = await client.from('user_schedules').select().eq('owner_id', user.id).eq('id', id).single();
-    if (scheduleRet.error) {
-        throw 'up5';
-    }
-    const scheduleHistoryRet = await client.from('user_schedules_history').select().eq('id', id).order('created_at');
-    if (scheduleRet.error) {
-        throw 'up7';
-    }
+  const user = await requireUser(event)
+  const id = +(getQuery(event).scheduleId as string)
+  if (!id || isNaN(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid schedule id' })
+  }
 
-    const retValue = {
-        ...scheduleRet.data,
-        history: scheduleHistoryRet.data
-    };
+  const [schedule] = await db
+    .select()
+    .from(userSchedules)
+    .where(and(eq(userSchedules.owner_id, user.id), eq(userSchedules.id, id)))
+    .limit(1)
 
-    return scheduleFromSupabase(retValue);
+  if (!schedule) {
+    throw createError({ statusCode: 404, statusMessage: 'Schedule not found' })
+  }
+
+  const history = await db
+    .select()
+    .from(userSchedulesHistory)
+    .where(eq(userSchedulesHistory.schedule_id, id))
+    .orderBy(asc(userSchedulesHistory.created_at))
+
+  return scheduleFromSupabase({
+    ...schedule,
+    history,
+  })
 })

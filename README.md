@@ -4,35 +4,16 @@ AI / contributor docs: [AGENTS.md](AGENTS.md) · [CODE_MAP.md](CODE_MAP.md) · [
 
 ## Setup
 
-Make sure to install the dependencies:
-
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
+cp .env.dist .env   # fill DATABASE_URL + Supabase Auth/Storage + Telegram secrets — see docs/env.md
+npm run db:up       # local Postgres via Docker Compose
+npm run db:migrate  # apply Drizzle domain schema
 ```
 
-## Supabase Login
+Supabase is still required for **Auth** and **Storage** (`SUPABASE_URL` / `SUPABASE_KEY`). Domain tables live in local Postgres.
 
-```bash
-npx supabase login
-```
-
-## Supabase Login
-
-Copy .env.dist as .env
-Fill out all fields in .env
-
-## Supabase autotypes (login requiered)
-
-```bash
-sh execs/supabase-type.sh
-```
+Optional Auth-era typegen: `npx supabase login` then `npm run type` / `sh execs/supabase-type.sh`.
 
 ## Development Server
 

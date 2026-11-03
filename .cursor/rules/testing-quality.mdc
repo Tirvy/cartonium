@@ -11,5 +11,5 @@ alwaysApply: false
 - `typescript.typeCheck` is **false** in `nuxt.config.ts` (known supabase/auth-js issue). Do not flip it casually.
 - `vue-tsc` is installed but not wired; prefer targeted manual checks over enabling broken global typecheck.
 - Before finishing risky changes: `npm run build` (or at least `npm run dev` smoke of touched routes).
-- Schema changes: migration under `supabase/migrations/`, then `npm run type`, adjust `shared/types/supabase.ts` overrides if needed.
+- Schema changes: edit `server/db/schema`, then `npm run db:generate` / `npm run db:migrate` (or `db:push`). Do not add domain schema under legacy `supabase/migrations/`.
 - Keep `CODE_MAP.md` / `docs/` accurate when adding endpoints or major features.

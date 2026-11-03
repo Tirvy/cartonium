@@ -11,7 +11,8 @@ Boardgame club platform: organize gatherings (RSVP), manage game collections (Te
 | Layer | Tech |
 |-------|------|
 | App | Nuxt 4 (`nuxt` ^4.4), Vue 3, Vuetify (`vuetify-nuxt-module`) |
-| Data | Supabase (Auth + Postgres + Storage), `@nuxtjs/supabase` |
+| Domain DB | Local Postgres + Drizzle (`DATABASE_URL`) |
+| Auth / Storage | Supabase Auth + Storage (`gamebox-pics`) via `@nuxtjs/supabase` |
 | i18n | `@nuxtjs/i18n` + `nuxt-translation-manager` (`i18n/locales/translations.csv`) |
 | Server | Nitro API routes, optional Nitro tasks, Telegram bots (`typescript-telegram-bot-api`) |
 | External | BoardGameGeek XML API, Tesera API, Google Sheets (bots) |
@@ -21,24 +22,27 @@ Boardgame club platform: organize gatherings (RSVP), manage game collections (Te
 ## Architecture principles
 
 1. **File-based Nuxt routing** under `app/pages/`; club routes nest under `/clubs/[clubname]/`.
-2. **Server owns DB access** — pages call `$fetch('/api/supabase/...')`; do not query Supabase tables from the client for club domain data (Auth client is OK via `useSupabaseClient` / `useSupabaseUser`).
+2. **Server owns DB access** — pages call `$fetch('/api/supabase/...')`; domain queries use Drizzle (`#server/db`). Client may use Supabase Auth (`useSupabaseClient` / `useSupabaseUser`) and Storage public URLs only.
 3. **Transform at the boundary** — snake_case DB rows ↔ camelCase UI types in `server/transformers.ts`.
-4. **Shared types** live in `shared/types/frontend.ts` (UI) and `shared/types/supabase.ts` (DB overrides).
+4. **Shared types** live in `shared/types/frontend.ts` (UI). Domain schema types come from Drizzle (`server/db/schema`). `shared/types/supabase.ts` is legacy Auth-era overrides.
 5. **No Pinia** — shared UI state uses Nuxt `useState` keys: `club`, `clubPermissions`, `lastGathering`, `lastGatheringName`.
 6. **Telegram bots are optional** — `server/plugins/telegram-bots-starter.ts` currently starts none (`bots={}`).
+7. **Identity** — Supabase Auth UUID (`serverSupabaseUser` / `requireUser`); write `owner_id` / profile ids explicitly (no `auth.uid()` on local Postgres).
 
 ## Project structure (short)
 
 ```
 app/           pages, components, composables, layouts, middleware, plugins, utils
-server/api/    Nitro handlers (bgg, tesera, common, supabase)
-server/utils/  TG auth, notify, rights
+server/api/    Nitro handlers (bgg, tesera, common, supabase route prefix)
+server/db/     Drizzle client + schema + migrations (domain Postgres)
+server/utils/  TG auth, notify, rights, require-user
 server/telegram-bots/  optional side bots
-shared/types/  frontend + supabase types
-supabase/migrations/  schema source of truth
+shared/types/  frontend (+ legacy supabase overrides)
+supabase/migrations/  LEGACY cloud schema reference only
 i18n/locales/  translations.csv → generated *.json (gitignored)
 docs/          human/AI architecture docs
 CODE_MAP.md    path → role inventory (token-efficient)
+docker-compose.yml  local Postgres
 ```
 
 ## Coding conventions
@@ -64,8 +68,8 @@ CODE_MAP.md    path → role inventory (token-efficient)
 ## Adding features
 
 1. Read `CODE_MAP.md` + relevant `docs/features/*.md`.
-2. Types first in `shared/types/frontend.ts` (and migrations + `npm run type` if schema changes).
-3. Server: add `server/api/...` handler; transform via `server/transformers.ts` if mapping rows.
+2. Types first in `shared/types/frontend.ts`; schema changes in `server/db/schema` then `npm run db:generate` / `db:migrate`.
+3. Server: add `server/api/...` handler using `#server/db`; transform via `server/transformers.ts` if mapping rows.
 4. Client: page under `app/pages/`, reuse components; `$fetch` existing API style.
 5. Permissions: check `profiles_club_rights` / composables (`useClubPermissions`, `useGetGlobalPermissions`) and supabase redirect includes in `nuxt.config.ts` if the route must be auth-gated.
 6. Update `CODE_MAP.md` and feature doc if the surface area changes.
@@ -79,10 +83,10 @@ CODE_MAP.md    path → role inventory (token-efficient)
 
 ## API & data
 
-- Client: `$fetch('/api/supabase/...')` or `useFetch` (rare). Typing `$fetch<>` is encouraged for new calls.
-- Server: `serverSupabaseClient` / service patterns already in handlers; return transformed objects.
+- Client: `$fetch('/api/supabase/...')` or `useFetch` (rare). Typing `$fetch<>` is encouraged for new calls. Route prefix is historical; handlers use Drizzle.
+- Server domain: `db` from `#server/db` + `requireUser` when auth is required. Auth/Storage still via `#supabase/server`.
 - Errors: prefer `createError({ statusCode, statusMessage })`. External BGG/Tesera often return `{ items: [], error }` with HTTP 200 — preserve that pattern when extending those proxies.
-- Regenerated DB types: `npm run type` → `.generated/supabase-database.ts` (gitignored); overrides in `shared/types/supabase.ts`.
+- Domain schema: Drizzle (`server/db/schema`, `server/db/migrations`). Optional remote Auth typing: `npm run type` → `.generated/supabase-database.ts` (gitignored).
 
 ## Error handling
 
@@ -101,21 +105,25 @@ No test runner. Do not add a full test stack unless asked. Manually verify: `npm
 ```bash
 npm install
 cp .env.dist .env   # fill values — see docs/env.md
-npx supabase login  # for type gen
+npm run db:up       # local Postgres (Docker)
+npm run db:migrate  # apply Drizzle migrations
 npm run dev         # 0.0.0.0:80 (Telegram login needs this port)
 npm run build
 node .output/server/index.mjs
 npm run preview
-npm run type        # remote Supabase types
+npm run db:generate # after schema edits
+npm run db:studio
+npm run type        # optional remote Supabase Auth-era types
 npm run format      # Prettier write
 npm run format:check
 ```
 
-Docker: `docker build . -t cartonis -f Dockerfile` then `docker run -p 80:80 --env-file .env -d cartonis`.
+App Docker image: `docker build . -t cartonis -f Dockerfile` then `docker run -p 80:80 --env-file .env -d cartonis`.
 
 ## Do NOT
 
-- Invent schema fields, RLS rules, or business rules not in code/migrations.
+- Invent schema fields or business rules not in `server/db/schema` / existing APIs.
+- Add new domain schema under `supabase/migrations/` (legacy only).
 - Query club domain tables directly from the browser when an API exists.
 - Enable Telegram bots in `telegram-bots-starter` without explicit request.
 - Commit `.env`, `creds.json`, or generated `i18n/locales/*.json` / `.generated/*`.

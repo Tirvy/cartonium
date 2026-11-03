@@ -1,50 +1,45 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
-import { gatheringFromSupabase } from '#server/transformers'
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { userSchedules, userSchedulesHistory } from '#server/db/schema'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event)
-    const user = await serverSupabaseUser(event);
+  const user = await requireUser(event)
+  const body = await readBody(event)
 
-    if (!user) {
-        throw createError({ statusMessage: 'User not found' })
-    }
-    const body = await readBody(event);
+  let scheduleId = body.id
 
-    let scheduleId = body.id;
+  if (!scheduleId) {
+    const [created] = await db
+      .insert(userSchedules)
+      .values({
+        title: body.title,
+        archive: false,
+        visibility: 'hidden',
+        owner_id: user.id,
+      })
+      .returning()
+    scheduleId = created?.id
+  } else if (body.title) {
+    await db
+      .update(userSchedules)
+      .set({ title: body.title })
+      .where(eq(userSchedules.id, scheduleId))
+  }
 
-    if (!scheduleId) {
-        const retCreate = await client.from('user_schedules').insert(
-            {
-                title: body.title,
-                archive: false,
-                visibility: 'hidden',
-                owner_id: user.id,
-            }).select().single();
-        if (retCreate.error) {
+  const [historyRow] = await db
+    .insert(userSchedulesHistory)
+    .values({
+      schedule_id: scheduleId,
+      start_date: body.startDate,
+      segment_size: 60,
+      segments: body.segments,
+    })
+    .returning()
 
-        } else {
-            scheduleId = retCreate.data.id
-        }
-    } else if (body.title) {
-        const retRename = await client.from('user_schedules').update(
-            {
-                id: scheduleId,
-                title: body.title,
-            }).eq('id', scheduleId).select().single();
-        console.log(retRename);
-    }
+  if (!historyRow) {
+    throw createError({ statusMessage: 'Failed to save schedule history' })
+  }
 
-    const { data, error } = await client.from('user_schedules_history').insert(
-        {
-            schedule_id: scheduleId,
-            start_date: body.startDate,
-            segment_size: 60,
-            segments: body.segments,
-        }).select().single();
-    if (error) {
-        throw createError({ statusMessage: error.message })
-    }
-
-    return scheduleId;
+  return scheduleId
 })

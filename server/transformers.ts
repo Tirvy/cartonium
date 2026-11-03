@@ -1,4 +1,4 @@
-import type { ClubCollection, ClubInfo, Club, GameBox, Gathering, GatheringWithGuests, Schedule } from '~/types/frontend.js';
+import type { ClubCollection, ClubInfo, Club, GameBoxWithClub, Gathering, GatheringWithGuests, Schedule } from '~/types/frontend.js';
 
 // clubs
 export function clubFromSupabase(data: any, clubSettingsData: any): Club {
@@ -36,8 +36,8 @@ export function clubInfoFromSupabase(data: any): ClubInfo {
     };
 }
 
-// gameBox
-export function gameBoxFromSupabase(data: Tables<'gameboxes_with_club_id'> | Tables<'gameboxes'>): GameBoxWithClub {
+// gameBox (snake_case rows from local Postgres / Drizzle)
+export function gameBoxFromSupabase(data: any): GameBoxWithClub {
     return {
         aliasTesera: data.alias_tesera || undefined,
         id: data.id,
@@ -60,7 +60,7 @@ export function gameBoxFromSupabase(data: Tables<'gameboxes_with_club_id'> | Tab
         clubId: 'club_id' in data ? data.club_id : null,
     };
 }
-export function gameBoxToSupabase(gameBox: GameBoxWithClub): Tables<'gameboxes'> {
+export function gameBoxToSupabase(gameBox: GameBoxWithClub): Record<string, unknown> {
     return {
         alias_tesera: gameBox.aliasTesera || null,
         id_bgg: gameBox.idBgg || null,

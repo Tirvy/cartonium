@@ -1,14 +1,27 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
+import { db } from '#server/db'
+import { tables } from '#server/db/schema'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event)
-    const body = await readBody(event);
+  const body = await readBody(event)
 
-    const { data, error } = await client.from('tables').upsert(body, { onConflict: 'id' }).select();
-    if (error) {
-        throw createError({ statusMessage: error.message })
-    }
+  let data
+  if (body.id) {
+    ;[data] = await db
+      .insert(tables)
+      .values(body)
+      .onConflictDoUpdate({
+        target: tables.id,
+        set: {
+          club_id: body.club_id,
+          title: body.title,
+          description: body.description,
+          people_max: body.people_max,
+        },
+      })
+      .returning()
+  } else {
+    ;[data] = await db.insert(tables).values(body).returning()
+  }
 
-    return data
+  return data ? [data] : []
 })

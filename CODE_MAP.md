@@ -2,8 +2,8 @@
 
 ## PROJECT
 NAME: cartonium (Cartonis) | ROLE: boardgame club site — gatherings, collections, schedules
-STACK: Nuxt 4 + Vuetify + Supabase + i18n(ru/en) + Nitro tasks + Telegram bots
-AUTH: Telegram Login Widget → HMAC verify → synthetic email/password → Supabase tokens in query
+STACK: Nuxt 4 + Vuetify + local Postgres/Drizzle + Supabase Auth/Storage + i18n(ru/en) + Nitro tasks + Telegram bots
+AUTH: Telegram Login Widget → HMAC verify → synthetic email/password → Supabase tokens in query; profiles in local Postgres
 AI_DOCS: AGENTS.md | CODE_MAP.md | docs/ | .cursor/rules/*.mdc
 
 ## COMMANDS
@@ -13,6 +13,11 @@ DEV_HOST: npm run devhost
 BUILD: npm run build
 START_PROD: node .output/server/index.mjs
 PREVIEW: npm run preview
+DB_UP: npm run db:up
+DB_MIGRATE: npm run db:migrate
+DB_GENERATE: npm run db:generate
+DB_PUSH: npm run db:push
+DB_STUDIO: npm run db:studio
 TYPES: npm run type
 TYPES_LOCAL: npm run type-local
 TYPES_SH: sh execs/supabase-type.sh
@@ -27,6 +32,8 @@ FORMAT_CHECK: npm run format:check
 FILE: nuxt.config.ts | ROLE: Nuxt modules, i18n, supabase redirects, nitro tasks, port 80
 FILE: vuetify.config.ts | ROLE: light/dark themes, VBtn defaults, locale ru
 FILE: tsconfig.json | ROLE: extends .nuxt/tsconfig; verbatimModuleSyntax false
+FILE: drizzle.config.ts | ROLE: Drizzle Kit config → server/db/migrations
+FILE: docker-compose.yml | ROLE: local Postgres 16
 FILE: Dockerfile | ROLE: node:20-alpine build + CMD .output/server/index.mjs
 FILE: .env.dist | ROLE: env template (names only below)
 FILE: .dockerignore | ROLE: docker ignore rules
@@ -34,16 +41,24 @@ FILE: package.json | ROLE: scripts + deps
 FILE: README.md | ROLE: setup/run docs
 FILE: i18n/locales/translations.csv | ROLE: nuxt-translation-manager source strings
 FILE: public/privacy-policy.html | ROLE: static privacy page
-FILE: execs/supabase-type.sh | ROLE: gen remote Supabase types → .generated/
+FILE: execs/supabase-type.sh | ROLE: optional remote Auth-era types → .generated/
 FILE: execs/docker-builder.sh | ROLE: docker build with .env as build-args
-ENV_KEYS: SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY, npm_config_supabase_id, NUXT_BOT_TOKEN, NUXT_TELEGRAM_PASSWORD_GENERATOR, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
+ENV_KEYS: DATABASE_URL, POSTGRES_*, SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY, npm_config_supabase_id, NUXT_BOT_TOKEN, NUXT_TELEGRAM_PASSWORD_GENERATOR, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
 DOCKER_ARGS_EXTRA: NUXT_BOT_LOGER_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_LUBA_SPREADSHEET, GOOGLE_CREDS_URL, SUPABASE_ACCESS_TOKEN, NITRO_PORT, PORT
 
 ## SHARED TYPES
 FILE: shared/types/frontend.ts | ROLE: UI/domain camelCase types
-FILE: shared/types/supabase.ts | ROLE: MergeDeep override of generated DB types
+FILE: shared/types/supabase.ts | ROLE: legacy MergeDeep override of generated Auth-era DB types (domain queries use Drizzle)
 FILE: shared/types/index.d.ts | ROLE: Nitro $Fetch typed-response override
 FILE: shared/types/visit.d.ts | ROLE: Visit type (unused by app)
+
+## SERVER DB (Drizzle)
+FILE: server/db/index.ts | ROLE: postgres.js + drizzle singleton
+FILE: server/db/schema/index.ts | ROLE: domain tables + views (snake_case fields)
+FILE: server/db/migrations/ | ROLE: SQL migrations from drizzle-kit
+FILE: server/utils/require-user.ts | ROLE: require Supabase Auth user for domain writes
+FILE: server/utils/upsert-profile.ts | ROLE: TG login → local profiles upsert
+
 
 TYPE: GameBox { id, aliasTesera, idBgg, idTesera, linkBgg, linkTesera, photoUrl, playersGood, playersMax, playersMin, playtimeAvg, playtimeMax, playtimeMin, ratingBgg, ratingTesera, title, titles, year }
 TYPE: GameBoxWithClub extends GameBox { clubId }
@@ -176,7 +191,7 @@ FILE: app/components/pages/add-games/gamebox-columns.ts | ROLE: GameBox field na
 FILE: app/components/pages/add-games/data.js | ROLE: sample multiline game titles
 
 ## SERVER — TRANSFORMERS / UTILS / PLUGINS / TASKS / ROUTES
-FILE: server/transformers.ts | ROLE: snake_case Supabase ↔ camelCase frontend
+FILE: server/transformers.ts | ROLE: snake_case DB rows ↔ camelCase frontend
 FN: clubFromSupabase(data, clubSettingsData) → Club | ....
 FN: clubCollectionFromSupabase(data) → ClubCollection | ....
 FN: clubInfoFromSupabase(data) → ClubInfo | ....
@@ -240,6 +255,7 @@ FILE: server/api/common/gamebox-check-exists.ts | ROLE: proxy existence check (s
 ENDPOINT: GET /api/common/gamebox-check-exists?alias= | ROLE: proxies check-game-exists
 
 ## SERVER — API SUPABASE
+NOTE: /api/supabase/* handlers use Drizzle (#server/db); Auth/Storage stay on Supabase
 FILE: server/api/supabase/club-data.get.ts | ROLE: club by url_name + settings
 ENDPOINT: GET /api/supabase/club-data?clubname= | ROLE: → Club
 FILE: server/api/supabase/club-info.get.ts | ROLE: club HTML info
@@ -343,9 +359,10 @@ FILE: server/telegram-bots/flood-reader/flood-reader.ts | ROLE: starts polling; 
 FN: quickStart() | ....
 
 ## DB
-FILE: supabase/migrations/20260325073214_init.sql | ROLE: core schema + RLS
-FILE: supabase/migrations/20260328234215_profile_sync.sql | ROLE: public.profile + auth.users sync triggers
-FILE: supabase/migrations/20261102150000_telegram_bot_club_bindings.sql | ROLE: telegram bot chat→club bindings
+FILE: supabase/migrations/README.md | ROLE: legacy cloud schema — do not extend; use server/db
+FILE: supabase/migrations/20260325073214_init.sql | ROLE: LEGACY cloud dump (reference only)
+FILE: supabase/migrations/20260328234215_profile_sync.sql | ROLE: LEGACY auth.users sync (not used locally)
+FILE: supabase/migrations/20261102150000_telegram_bot_club_bindings.sql | ROLE: LEGACY bot bindings SQL (ported to Drizzle)
 TABLE: gameboxes | ROLE: board-game catalog (Tesera/BGG ids, ratings, players, playtime)
 TABLE: clubs | ROLE: club identity (title, url_name)
 TABLE: clubs_collections | ROLE: club ↔ gamebox membership

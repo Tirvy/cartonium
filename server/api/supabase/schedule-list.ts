@@ -1,22 +1,13 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { userSchedules } from '#server/db/schema'
 import { scheduleFromSupabase } from '#server/transformers'
-import type { Schedule } from '#shared/types/frontend';
+import type { Schedule } from '#shared/types/frontend'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event): Promise<Schedule[]> => {
-    const client = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
+  const user = await requireUser(event)
 
-    if (!user) {
-        throw 'up325';
-    }
-
-    const schedulesRet = await client.from('user_schedules').select().eq('owner_id', user.id);
-    if (schedulesRet.error) {
-        throw 'up21';
-    }
-
-    const retValue = schedulesRet.data.map(scheduleFromSupabase);
-
-    return retValue;
+  const schedules = await db.select().from(userSchedules).where(eq(userSchedules.owner_id, user.id))
+  return schedules.map(scheduleFromSupabase)
 })

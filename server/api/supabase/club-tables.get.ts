@@ -1,21 +1,16 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js';
-import { tablesFromSupabase } from '#server/transformers';
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { tables } from '#server/db/schema'
+import { tablesFromSupabase } from '#server/transformers'
 
 export default defineEventHandler(async (event): Promise<Table[]> => {
-  const query = getQuery(event);
-  const clubId = query.clubid as string;
+  const query = getQuery(event)
+  const clubId = query.clubid as string
 
   if (!clubId) {
     throw createError({ statusMessage: 'Missing clubid' })
   }
 
-  const client = await serverSupabaseClient<Database>(event)
-
-  const { data, error } = await client.from('tables').select('*').eq('club_id', clubId);
-  if (error) {
-    throw createError({ statusMessage: error.message })
-  }
-
-  return data.map(tablesFromSupabase);
+  const data = await db.select().from(tables).where(eq(tables.club_id, clubId))
+  return data.map(tablesFromSupabase)
 })

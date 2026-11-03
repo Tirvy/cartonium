@@ -1,32 +1,41 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
+import { db } from '#server/db'
+import { gatherings, gatheringsGuests } from '#server/db/schema'
 import { gatheringFromSupabase } from '#server/transformers'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event)
-    const user = await serverSupabaseUser(event);
+  const user = await requireUser(event)
+  const body = await readBody(event)
+  const { with_host: _withHost, ...rest } = body
 
-    if (!user) {
-        throw createError({ statusMessage: 'User not found' })
-    }
-    const body = await readBody(event);
+  const values = {
+    ...rest,
+    owner_id: rest.owner_id || user.id,
+  }
 
-    const { data, error } = await client.from('gatherings').upsert(
-        {
-            ...body,
-            with_host: undefined,
-        }, { onConflict: 'id' }).select().single();
-    if (error) {
-        throw createError({ statusMessage: error.message })
-    }
+  let data
+  if (values.id) {
+    ;[data] = await db
+      .insert(gatherings)
+      .values(values)
+      .onConflictDoUpdate({
+        target: gatherings.id,
+        set: values,
+      })
+      .returning()
+  } else {
+    ;[data] = await db.insert(gatherings).values(values).returning()
+  }
 
-    const addinGuestsRes = await client.from('gatherings_guests').insert(
-        {
-            gathering_id: data.id,
-            user_id: user.id,
-            guests_number: (+body.with_host || 0) + 1,
-        }
-    );
+  if (!data) {
+    throw createError({ statusMessage: 'Failed to save gathering' })
+  }
 
-    return gatheringFromSupabase(data);
+  await db.insert(gatheringsGuests).values({
+    gathering_id: data.id,
+    user_id: user.id,
+    guests_number: (+body.with_host || 0) + 1,
+  })
+
+  return gatheringFromSupabase(data)
 })

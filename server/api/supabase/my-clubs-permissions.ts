@@ -1,26 +1,22 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js'
+import { and, eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { profiles, profilesClubRights } from '#server/db/schema'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event);
-    const query = getQuery(event);
-    const userid = query.userid as string;
-    const clubid = query.clubid as string;
-    if (!userid || !clubid) {
-        return [];
-    }
+  const query = getQuery(event)
+  const userid = query.userid as string
+  const clubid = query.clubid as string
+  if (!userid || !clubid) {
+    return []
+  }
 
-    let profile = await client.from('profiles').select('*')
-        .eq('id', userid).single();
-    if (profile.error) {
-        throw createError({ statusMessage: profile.error.message })
-    }
+  const [profile] = await db.select().from(profiles).where(eq(profiles.id, userid)).limit(1)
+  if (!profile) {
+    throw createError({ statusMessage: 'Profile not found' })
+  }
 
-    let clubs = await client.from('profiles_club_rights').select('*')
-        .eq('profile_id', userid).eq('club_id', clubid);
-    if (clubs.error) {
-        throw createError({ statusMessage: clubs.error.message })
-    }
-
-    return clubs.data;
+  return db
+    .select()
+    .from(profilesClubRights)
+    .where(and(eq(profilesClubRights.profile_id, userid), eq(profilesClubRights.club_id, clubid)))
 })

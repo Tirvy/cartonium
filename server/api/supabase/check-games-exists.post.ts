@@ -1,32 +1,27 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
-import { gameBoxFromSupabase } from '#server/transformers';
+import { arrayOverlaps } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gameboxes } from '#server/db/schema'
+import { gameBoxFromSupabase } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event);
-  const body = await readBody(event);
-  let titles = (body.titles as string[]);
+  const body = await readBody(event)
+  let titles = body.titles as string[]
   if (!titles?.length) {
     throw createError({ statusMessage: 'title required' })
   }
-  titles = titles.map(title => title.trim());
-  const client = await serverSupabaseClient<Database>(event);
+  titles = titles.map((title) => title.trim())
 
-  let retData: any[] = [];
+  let retData: (typeof gameboxes.$inferSelect)[] = []
 
-  const splitLimit = 80;
-  let titlesLeft = [...titles];
+  const splitLimit = 80
+  let titlesLeft = [...titles]
   while (titlesLeft.length > 0) {
-    const toSlice = titlesLeft.length > splitLimit ? splitLimit : titlesLeft.length;
-    const titlesNow = titlesLeft.slice(0, toSlice);
-    const { data, error } = await client.from('gameboxes').select('*').overlaps('titles', titlesNow);
-    if (error) {
-      throw createError({ message: error.message })
-    }
-    retData = retData.concat(data);
-    titlesLeft = titlesLeft.slice(toSlice);
+    const toSlice = titlesLeft.length > splitLimit ? splitLimit : titlesLeft.length
+    const titlesNow = titlesLeft.slice(0, toSlice)
+    const data = await db.select().from(gameboxes).where(arrayOverlaps(gameboxes.titles, titlesNow))
+    retData = retData.concat(data)
+    titlesLeft = titlesLeft.slice(toSlice)
   }
 
-
-  return retData.map((item: Tables<'gameboxes'>) => gameBoxFromSupabase(item));
+  return retData.map((item) => gameBoxFromSupabase(item))
 })

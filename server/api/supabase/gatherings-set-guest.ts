@@ -1,33 +1,43 @@
-import { serverSupabaseUser, serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
-import telegramNotify from '#server/utils/telegram-notify';
-import type { User } from '@supabase/auth-js';
+import { and, eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gatheringsGuests, gatheringsWithGuests } from '#server/db/schema'
+import telegramNotify from '#server/utils/telegram-notify'
+import requireUser from '#server/utils/require-user'
+import type { User } from '@supabase/auth-js'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient<Database>(event)
-  const user = await serverSupabaseUser(event);
+  const user = await requireUser(event)
+  const body = await readBody(event)
 
-  if (!user) {
-    throw createError({ statusMessage: 'User not found' })
-  }
-  const body = await readBody(event);
+  const previousData = await db
+    .select()
+    .from(gatheringsWithGuests)
+    .where(
+      and(
+        eq(gatheringsWithGuests.id, body.gathering_id),
+        eq(gatheringsWithGuests.user_id, body.guest_id),
+      ),
+    )
 
-  const previousDataResponse = await client.from('gatherings_with_guests').select()
-    .eq('id', body.gathering_id).eq('user_id', body.guest_id);
-
-  const { data, error } = await client.from('gatherings_guests').upsert(
-    {
+  const [data] = await db
+    .insert(gatheringsGuests)
+    .values({
       gathering_id: body.gathering_id,
       user_id: body.guest_id,
       guests_number: body.number,
-    }, { onConflict: 'gathering_id, user_id' }).select().single();
+    })
+    .onConflictDoUpdate({
+      target: [gatheringsGuests.gathering_id, gatheringsGuests.user_id],
+      set: { guests_number: body.number },
+    })
+    .returning()
 
-  if (error) {
-    throw createError({ statusMessage: error.message })
+  if (!data) {
+    throw createError({ statusMessage: 'Failed to update guest' })
   }
 
-  if (previousDataResponse.data?.length) {
-    const message = creatMessage(user, data, previousDataResponse?.data);
+  if (previousData.length) {
+    const message = creatMessage(user, data, previousData)
 
     telegramNotify(event, {
       to: user.user_metadata.telegram_id,
@@ -35,37 +45,41 @@ export default defineEventHandler(async (event) => {
       type: 'gathering-player-change',
       why: `because i can`,
       what: message,
-    });
+    })
   }
 
-  return { status: 'ok' };
+  return { status: 'ok' }
 })
 
-function creatMessage(user: User, newData: Database['public']['Tables']['gatherings_guests']['Row'], previousData: Database['public']['Views']['gatherings_with_guests']['Row'][]) {
-  let message = 'Gathering for ';
+function creatMessage(
+  user: User,
+  newData: typeof gatheringsGuests.$inferSelect,
+  previousData: (typeof gatheringsWithGuests.$inferSelect)[],
+) {
+  let message = 'Gathering for '
 
-  const userPrevData = previousData.find(item => item.user_id === user.id);
-  const userPrevGuests = userPrevData?.guests_number;
-  const userNewGuests = newData.guests_number;
-  const gatheringData: Database['public']['Views']['gatherings_with_guests']['Row'] = previousData[0];
+  const userPrevData = previousData.find((item) => item.user_id === user.id)
+  const userPrevGuests = userPrevData?.guests_number
+  const userNewGuests = newData.guests_number
+  const gatheringData = previousData[0]
 
-  const gamebox = gatheringData.gamebox as Database['public']['Tables']['gameboxes']['Row'];
-  message += `*${(gamebox?.title || gatheringData.own_name)}*`;
+  const gamebox = gatheringData.gamebox as { title?: string } | null
+  message += `*${gamebox?.title || gatheringData.own_name}*`
 
   if (gatheringData.start_date) {
-    const date = (new Date(gatheringData.start_date)).toLocaleDateString();
-    message += ' at ' + date;
+    const date = new Date(gatheringData.start_date).toLocaleDateString()
+    message += ' at ' + date
   }
-  message += ':\n';
+  message += ':\n'
 
-  let username = user.user_metadata.full_name;
+  let username = user.user_metadata.full_name
   if (user.user_metadata.telegram_username) {
-    username += ` @${user.user_metadata.telegram_username}`;
+    username += ` @${user.user_metadata.telegram_username}`
   }
   if (!userPrevData || userPrevGuests === 0) {
     message += `${username} joined`
     if (userNewGuests > 1) {
-      message += ` with ${userNewGuests - 1} guests`;
+      message += ` with ${userNewGuests - 1} guests`
     }
   } else if (newData?.guests_number === 0) {
     message += `${username} left`

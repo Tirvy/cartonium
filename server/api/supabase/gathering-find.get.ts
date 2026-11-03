@@ -1,24 +1,27 @@
-import { serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js';
-import { gatheringFromSupabase } from '#server/transformers';
-import { Gathering } from '#shared/types/frontend';
+import { and, eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gatherings } from '#server/db/schema'
+import { gatheringFromSupabase } from '#server/transformers'
+import type { Gathering } from '#shared/types/frontend'
 
 export default defineEventHandler(async (event): Promise<Gathering> => {
-  const client = await serverSupabaseClient<Database>(event);
-  const query = getQuery(event);
-  const clubid = query.clubid as string;
-  const gatheringid = query.gatheringid as string;
+  const query = getQuery(event)
+  const clubid = query.clubid as string
+  const gatheringid = query.gatheringid as string
 
   if (isNaN(+gatheringid)) {
-    throw createError({ statusMessage: 'Gathering ID must be a number' });
+    throw createError({ statusMessage: 'Gathering ID must be a number' })
   }
 
-  const { data, error } = await client.from('gatherings').select('*').eq('club_id', clubid).eq('id', +gatheringid).single();
+  const [data] = await db
+    .select()
+    .from(gatherings)
+    .where(and(eq(gatherings.club_id, clubid), eq(gatherings.id, +gatheringid)))
+    .limit(1)
 
-  if (error) {
-    throw createError({ statusMessage: error.message })
+  if (!data) {
+    throw createError({ statusMessage: 'Gathering not found' })
   }
 
-
-  return gatheringFromSupabase(data);
+  return gatheringFromSupabase(data)
 })

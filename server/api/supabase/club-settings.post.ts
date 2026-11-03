@@ -1,13 +1,17 @@
-import { serverSupabaseClient } from '#supabase/server'
-import type { Database } from '#shared/types/supabase.js'
+import { db } from '#server/db'
+import { clubsSettings } from '#server/db/schema'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event)
-    const body = await readBody(event);
+  const body = await readBody(event)
 
-    const { data, error } = await client.from('clubs_settings').upsert(body, { onConflict: 'club_id' }).select().single();
-    if (error) {
-        throw createError({ statusMessage: error.message })
-    }
-    return (data);
+  const [data] = await db
+    .insert(clubsSettings)
+    .values(body)
+    .onConflictDoUpdate({
+      target: clubsSettings.club_id,
+      set: body,
+    })
+    .returning()
+
+  return data
 })

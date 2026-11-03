@@ -1,40 +1,41 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js'
-import type { GameBox, GameBoxWithClub } from "#shared/types/frontend.js";
-import { gameBoxFromSupabase } from '#server/transformers.js';
+import { and, asc, desc, ilike } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gameboxes } from '#server/db/schema'
+import type { GameBoxWithClub } from '#shared/types/frontend.js'
+import { gameBoxFromSupabase } from '#server/transformers.js'
 
-// todo: fix next line!
-/// its a copypasta from club-collection
 export default defineEventHandler(async (event): Promise<{ items: GameBoxWithClub[] }> => {
-  const query = getQuery(event) as { page: number, itemsPerPage: number, sortBy: { key: string, order: string }, search: string };
+  const query = getQuery(event) as {
+    page: number
+    itemsPerPage: number
+    sortBy: { key: string; order: string }
+    search: string
+  }
 
-  const client = await serverSupabaseClient<Database>(event)
-
-  const pageSize = +query.itemsPerPage || 25;
-  let request = client.from('gameboxes').select('*');
+  const pageSize = +query.itemsPerPage || 25
+  const conditions = []
   if (query.search) {
-    request = request.textSearch("title", query.search, {
-      type: 'websearch',
-    })
-  }
-  if (query.page) {
-    const page = query.page - 1;
-    request = request.range(page * pageSize, (page + 1) * pageSize);
-  }
-  if (query.sortBy) {
-    request = request.order(query.sortBy.key, { ascending: query.sortBy.order === 'ascending' })
+    conditions.push(ilike(gameboxes.title, `%${query.search}%`))
   }
 
-  const { data, error } = await request;
-  if (error) {
-    throw createError({ statusMessage: error.message })
+  let orderExpr = desc(gameboxes.id)
+  if (query.sortBy?.key) {
+    const col = (gameboxes as any)[query.sortBy.key] ?? gameboxes.id
+    orderExpr = query.sortBy.order === 'ascending' ? asc(col) : desc(col)
   }
 
-  // const ret_data = data.map(item => {
-  //   return gameBoxFromSupabase(item);
-  // })
+  const page = query.page ? +query.page - 1 : 0
+  const offset = page * pageSize
+
+  const data = await db
+    .select()
+    .from(gameboxes)
+    .where(conditions.length ? and(...conditions) : undefined)
+    .orderBy(orderExpr)
+    .limit(pageSize)
+    .offset(offset)
 
   return {
-    items: data.map(gameBoxFromSupabase)
-  };
+    items: data.map(gameBoxFromSupabase),
+  }
 })

@@ -1,7 +1,6 @@
 import { serverSupabaseClient } from '#supabase/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import telegramPasswordGenerator from '#server/utils/telegram-password-generator';
-import type { User } from '@supabase/auth-js';
+import upsertProfile from '#server/utils/upsert-profile';
 import telegramBots from '#server/utils/telegram-bots';
 
 const techChatId = 327078611;
@@ -67,7 +66,7 @@ export default defineEventHandler(async (event) => {
 
   const sessionSource = singInRes?.data?.session ?? signUpRes?.data?.session;
   if (sessionSource) {
-    updateUserData(client, sessionSource.user, tgData);
+    await upsertProfile(sessionSource.user, tgData);
     const urlParams = new URLSearchParams({
       telegram_access_token: sessionSource.access_token,
       telegram_refresh_token: sessionSource.refresh_token,
@@ -92,16 +91,4 @@ function getMetadataObject(tgData: TelegramLoginPayload) {
     telegram_username: tgData.username,
     is_imaginery: true,
   }
-}
-
-async function updateUserData(client: SupabaseClient, user: User, tgData: TelegramLoginPayload) {
-  const ret = await client.from('profiles').upsert({
-    id: user.id,
-    updated_at: new Date(),
-    full_name: [tgData.first_name, tgData.last_name].filter(Boolean).join(' '),
-    avatar_url: tgData.photo_url,
-    telegram_username: tgData.username,
-    bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
-    chat_id: tgData.id,
-  }, { onConflict: 'id' }).select();
 }

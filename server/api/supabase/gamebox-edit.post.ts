@@ -1,19 +1,20 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server'
-import { gameBoxToSupabase } from '#server/transformers';
-import type { Database } from '#shared/types/supabase.js'
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gameboxes } from '#server/db/schema'
+import { gameBoxToSupabase } from '#server/transformers'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
-  const user = await serverSupabaseUser(event)
-  const client = await serverSupabaseClient<Database>(event)
-  const body = await readBody(event);
-  const gamebox = body.gamebox;
-
+  await requireUser(event)
+  const body = await readBody(event)
+  const gamebox = body.gamebox
   const gameboxesFormattedForBd = gameBoxToSupabase(gamebox)
 
-  const { data, error } = await client.from('gameboxes').update(gameboxesFormattedForBd).eq('id', gamebox.id).select();
-  if (error) {
-    throw createError({ statusMessage: error.message })
-  }
+  const data = await db
+    .update(gameboxes)
+    .set(gameboxesFormattedForBd as typeof gameboxes.$inferInsert)
+    .where(eq(gameboxes.id, gamebox.id))
+    .returning()
 
   return data
 })

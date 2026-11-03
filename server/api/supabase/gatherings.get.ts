@@ -1,47 +1,44 @@
-import { serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js';
-import { gatheringWithGuestsFromSupabase } from '#server/transformers';
+import { and, asc, eq, gte } from 'drizzle-orm'
+import { db } from '#server/db'
+import { gatheringsWithGuests } from '#server/db/schema'
+import { gatheringWithGuestsFromSupabase } from '#server/transformers'
+import type { GatheringWithGuests } from '#shared/types/frontend'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient<Database>(event);
-  const query = getQuery(event);
-  const clubid = query.clubid as string;
+  const query = getQuery(event)
+  const clubid = query.clubid as string
 
-  let startDate = '';
+  let startDate = ''
   if (query['date-from']) {
-    startDate = query['date-from'] as string;
+    startDate = query['date-from'] as string
   } else {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    startDate = today.toISOString();
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    startDate = today.toISOString()
   }
 
-  const { data, error } = await client.from('gatherings_with_guests').select('*').gte('start_date', startDate).eq('club_id', clubid)
-    .order('start_date', { ascending: true });
+  const data = await db
+    .select()
+    .from(gatheringsWithGuests)
+    .where(
+      and(gte(gatheringsWithGuests.start_date, new Date(startDate)), eq(gatheringsWithGuests.club_id, clubid)),
+    )
+    .orderBy(asc(gatheringsWithGuests.start_date))
 
-  if (error) {
-    throw createError({ statusMessage: error.message })
-  }
-
-
-  return clampGatherings(data.map(gatheringWithGuestsFromSupabase));
+  return clampGatherings(data.map(gatheringWithGuestsFromSupabase))
 })
 
 function clampGatherings(gatheringsArray: GatheringWithGuests[]) {
-  let hashed = gatheringsArray.reduce((acc: any, gathering) => {
-    const foundItem: GatheringWithGuests = acc[gathering.id];
+  const hashed = gatheringsArray.reduce((acc: Record<number, GatheringWithGuests>, gathering) => {
+    const foundItem = acc[gathering.id]
     if (foundItem) {
-      foundItem.guests = [...foundItem.guests, ...gathering.guests];
-      foundItem.slotsFilled = foundItem.guests.reduce((acc: number, item) => {
-        return acc + item.totalGuests
-      }, 0);
+      foundItem.guests = [...foundItem.guests, ...gathering.guests]
+      foundItem.slotsFilled = foundItem.guests.reduce((sum, item) => sum + item.totalGuests, 0)
     } else {
-      acc[gathering.id] = {
-        ...gathering,
-      }
+      acc[gathering.id] = { ...gathering }
     }
-    return acc;
+    return acc
   }, {})
 
-  return Object.values(hashed);
-} 
+  return Object.values(hashed)
+}

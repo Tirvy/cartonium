@@ -2,8 +2,8 @@
 
 Sources of truth:
 
-1. **Schema**: `supabase/migrations/*.sql`
-2. **Generated DB types**: `.generated/supabase-database.ts` (`npm run type`) + overrides in `shared/types/supabase.ts`
+1. **Schema**: `server/db/schema/` + `server/db/migrations/` (Drizzle → local Postgres)
+2. **Legacy reference**: `supabase/migrations/*.sql` (historical cloud dump; do not extend)
 3. **UI/domain types**: `shared/types/frontend.ts`
 4. **Mapping**: `server/transformers.ts`
 
@@ -28,7 +28,7 @@ erDiagram
   user_schedules ||--o{ user_schedules_history : versions
 ```
 
-## Tables (from migrations)
+## Tables
 
 | Table | Role |
 |-------|------|
@@ -39,37 +39,34 @@ erDiagram
 | `clubs_settings` | Themes, avatar, guest permissions, collection filter flags, reservation contacts |
 | `gatherings` | Scheduled play (owner, club, table, gamebox, guest cap, comments, start) |
 | `gatherings_guests` | RSVP rows (guest profile + count) |
-| `profiles` | App profile (telegram fields, chat_id, etc.) |
-| `profiles_club_rights` | `profile_id`, `club_id`, `relation_type` (e.g. `gamemaster` appears in RLS) |
+| `profiles` | App profile (telegram fields, chat_id, etc.); `id` = Supabase Auth UUID (no FK to `auth.users`) |
+| `profiles_club_rights` | `profile_id`, `club_id`, `relation_type` (e.g. `gamemaster`) |
 | `tables` | Physical tables at a club |
 | `telegram_chats` / `telegram_chats_logs` | Bot chat mappings |
 | `user_schedules` / `user_schedules_history` | Named calendars + boolean segment snapshots |
-| `profile` | Auth-synced profile (`email`, `full_name`, `avatar_url`, `terms_accepted_at`) from later migration |
+| `telegram_bot_club_bindings` | Schedule bot chat→club |
 
-## Views / matviews
+## Views (local Postgres)
 
 | View | Role |
 |------|------|
 | `gameboxes_with_club_id` | Gameboxes + array of club ids |
-| `gatherings_with_guests` | Upcoming gatherings joined with guests/profiles/gamebox/owner |
-| `users_raw_data` | `auth.users` id + metadata |
+| `gatherings_with_guests` | Upcoming gatherings joined with guests/profiles/gamebox/owner (profiles replace former `auth.users` metadata) |
 
 ## Frontend types (camelCase)
 
 Defined in `shared/types/frontend.ts`. Important shapes:
 
-- `Club` — settings flattened onto club for UI (`guestCanGatherOwn`, `avatarUrl`, reservation fields, collection search flags, …)
+- `Club` — settings flattened onto club for UI
 - `GameBox` / `GameBoxWithClub` — catalog card data
 - `Gathering` / `GatheringWithGuests` / `GatheringGuest` / `GatheringComputedValue`
 - `Table`, `Schedule` / `ScheduleHistoryItem`
-- `GameboxAddData`, `GameBoxSearchResult`, `GameBoxDataTesera`, `GameBoxDataBgg`
-- `TelegramNotification` — `{ to, type, why, what, bot_name }` with `type`: `gathering-player-change` \| `gathering-removed`
+- `TelegramNotification` — `{ to, type, why, what, bot_name }`
 
 ## Auth identity bridge
 
-Telegram Login → HMAC verify (`NUXT_BOT_TOKEN`) → synthetic email `{telegramId}@tgauth-happens.com` + HMAC password (`NUXT_TELEGRAM_PASSWORD_GENERATOR`) → Supabase Auth user. Session tokens may arrive as `telegram_*_token` query params and are consumed by `app/middleware/set-session.global.ts`.
+Telegram Login → HMAC verify (`NUXT_BOT_TOKEN`) → synthetic email `{telegramId}@tgauth-happens.com` + HMAC password → **Supabase Auth** user. Profile row upserted into **local Postgres** (`profiles`). Session tokens may arrive as `telegram_*_token` query params and are consumed by `app/middleware/set-session.global.ts`.
 
 ## Storage
 
-- Bucket usage observed in code: `gamebox-pics` (thumbnails via `server/api/common/add-pictures.post.ts`).
-- Picture URL helper: `app/utils/gamebox-picture-get.ts` (storage public URL else Tesera `photoUrl`).
+- Bucket usage: `gamebox-pics` on **Supabase Storage** (upload via authenticated Supabase client; public URL helper in `app/utils/gamebox-picture-get.ts`).

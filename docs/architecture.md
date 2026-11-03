@@ -1,6 +1,6 @@
 # Architecture
 
-Cartonium (UI: Cartonis) is a Nuxt 4 universal app with Nitro server routes over Supabase, plus optional Telegram bots.
+Cartonium (UI: Cartonis) is a Nuxt 4 universal app with Nitro server routes over local Postgres (Drizzle), Supabase Auth/Storage, plus optional Telegram bots.
 
 ## High-level
 
@@ -17,13 +17,16 @@ flowchart TB
   subgraph nitro [Nitro]
     API["server/api/*"]
     XF[server/transformers.ts]
+    DB["server/db Drizzle"]
     Utils[server/utils]
     API --> XF
+    API --> DB
     API --> Utils
   end
 
   subgraph external [External]
-    SB[(Supabase Auth DB Storage)]
+    PG[(Local Postgres)]
+    SB[Supabase Auth Storage]
     BGG[BoardGameGeek API]
     Tesera[Tesera API]
     TG[Telegram Bot API]
@@ -31,12 +34,15 @@ flowchart TB
   end
 
   Pages -->|"$fetch /api/..."| API
-  API --> SB
+  Pages -->|"Auth session / Storage URLs"| SB
+  DB --> PG
+  API -->|"signUp / Storage upload"| SB
   API --> BGG
   API --> Tesera
   Utils --> TG
   Bots[server/telegram-bots] --> TG
   Bots --> Sheets
+  Bots --> DB
 ```
 
 ## Major subsystems
@@ -49,7 +55,7 @@ flowchart TB
 | Settings | Club flags, tables CRUD, themes (partial), public HTML info |
 | Schedules | User availability grids + history segments |
 | Admin | Global gamebox catalog CRUD + picture fetch |
-| Auth | Telegram Login Widget → HMAC → synthetic email/password → Supabase session |
+| Auth | Telegram Login Widget → HMAC → synthetic email/password → Supabase Auth session; profile in local Postgres |
 | Bots | Blood Bowl votes, Luba quiz, flood-reader stub (not auto-started) |
 
 ## Component relationships
@@ -75,7 +81,7 @@ No Pinia. Shared keys:
 - `clubPermissions` — `useClubPermissions`
 - `lastGathering` / `lastGatheringName` — handoff after create
 
-Also: Supabase user session, cookie `theme`, localStorage `gatherings-view`.
+Also: Supabase Auth user session, cookie `theme`, localStorage `gatherings-view`.
 
 ## Routing
 
@@ -93,13 +99,15 @@ Also: Supabase user session, cookie `theme`, localStorage `gatherings-view`.
 
 | Client OK | Server only |
 |-----------|-------------|
-| `useSupabaseUser` / session | Table queries for clubs, gatherings, gameboxes |
-| `$fetch` to Nitro | BGG/Tesera proxy + XML parse |
-| UI state | TG HMAC secrets, bot tokens, Google creds |
+| `useSupabaseUser` / session | Domain table queries via Drizzle (`#server/db`) |
+| Storage public URLs | BGG/Tesera proxy + XML parse |
+| `$fetch` to Nitro | TG HMAC secrets, bot tokens, Google creds |
+| UI state | |
 
 ## External dependencies
 
-- **Supabase**: Auth, Postgres (RLS), Storage (`gamebox-pics`), pgmq (telegram queue; optional).
+- **Local Postgres + Drizzle**: domain data (`DATABASE_URL`).
+- **Supabase**: Auth + Storage (`gamebox-pics`); pgmq path exists but notify queue is usually commented out.
 - **BGG / Tesera**: catalog enrichment; BGG calls serialized by `server/plugins/bgg-timeout.ts`.
 - **Telegram**: login bot token (`NUXT_BOT_TOKEN`), notify bots, optional feature bots.
 - **Google Sheets**: Blood Bowl + Luba bots via `creds.json` / env spreadsheet IDs.

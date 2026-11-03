@@ -1,18 +1,13 @@
-import { serverSupabaseUser, serverSupabaseClient } from '#supabase/server';
-import type { Database } from '#shared/types/supabase.js'
+import { eq } from 'drizzle-orm'
+import { db } from '#server/db'
+import { profilesClubRights } from '#server/db/schema'
+import { serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-    const client = await serverSupabaseClient<Database>(event);
-    const user = await serverSupabaseUser(event);
-    if (!user?.id) {
-        return [];
-    }
+  const user = await serverSupabaseUser(event)
+  if (!user?.id) {
+    return []
+  }
 
-    let clubs = await client.from('profiles_club_rights').select('*')
-        .eq('profile_id', user.id);
-    if (clubs.error) {
-        throw createError({ statusMessage: clubs.error.message })
-    }
-
-    return clubs.data;
+  return db.select().from(profilesClubRights).where(eq(profilesClubRights.profile_id, user.id))
 })
