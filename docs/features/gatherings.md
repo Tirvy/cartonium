@@ -26,7 +26,7 @@ Route notes:
 sequenceDiagram
   participant UI as Gatherings UI
   participant API as /api/db
-  participant DB as Supabase
+  participant DB as Postgres
   participant TG as telegramNotify
   UI->>API: GET gatherings?clubid&date-from
   API->>DB: gatherings_with_guests

@@ -4,6 +4,7 @@ import {
   boolean,
   check,
   date,
+  index,
   integer,
   jsonb,
   json,
@@ -16,6 +17,7 @@ import {
   timestamp,
   uuid,
   unique,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
 export * from './auth'
@@ -49,12 +51,16 @@ export const gameboxes = pgTable(
   ],
 )
 
-export const clubs = pgTable('clubs', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  title: text('title').notNull(),
-  url_name: text('url_name').notNull(),
-})
+export const clubs = pgTable(
+  'clubs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    title: text('title').notNull(),
+    url_name: text('url_name').notNull(),
+  },
+  (t) => [uniqueIndex('clubs_url_name_uidx').on(t.url_name)],
+)
 
 export const clubsCollections = pgTable(
   'clubs_collections',
@@ -88,24 +94,30 @@ export const clubsSettings = pgTable('clubs_settings', {
   gathering_warning: text('gathering_warning').default('').notNull(),
 })
 
-export const gatherings = pgTable('gatherings', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
-  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  owner_id: text('owner_id').notNull(),
-  start_date: timestamp('start_date', { withTimezone: true }),
-  comment_owner: text('comment_owner').default('').notNull(),
-  guests_max: bigint('guests_max', { mode: 'number' }).notNull(),
-  comment_club: text('comment_club').default('').notNull(),
-  club_id: uuid('club_id').notNull(),
-  table_id: bigint('table_id', { mode: 'number' }),
-  own_name: text('own_name'),
-  gamebox_id: bigint('gamebox_id', { mode: 'number' }),
-})
+export const gatherings = pgTable(
+  'gatherings',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+    created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    owner_id: text('owner_id').notNull(),
+    start_date: timestamp('start_date', { withTimezone: true }),
+    comment_owner: text('comment_owner').default('').notNull(),
+    guests_max: bigint('guests_max', { mode: 'number' }).notNull(),
+    comment_club: text('comment_club').default('').notNull(),
+    club_id: uuid('club_id').notNull(),
+    table_id: bigint('table_id', { mode: 'number' }),
+    own_name: text('own_name'),
+    gamebox_id: bigint('gamebox_id', { mode: 'number' }),
+  },
+  (t) => [index('gatherings_club_id_start_date_idx').on(t.club_id, t.start_date)],
+)
 
 export const gatheringsGuests = pgTable(
   'gatherings_guests',
   {
-    gathering_id: bigint('gathering_id', { mode: 'number' }).notNull(),
+    gathering_id: bigint('gathering_id', { mode: 'number' })
+      .notNull()
+      .references(() => gatherings.id, { onDelete: 'cascade' }),
     user_id: text('user_id').notNull(),
     guests_number: smallint('guests_number').notNull(),
   },
@@ -116,23 +128,31 @@ export const gatheringsGuests = pgTable(
 )
 
 /** App profile; id matches Better Auth `user.id` (text). */
-export const profiles = pgTable('profiles', {
-  id: text('id').primaryKey(),
-  updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-  full_name: text('full_name'),
-  avatar_url: text('avatar_url'),
-  telegram_username: text('telegram_username'),
-  bot_name: text('bot_name').default('').notNull(),
-  chat_id: integer('chat_id').default(0).notNull(),
-})
+export const profiles = pgTable(
+  'profiles',
+  {
+    id: text('id').primaryKey(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+    full_name: text('full_name'),
+    avatar_url: text('avatar_url'),
+    telegram_username: text('telegram_username'),
+    bot_name: text('bot_name').default('').notNull(),
+    chat_id: bigint('chat_id', { mode: 'number' }).default(0).notNull(),
+  },
+  (t) => [index('profiles_chat_id_idx').on(t.chat_id)],
+)
 
-export const profilesClubRights = pgTable('profiles_club_rights', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
-  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  relation_type: text('relation_type').notNull(),
-  profile_id: text('profile_id'),
-  club_id: uuid('club_id'),
-})
+export const profilesClubRights = pgTable(
+  'profiles_club_rights',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+    created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    relation_type: text('relation_type').notNull(),
+    profile_id: text('profile_id'),
+    club_id: uuid('club_id'),
+  },
+  (t) => [index('profiles_club_rights_profile_club_idx').on(t.profile_id, t.club_id)],
+)
 
 export const tables = pgTable('tables', {
   id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
@@ -149,7 +169,7 @@ export const telegramChats = pgTable(
     created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     user_id: text('user_id').notNull(),
     bot_name: text('bot_name').notNull(),
-    chat_id: integer('chat_id').notNull(),
+    chat_id: bigint('chat_id', { mode: 'number' }).notNull(),
   },
   (t) => [primaryKey({ columns: [t.user_id, t.bot_name] })],
 )
@@ -157,7 +177,7 @@ export const telegramChats = pgTable(
 export const telegramChatsLogs = pgTable('telegram_chats_logs', {
   admin_name: text('admin_name').primaryKey(),
   bot_token: text('bot_token').notNull(),
-  chat_id: integer('chat_id').notNull(),
+  chat_id: bigint('chat_id', { mode: 'number' }).notNull(),
 })
 
 export const userSchedules = pgTable('user_schedules', {
@@ -169,14 +189,20 @@ export const userSchedules = pgTable('user_schedules', {
   title: text('title').notNull(),
 })
 
-export const userSchedulesHistory = pgTable('user_schedules_history', {
-  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
-  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  schedule_id: bigint('schedule_id', { mode: 'number' }).notNull(),
-  start_date: date('start_date').notNull(),
-  segment_size: integer('segment_size').default(30).notNull(),
-  segments: boolean('segments').array().notNull(),
-})
+export const userSchedulesHistory = pgTable(
+  'user_schedules_history',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
+    created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    schedule_id: bigint('schedule_id', { mode: 'number' })
+      .notNull()
+      .references(() => userSchedules.id, { onDelete: 'cascade' }),
+    start_date: date('start_date').notNull(),
+    segment_size: integer('segment_size').default(30).notNull(),
+    segments: boolean('segments').array().notNull(),
+  },
+  (t) => [index('user_schedules_history_schedule_id_idx').on(t.schedule_id)],
+)
 
 export const telegramBotClubBindings = pgTable(
   'telegram_bot_club_bindings',

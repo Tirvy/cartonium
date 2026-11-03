@@ -1,56 +1,52 @@
-# Dockerfile
+# Cartonium production image (Nuxt/Nitro + local Postgres via DATABASE_URL)
+FROM node:20-alpine AS build
 
-# Use an official Node.js runtime as the base image
-FROM node:20-alpine
-
-# ARGS for js usage
-ARG SUPABASE_URL
-ARG SUPABASE_KEY
-ARG NUXT_BOT_TOKEN
-ARG NUXT_TELEGRAM_PASSWORD_GENERATOR
-ARG NUXT_BOT_LOGER_TOKEN
-ARG NUXT_BOT_LUBA_TOKEN
-ARG NUXT_BOT_LUBA_SPREADSHEET
-
-# ARGS for docker build
-ARG GOOGLE_CREDS_URL
-ARG SUPABASE_ACCESS_TOKEN
+ARG GOOGLE_CREDS_URL=
 ARG NITRO_PORT=80
 ARG PORT=80
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY package.json ./
+COPY package.json package-lock.json ./
+RUN NODE_OPTIONS=--max_old_space_size=950 npm ci --legacy-peer-deps
 
-# Getting gcreds
-# ADD ${GOOGLE_CREDS_URL} creds.json
-RUN apk add --update wget && \
-    wget -O creds.json `echo ${GOOGLE_CREDS_URL} | tr -d \'`
+# Optional Google Sheets creds for legacy bots
+RUN if [ -n "$GOOGLE_CREDS_URL" ]; then \
+      apk add --no-cache wget && \
+      wget -O creds.json "$(echo "$GOOGLE_CREDS_URL" | tr -d "'")" ; \
+    else \
+      echo '{}' > creds.json ; \
+    fi
 
-# Setup local supabase
-RUN npx supabase login --token ${SUPABASE_ACCESS_TOKEN}
-RUN mkdir .generated
-RUN npm run type
-
-# Install dependencies
-# limited to 1000 cuz current hosting is this much powerfull @tirvy
-RUN NODE_OPTIONS=--max_old_space_size=950 npm install
-
-
-# Copy the rest of the application files to the container
 COPY . .
 
-# Build the Next.js application for production
-# limited to 1000 cuz current hosting is this much powerfull @tirvy
 RUN NODE_OPTIONS=--max-old-space-size=950 npm run build
 
+FROM node:20-alpine AS runner
 
-ENV PORT=$PORT
+ARG NITRO_PORT=80
+ARG PORT=80
+
+WORKDIR /app
+
 ENV NODE_ENV=production
+ENV PORT=$PORT
+ENV NITRO_PORT=$NITRO_PORT
+ENV GAMEBOX_PICS_DIR=/data/gamebox-pics
 
-#EXPOSE 3000
-#EXPOSE 80
+RUN apk add --no-cache wget
+
+COPY --from=build /app/package.json /app/package-lock.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/.output ./.output
+COPY --from=build /app/server/db ./server/db
+COPY --from=build /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=build /app/creds.json ./creds.json
+COPY docker/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh && mkdir -p /data/gamebox-pics
+
 EXPOSE ${NITRO_PORT}
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", ".output/server/index.mjs"]

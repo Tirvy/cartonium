@@ -8,7 +8,7 @@ Copy `.env.dist` → `.env` and fill values. Never commit `.env` or `creds.json`
 |----------|---------|
 | `DATABASE_URL` | Local/domain Postgres connection string for Drizzle |
 | `BETTER_AUTH_SECRET` | Better Auth signing secret (≥32 chars) |
-| `BETTER_AUTH_URL` / `NUXT_PUBLIC_SITE_URL` | Public app origin (Telegram Login needs reachable HTTPS in prod/dev tunnel) |
+| `BETTER_AUTH_URL` / `NUXT_PUBLIC_SITE_URL` | **Exact** public browser origin. Must be `https://…` when TLS is terminated by a reverse proxy or tunnel; mismatches break cookies/CSRF |
 | `NUXT_BOT_TOKEN` | Telegram bot token for Login Widget HMAC |
 | `NUXT_PUBLIC_BOT_LOGIN` | Telegram bot username (no `@`) for the widget |
 
@@ -21,13 +21,28 @@ Copy `.env.dist` → `.env` and fill values. Never commit `.env` or `creds.json`
 | `POSTGRES_DB` | Database name |
 | `POSTGRES_PORT` | Host port mapped to 5432 |
 
-Start DB: `npm run db:up` then `npm run db:migrate`.
+Start DB: `npm run db:up` then `npm run db:migrate` then `npm run db:seed`. See [cutover.md](./cutover.md).
+
+## Better Auth extras
+
+| Variable | Purpose |
+|----------|---------|
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Extra allowed origins (comma-separated). `NUXT_PUBLIC_SITE_URL` is always included when set |
+| `BETTER_AUTH_ALLOW_SIGNUP` | Set to `true` to enable `POST /api/auth/sign-up/email` (default disabled) |
+
+## Seed / storage
+
+| Variable | Purpose |
+|----------|---------|
+| `SEED_CLUB_URL_NAME` / `SEED_CLUB_TITLE` | Default club for `npm run db:seed` (`terra`) |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | Optional first admin + gamemaster right |
+| `SEED_ADMIN_TELEGRAM_ID` | Optional Telegram id on seeded admin |
+| `GAMEBOX_PICS_DIR` | Absolute dir for BGG thumbnails (served via `/gamebox-pics/:id`) |
 
 ## Optional / bots / Docker
 
 | Variable | Purpose |
 |----------|---------|
-| `BETTER_AUTH_TRUSTED_ORIGINS` | Extra allowed origins (comma-separated) |
 | `NUXT_BOT_LOGER_TOKEN` | Logger bot |
 | `NUXT_BOT_BLOODBOWL_TOKEN` | Blood Bowl bot |
 | `NUXT_BOT_BLOODBOWL_SPREADSHEET` | Sheet id for BB data |
@@ -43,4 +58,5 @@ Start DB: `npm run db:up` then `npm run db:migrate`.
 
 - Dev server: `host: 0.0.0.0`, **port 80** (Telegram Login domain rules).
 - Domain schema: `server/db/schema` → `npm run db:generate` / `db:migrate`.
-- Gamebox images: `public/gamebox-pics/{id}` (local filesystem).
+- Gamebox images: `GAMEBOX_PICS_DIR` or `public/gamebox-pics/{id}` (+ Nitro route in production).
+- Health: `GET /api/health` runs `SELECT 1`.

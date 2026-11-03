@@ -17,7 +17,7 @@ Global admins manage the shared gamebox catalog (paginated CRUD) and bulk-fetch 
 ## Business rules
 
 - `/admin*` requires logged-in user with global admin relation (middleware redirects otherwise).
-- Also covered by supabase redirect include for `/admin(/*)?`.
+- `/admin*` gated by `club-admin-reroute.global.ts` + global admin rights.
 - Pictures: POST `add-pictures` with `gameBoxIds` → fetch BGG thumbs → Storage `gamebox-pics`.
 
 ## Extend safely

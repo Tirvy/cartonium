@@ -1,10 +1,13 @@
 import { db } from '#server/db'
 import { clubsCollections } from '#server/db/schema'
+import { requireClubGamemaster } from '#server/utils/require-rights'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const query = getQuery(event)
   const clubId = query.clubid as string
+  await requireClubGamemaster(event, clubId)
+
   const gameBoxIds: Array<number> = body.gameBoxIds
 
   const dataToSend = gameBoxIds.map((gameBoxId) => ({

@@ -1,18 +1,21 @@
 import { and, eq } from 'drizzle-orm'
 import { db } from '#server/db'
-import { profiles, profilesClubRights } from '#server/db/schema'
+import { profilesClubRights } from '#server/db/schema'
+import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireUser(event)
   const query = getQuery(event)
-  const userid = query.userid as string
+  const userid = (query.userid as string) || user.id
   const clubid = query.clubid as string
-  if (!userid || !clubid) {
-    return []
+
+  // Only allow reading own permissions (replaces former RLS auth.uid() = profile_id)
+  if (userid !== user.id) {
+    throw createError({ statusCode: 403, statusMessage: 'Cannot read another user permissions' })
   }
 
-  const [profile] = await db.select().from(profiles).where(eq(profiles.id, userid)).limit(1)
-  if (!profile) {
-    throw createError({ statusMessage: 'Profile not found' })
+  if (!clubid) {
+    return []
   }
 
   return db

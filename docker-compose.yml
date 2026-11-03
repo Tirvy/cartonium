@@ -16,5 +16,26 @@ services:
       timeout: 5s
       retries: 10
 
+  # Optional full-stack run: docker compose --profile app up
+  app:
+    profiles: ['app']
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '${PORT:-80}:80'
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cartonium}:${POSTGRES_PASSWORD:-cartonium}@postgres:5432/${POSTGRES_DB:-cartonium}
+      GAMEBOX_PICS_DIR: /data/gamebox-pics
+    volumes:
+      - cartonium_gamebox_pics:/data/gamebox-pics
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   cartonium_pgdata:
+  cartonium_gamebox_pics:

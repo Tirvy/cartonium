@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { userSchedules, userSchedulesHistory } from '#server/db/schema'
 import requireUser from '#server/utils/require-user'
@@ -20,11 +20,21 @@ export default defineEventHandler(async (event) => {
       })
       .returning()
     scheduleId = created?.id
-  } else if (body.title) {
-    await db
-      .update(userSchedules)
-      .set({ title: body.title })
-      .where(eq(userSchedules.id, scheduleId))
+  } else {
+    const [existing] = await db
+      .select()
+      .from(userSchedules)
+      .where(and(eq(userSchedules.id, scheduleId), eq(userSchedules.owner_id, user.id)))
+      .limit(1)
+    if (!existing) {
+      throw createError({ statusCode: 403, statusMessage: 'Not your schedule' })
+    }
+    if (body.title) {
+      await db
+        .update(userSchedules)
+        .set({ title: body.title })
+        .where(and(eq(userSchedules.id, scheduleId), eq(userSchedules.owner_id, user.id)))
+    }
   }
 
   const [historyRow] = await db
@@ -38,7 +48,7 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   if (!historyRow) {
-    throw createError({ statusMessage: 'Failed to save schedule history' })
+    throw createError({ statusCode: 500, statusMessage: 'Failed to save schedule history' })
   }
 
   return scheduleId

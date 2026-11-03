@@ -17,12 +17,21 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    // Match UI registrationAvailable=false; set BETTER_AUTH_ALLOW_SIGNUP=true to open signup.
+    disableSignUp: process.env.BETTER_AUTH_ALLOW_SIGNUP !== 'true',
   },
   baseURL: process.env.BETTER_AUTH_URL || process.env.NUXT_PUBLIC_SITE_URL,
   secret: process.env.BETTER_AUTH_SECRET,
-  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS
-    ? process.env.BETTER_AUTH_TRUSTED_ORIGINS.split(',').map((s) => s.trim())
-    : undefined,
+  trustedOrigins: (() => {
+    const origins = new Set<string>()
+    for (const raw of (process.env.BETTER_AUTH_TRUSTED_ORIGINS || '').split(',')) {
+      const o = raw.trim()
+      if (o) origins.add(o)
+    }
+    const site = process.env.NUXT_PUBLIC_SITE_URL?.trim()
+    if (site) origins.add(site)
+    return origins.size ? [...origins] : undefined
+  })(),
   plugins: [
     telegram({
       botToken,

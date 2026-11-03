@@ -166,12 +166,14 @@ onMounted(() => {
   }
 });
 
-// club avatar
+// club avatar (from clubs_settings.avatar_url, with local static fallback)
 const clubAvatar = computed(() => {
   return {
-    pictureUrl: `https://impmukiwmihnyyzvyjyp.supabase.co/storage/v1/object/public/club-avatars/${clubName.value}.png`,
+    pictureUrl:
+      currentClub.value?.avatarUrl || `/club-avatars/${clubName.value}.png`,
   }
 });
+
 
 // setting up user avatar
 const user = useAuthUser();

@@ -2,10 +2,10 @@ import { eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gameboxes } from '#server/db/schema'
 import { gameBoxToDb } from '#server/transformers'
-import requireUser from '#server/utils/require-user'
+import { requireGlobalAdmin } from '#server/utils/require-rights'
 
 export default defineEventHandler(async (event) => {
-  await requireUser(event)
+  await requireGlobalAdmin(event)
   const body = await readBody(event)
   const gamebox = body.gamebox
   const gameboxesFormattedForBd = gameBoxToDb(gamebox)

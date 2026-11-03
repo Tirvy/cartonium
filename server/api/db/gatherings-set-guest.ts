@@ -1,12 +1,30 @@
 import { and, eq } from 'drizzle-orm'
 import { db } from '#server/db'
-import { gatheringsGuests, gatheringsWithGuests } from '#server/db/schema'
+import { gatherings, gatheringsGuests, gatheringsWithGuests, profiles } from '#server/db/schema'
 import telegramNotify from '#server/utils/telegram-notify'
-import requireUser, { type AppUser } from '#server/utils/require-user'
+import type { AppUser } from '#server/utils/require-user'
+import { resolveGuestActorUserId } from '#server/utils/require-rights'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
   const body = await readBody(event)
+  if (!body.gathering_id) {
+    throw createError({ statusCode: 400, statusMessage: 'gathering_id required' })
+  }
+
+  const [gathering] = await db
+    .select()
+    .from(gatherings)
+    .where(eq(gatherings.id, body.gathering_id))
+    .limit(1)
+  if (!gathering) {
+    throw createError({ statusCode: 404, statusMessage: 'Gathering not found' })
+  }
+
+  const { user, actorUserId } = await resolveGuestActorUserId(
+    event,
+    body.guest_id,
+    gathering.club_id,
+  )
 
   const previousData = await db
     .select()
@@ -14,7 +32,7 @@ export default defineEventHandler(async (event) => {
     .where(
       and(
         eq(gatheringsWithGuests.id, body.gathering_id),
-        eq(gatheringsWithGuests.user_id, body.guest_id),
+        eq(gatheringsWithGuests.user_id, actorUserId),
       ),
     )
 
@@ -22,7 +40,7 @@ export default defineEventHandler(async (event) => {
     .insert(gatheringsGuests)
     .values({
       gathering_id: body.gathering_id,
-      user_id: body.guest_id,
+      user_id: actorUserId,
       guests_number: body.number,
     })
     .onConflictDoUpdate({
@@ -32,19 +50,25 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   if (!data) {
-    throw createError({ statusMessage: 'Failed to update guest' })
+    throw createError({ statusCode: 500, statusMessage: 'Failed to update guest' })
   }
 
   if (previousData.length) {
     const message = creatMessage(user, data, previousData)
-
-    telegramNotify(event, {
-      to: user.user_metadata.telegram_id,
-      bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
-      type: 'gathering-player-change',
-      why: `because i can`,
-      what: message,
-    })
+    const [ownerProfile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.id, gathering.owner_id))
+      .limit(1)
+    if (ownerProfile?.chat_id) {
+      telegramNotify(event, {
+        to: Number(ownerProfile.chat_id),
+        bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
+        type: 'gathering-player-change',
+        why: `because i can`,
+        what: message,
+      })
+    }
   }
 
   return { status: 'ok' }

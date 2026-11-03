@@ -20,7 +20,7 @@ Types: `Club`, `Table`, `ClubInfo`. Transformers: `clubFromDb`, `tablesFromDb`, 
 ## Business rules
 
 - Settings parent redirects users without admin rights to gatherings.
-- Supabase auth redirect **includes** settings and information edit paths.
+- Settings and information edit paths use `middleware: 'auth-required'`.
 - Club object in UI merges `clubs` + `clubs_settings` fields.
 
 ## Extend safely

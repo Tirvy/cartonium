@@ -2,21 +2,25 @@ import { relations } from 'drizzle-orm'
 import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 /** Better Auth core tables (+ Telegram plugin columns). */
-export const user = pgTable('user', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  telegramId: text('telegram_id'),
-  telegramPhoneNumber: text('telegram_phone_number'),
-  telegramUsername: text('telegram_username'),
-})
+export const user = pgTable(
+  'user',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull().unique(),
+    emailVerified: boolean('email_verified').default(false).notNull(),
+    image: text('image'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    telegramId: text('telegram_id'),
+    telegramPhoneNumber: text('telegram_phone_number'),
+    telegramUsername: text('telegram_username'),
+  },
+  (table) => [index('user_telegram_id_idx').on(table.telegramId)],
+)
 
 export const session = pgTable(
   'session',

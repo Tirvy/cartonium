@@ -36,6 +36,7 @@ describe('Drizzle domain + Better Auth schema', () => {
     expect(profileCols.id.name).toBe('id')
     expect(profileCols.id.columnType).toBe('PgText')
     expect(profileCols.chat_id.name).toBe('chat_id')
+    expect(profileCols.chat_id.columnType).toBe('PgBigInt53')
 
     const gatheringCols = getTableColumns(gatherings)
     expect(gatheringCols.owner_id.columnType).toBe('PgText')
@@ -46,6 +47,7 @@ describe('Drizzle domain + Better Auth schema', () => {
     const scheduleCols = getTableColumns(userSchedules)
     expect(scheduleCols.owner_id.columnType).toBe('PgText')
   })
+
 
   it('registers replacement views for former matviews', () => {
     expect(gameboxesWithClubId).toBeTruthy()

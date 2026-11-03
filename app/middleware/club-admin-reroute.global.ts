@@ -8,8 +8,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/')
   }
 
-  const { data: permissions } = await useGetGlobalPermissions()
-  if (!permissions.value?.length) {
+  const hasPermissions = await useGetGlobalPermissions()
+  if (!hasPermissions) {
     return navigateTo('/')
   }
 })

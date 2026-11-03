@@ -1,16 +1,18 @@
 import { inArray } from 'drizzle-orm'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import { db } from '#server/db'
 import { gameboxesWithClubId } from '#server/db/schema'
 import { apiURL } from '../bgg/common'
 import { XMLParser } from 'fast-xml-parser'
+import { requireGlobalAdmin } from '#server/utils/require-rights'
+import { gameboxPicsDir, gameboxPicPath } from '#server/utils/gamebox-pics'
 
 const parser = new XMLParser({
   ignoreAttributes: false,
 })
 
 export default defineEventHandler(async (event) => {
+  await requireGlobalAdmin(event)
   const body = await readBody(event)
   const gameBoxIds = body.gameBoxIds as number[]
 
@@ -41,7 +43,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const picsDir = join(process.cwd(), 'public', 'gamebox-pics')
+  const picsDir = gameboxPicsDir()
   await mkdir(picsDir, { recursive: true })
 
   const responses = []
@@ -51,8 +53,7 @@ export default defineEventHandler(async (event) => {
 
   async function fetchUrlAndSave(url: string, id: number) {
     const picture = await fetch(url).then((x) => x.arrayBuffer())
-    const filePath = join(picsDir, String(id))
-    await writeFile(filePath, Buffer.from(picture))
+    await writeFile(gameboxPicPath(id), Buffer.from(picture))
     return { path: `/gamebox-pics/${id}`, id }
   }
 

@@ -18,39 +18,38 @@ DB_MIGRATE: npm run db:migrate
 DB_GENERATE: npm run db:generate
 DB_PUSH: npm run db:push
 DB_STUDIO: npm run db:studio
-TYPES: npm run type
-TYPES_LOCAL: npm run type-local
-TYPES_SH: sh execs/supabase-type.sh
+DB_SEED: npm run db:seed
+DB_BACKFILL_AUTH: npm run db:backfill-auth
 DOCKER_BUILD: docker build . -t cartonis -f Dockerfile
 DOCKER_RUN: docker run -p 80:80 --env-file .env -d cartonis
 DOCKER_LOCAL: sh execs/docker-builder.sh
 TEST: npm test
 TEST_WATCH: npm run test:watch
-TEST_DIR: tests/ (Vitest; DB transformers/schema/auth mapping/migrations)
+TEST_DIR: tests/ (Vitest; DB transformers/schema/auth mapping/migrations/rights)
 FORMAT: npm run format
 FORMAT_CHECK: npm run format:check
 
 ## CONFIG / ROOT
-FILE: nuxt.config.ts | ROLE: Nuxt modules, i18n, supabase redirects, nitro tasks, port 80
+FILE: nuxt.config.ts | ROLE: Nuxt modules, i18n, port 80
 FILE: vuetify.config.ts | ROLE: light/dark themes, VBtn defaults, locale ru
 FILE: tsconfig.json | ROLE: extends .nuxt/tsconfig; verbatimModuleSyntax false
 FILE: drizzle.config.ts | ROLE: Drizzle Kit config → server/db/migrations
-FILE: docker-compose.yml | ROLE: local Postgres 16
-FILE: Dockerfile | ROLE: node:20-alpine build + CMD .output/server/index.mjs
+FILE: docker-compose.yml | ROLE: local Postgres 16 (+ optional app profile + pics volume)
+FILE: Dockerfile | ROLE: multi-stage build; entrypoint runs drizzle migrate
+FILE: docker/entrypoint.sh | ROLE: migrate then node .output/server/index.mjs
 FILE: .env.dist | ROLE: env template (names only below)
 FILE: .dockerignore | ROLE: docker ignore rules
 FILE: package.json | ROLE: scripts + deps
 FILE: README.md | ROLE: setup/run docs
 FILE: i18n/locales/translations.csv | ROLE: nuxt-translation-manager source strings
 FILE: public/privacy-policy.html | ROLE: static privacy page
-FILE: execs/supabase-type.sh | ROLE: optional remote Auth-era types → .generated/
+FILE: docs/cutover.md | ROLE: migrate-from-Supabase + seed/backfill notes
 FILE: execs/docker-builder.sh | ROLE: docker build with .env as build-args
-ENV_KEYS: DATABASE_URL, POSTGRES_*, BETTER_AUTH_SECRET, BETTER_AUTH_URL, NUXT_PUBLIC_SITE_URL, NUXT_BOT_TOKEN, NUXT_PUBLIC_BOT_LOGIN, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
+ENV_KEYS: DATABASE_URL, POSTGRES_*, BETTER_AUTH_SECRET, BETTER_AUTH_URL, NUXT_PUBLIC_SITE_URL, BETTER_AUTH_TRUSTED_ORIGINS, BETTER_AUTH_ALLOW_SIGNUP, NUXT_BOT_TOKEN, NUXT_PUBLIC_BOT_LOGIN, GAMEBOX_PICS_DIR, SEED_ADMIN_*, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
 DOCKER_ARGS_EXTRA: NUXT_BOT_LOGER_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_LUBA_SPREADSHEET, GOOGLE_CREDS_URL, NITRO_PORT, PORT
 
 ## SHARED TYPES
 FILE: shared/types/frontend.ts | ROLE: UI/domain camelCase types
-FILE: shared/types/supabase.ts | ROLE: legacy MergeDeep override of generated Auth-era DB types (domain queries use Drizzle)
 FILE: shared/types/index.d.ts | ROLE: Nitro $Fetch typed-response override
 FILE: shared/types/visit.d.ts | ROLE: Visit type (unused by app)
 
@@ -97,26 +96,27 @@ FILE: app/layouts/default.vue | ROLE: global bar (brand, i18n, TG login)
 FILE: app/layouts/login.vue | ROLE: empty v-app for auth callback
 FILE: app/layouts/in-da-club.vue | ROLE: club chrome — nav, user, cookie, theme
 FILE: app/middleware/club-admin-reroute.global.ts | ROLE: /admin* requires global admin
-FN: defineNuxtRouteMiddleware(to, from) | ....
-FILE: app/middleware/set-session.global.ts | ROLE: consume telegram_*_token query → Supabase session
-FN: defineNuxtRouteMiddleware(to, from) | ....
+FN: defineNuxtRouteMiddleware(to) | ....
+FILE: app/middleware/auth-required.ts | ROLE: redirect unauthenticated users
 FILE: app/plugins/maska.ts | ROLE: registers v-maska
-FILE: app/utils/helpers.ts | ROLE: id-hash + JSON guard
+FILE: app/utils/helpers.ts | ROLE: id-hash + plain-object guard
 FN: listToHashed(sortSource) | ....
 FN: isJson(element) | ....
 FILE: app/utils/rules.ts | ROLE: Vuetify form rules
 FN: ruleIsNumber(value) | ....
 FN: ruleIsNotNegative(value) | ....
 FN: ruleIsTime(value) | ....
-FILE: app/utils/gamebox-picture-get.ts | ROLE: storage URL else Tesera photoUrl
+FILE: app/utils/gamebox-picture-get.ts | ROLE: HEAD /gamebox-pics/:id else Tesera photoUrl
 FN: gameboxPictureGet(gamebox) | ....
+FILE: app/utils/auth-client.ts | ROLE: Better Auth client + telegram plugin
+
 
 ## APP — COMPOSABLES
 FILE: app/composables/useClubPermissions.ts | ROLE: user↔current-club relation
 FN: useClubPermissions() → { clubPermissions, update }
 FILE: app/composables/useConstants.ts | ROLE: named constant bags (GameBox columns)
 FN: useConstants(key) → any
-FILE: app/composables/useCurrentUserAsGuest.ts | ROLE: Supabase user → GatheringGuest
+FILE: app/composables/useCurrentUserAsGuest.ts | ROLE: session user → GatheringGuest
 FN: useCurrentUserAsGuest() → GatheringGuest
 FILE: app/composables/useDebounce.ts | ROLE: debounce wrapper
 FN: useDebounce(func, timeout) → (...args) => void
@@ -129,7 +129,6 @@ FN: useUpdateClubData() → (clubname) => Club | null
 
 ## APP — PAGES
 FILE: app/pages/index.vue | ROLE: / landing; logged-in → default club gatherings
-FILE: app/pages/confirm.vue | ROLE: /confirm Supabase auth callback
 FILE: app/pages/admin/index.vue | ROLE: /admin global-admin hub
 FILE: app/pages/admin/gameboxes.vue | ROLE: /admin/gameboxes paginated gamebox CRUD
 FN: loadItems({ page, itemsPerPage, sortBy, search }) | ....
@@ -138,7 +137,6 @@ FILE: app/pages/admin/gameboxes-pictures.vue | ROLE: /admin/gameboxes-pictures b
 FN: getNewPictures() | ....
 FILE: app/pages/users/index.vue | ROLE: /users BGG/Tesera user collection debug
 FILE: app/pages/dev/ui-kit.vue | ROLE: /dev/ui-kit Vuetify playground
-FILE: app/pages/auth/telegram-callback-page.vue | ROLE: /auth/telegram-callback-page posts TG payload → navigate
 FILE: app/pages/clubs/[clubname].vue | ROLE: /clubs/:clubname parent load/SEO; → gatherings
 FILE: app/pages/clubs/[clubname]/admin-login.vue | ROLE: club login/logout
 FILE: app/pages/clubs/[clubname]/gatherings.vue | ROLE: guests→/table, admins→/table-admin
@@ -164,7 +162,7 @@ FN: saveToDatabase() | ....
 FILE: app/pages/clubs/[clubname]/collection/index.vue | ROLE: filterable club gamebox library
 FN: applyFilter() / fetchData() | ....
 FILE: app/pages/clubs/[clubname]/collection/add-games.vue | ROLE: 5-step add-games wizard
-FN: saveGamesList(value) / addTheseExisting(...) / searchForeignData(source, titles) / getGameBoxData(syncData) / sendGameboxesToSupabase(gameboxesData) | ....
+FN: saveGamesList(value) / addTheseExisting(...) / searchForeignData(source, titles) / getGameBoxData(syncData) | ....
 FILE: app/pages/clubs/[clubname]/profile/index.vue | ROLE: profile — theme toggle, logout, login
 FILE: app/pages/clubs/[clubname]/profile/schedules/list.vue | ROLE: user’s availability schedules
 FILE: app/pages/clubs/[clubname]/profile/schedules/item/[[id]].vue | ROLE: create/edit weekly availability board
@@ -208,25 +206,27 @@ FN: gatheringFromDb(data) → Gathering | ....
 FN: gatheringWithGuestsFromDb(data) → GatheringWithGuests | ....
 FN: tablesFromDb(data) → Table | ....
 FN: scheduleFromDb(data) → Schedule | ....
-FILE: server/utils/check-telegram-auth.ts | ROLE: HMAC-verify TG Login Widget payload
-FN: default(tgData: TelegramLoginPayload) → boolean | ....
-FILE: server/utils/telegram-password-generator.ts | ROLE: deterministic HMAC password from TG id
-FN: default(tgData: TelegramLoginPayload) → string | ....
+FILE: server/utils/auth.ts | ROLE: Better Auth instance (drizzle adapter + telegram plugin)
+FILE: server/utils/require-user.ts | ROLE: session → AppUser; sessionUserToAppUser mapper
+FILE: server/utils/require-rights.ts | ROLE: club gamemaster / global admin / gathering owner checks
+FILE: server/utils/upsert-profile.ts | ROLE: Better Auth user → profiles upsert
+FILE: server/utils/gamebox-pics.ts | ROLE: GAMEBOX_PICS_DIR helpers
 FILE: server/utils/telegram-bots.ts | ROLE: shared botPublic + botLogger instances
 FILE: server/utils/send-telegram-message.ts | ROLE: send via botPublic MarkdownV2
 FN: sendTelegramMessage(message) | ....
-FILE: server/utils/telegram-notify.ts | ROLE: notify wrapper (queue store commented)
+FILE: server/utils/telegram-notify.ts | ROLE: notify wrapper (numeric chat_id)
 FN: telegramNotify(event, message) | ....
-FILE: server/utils/store-message.ts | ROLE: enqueue to pgmq telegram-messages
-FN: storeMessage(event, message) | ....
 FILE: server/utils/profile-club-rights.ts | ROLE: session user’s club_id list
 FN: profileClubRights(event) | ....
 FILE: server/plugins/bgg-timeout.ts | ROLE: serialize /api/bgg/* 2.5s gap; 429 → 5min cooldown
 FILE: server/plugins/telegram-bots-starter.ts | ROLE: bot launcher — club-schedule when token set
-FILE: server/tasks/telegram/send-messages.ts | ROLE: Nitro task drain pgmq → send TG
-TASK: telegram:send-messages | ROLE: rpc read queue, send, archive
-FILE: server/routes/auth/telegram-callback.ts | ROLE: TG signup/signin then sendRedirect w/ tokens
-ENDPOINT: GET /auth/telegram-callback | ROLE: verify TG → session redirect
+FILE: server/routes/gamebox-pics/[id].get.ts | ROLE: serve pics from GAMEBOX_PICS_DIR
+ENDPOINT: GET /gamebox-pics/:id | ROLE: image/jpeg stream
+FILE: server/api/auth/[...all].ts | ROLE: Better Auth catch-all handler
+ENDPOINT: /api/auth/* | ROLE: sign-in/session/telegram
+FILE: server/api/health.get.ts | ROLE: DB SELECT 1 probe
+ENDPOINT: GET /api/health | ROLE: { ok, db }
+
 
 ## SERVER — API CATCH-ALL / BGG / TESERA / COMMON
 FILE: server/api/[...].ts | ROLE: unmatched /api/* stub
@@ -248,20 +248,12 @@ FILE: server/api/tesera/get-user-collection.ts | ROLE: Tesera user games
 ENDPOINT: GET /api/tesera/get-user-collection?username= | ROLE: user collection
 FILE: server/api/tesera/search.ts | ROLE: Tesera title search
 ENDPOINT: GET /api/tesera/search?title= | ROLE: → {items} GameBoxSearchResult
-FILE: server/api/common/telegram-callback.ts | ROLE: TG widget → Supabase signup/signin JSON
-ENDPOINT: GET /api/common/telegram-callback | ROLE: verify → {url} w/ tokens
-FILE: server/api/common/try-login.ts | ROLE: TG-verified signIn only
-ENDPOINT: GET /api/common/try-login | ROLE: signInWithPassword → {url}
-FILE: server/api/common/try-register.ts | ROLE: TG-verified signUp only
-ENDPOINT: GET /api/common/try-register | ROLE: auth.signUp → {url}
-FILE: server/api/common/get-creds.ts | ROLE: synthetic TG login/password
-ENDPOINT: GET /api/common/get-creds | ROLE: {login, password}
-FILE: server/api/common/add-pictures.post.ts | ROLE: BGG thumbs → storage gamebox-pics
-ENDPOINT: POST /api/common/add-pictures | ROLE: body.gameBoxIds → upload
-FILE: server/api/common/gamebox-check-exists.ts | ROLE: proxy existence check (stale path)
-ENDPOINT: GET /api/common/gamebox-check-exists?alias= | ROLE: proxies check-game-exists
+FILE: server/api/common/add-pictures.post.ts | ROLE: BGG thumbs → GAMEBOX_PICS_DIR (global admin)
+ENDPOINT: POST /api/common/add-pictures | ROLE: body.gameBoxIds → write files
+FILE: server/api/common/gamebox-check-exists.ts | ROLE: proxy → check-games-exists POST
+ENDPOINT: GET /api/common/gamebox-check-exists?alias= | ROLE: titles=[alias]
 
-## SERVER — API SUPABASE
+## SERVER — API DB
 FILE: server/api/db/club-data.get.ts | ROLE: club by url_name + settings
 ENDPOINT: GET /api/db/club-data?clubname= | ROLE: → Club
 FILE: server/api/db/club-info.get.ts | ROLE: club HTML info
@@ -318,8 +310,7 @@ TOKENS: NUXT_BOT_SCHEDULE_TOKEN, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_LUBA_TOKEN, 
 FILE: server/telegram-bots/club-schedule/bot-object.ts | ROLE: TelegramBot instance
 FILE: server/telegram-bots/club-schedule/club-schedule.ts | ROLE: polling + /start + /schedule
 CMDS: /start {club_id}, /schedule
-FILE: server/telegram-bots/club-schedule/supabase.ts | ROLE: service-role Supabase client
-FILE: server/telegram-bots/club-schedule/bindings.ts | ROLE: chat→club binding CRUD
+FILE: server/telegram-bots/club-schedule/bindings.ts | ROLE: chat→club binding CRUD (Drizzle)
 FN: getClubBinding(chatId) / setClubBinding(chatId, clubId) / isClubId(value) | ....
 FILE: server/telegram-bots/club-schedule/gatherings.ts | ROLE: fetch + format upcoming gatherings
 FN: fetchUpcomingGatherings(clubId) / formatGatheringsMessage(...) / findProfileIdByTelegramChatId(...) | ....
@@ -384,17 +375,18 @@ TABLE: telegram_chats_logs | ROLE: bot/admin chat log mapping
 TABLE: telegram_bot_club_bindings | ROLE: side-bot chat→club context (service role)
 TABLE: user_schedules | ROLE: named availability calendars
 TABLE: user_schedules_history | ROLE: time-segment availability snapshots
-TABLE: profile | ROLE: auth-synced profile (email, full_name, avatar_url, terms_accepted_at)
+TABLE: user/session/account/verification | ROLE: Better Auth tables (+ telegram columns)
 VIEW: gameboxes_with_club_id | ROLE: gameboxes + owning club ids array
-VIEW: users_raw_data | ROLE: auth.users id + metadata
 VIEW: gatherings_with_guests | ROLE: upcoming gatherings joined guests/profiles/gamebox/owner
 
 ## DOMAIN FLOW
-FLOW: / → login (TG/email) → set-session tokens → default club (terra)
-FLOW: /clubs/:name → club-data → layout in-da-club
-FLOW: gatherings → gatherings.get → join/leave via gatherings-set-guest → TG notify
-FLOW: gathering create/edit → gathering.post; remove → gathering-remove + TG cancel
-FLOW: collection → club-collection; add-games wizard → Tesera/BGG search → gamebox-add → add-games-to-club
-FLOW: settings/tables → club-settings / club-tables; info → club-info
-FLOW: schedules → schedule-list/find/post + schedule-board segments
+FLOW: / → login (TG/email Better Auth) → default club (terra; seed via db:seed)
+FLOW: /clubs/:name → club-data → layout in-da-club (avatarUrl / club-avatars)
+FLOW: gatherings → gatherings.get → join/leave via gatherings-set-guest → TG notify (profile.chat_id)
+FLOW: gathering create/edit → gathering.post (owner forced); remove → gathering-remove + owner/admin check
+FLOW: collection → club-collection; add-games wizard → Tesera/BGG search → gamebox-add → add-games-to-club (authz)
+FLOW: settings/tables → club-settings / club-tables; info → club-info (club gamemaster)
+FLOW: schedules → schedule-list/find/post (owner_id scoped) + schedule-board segments
 FLOW: admin → my-global-permissions gate → gameboxes CRUD / pictures
+FLOW: cutover → pg_dump → migrate → db:backfill-auth → verify identity
+

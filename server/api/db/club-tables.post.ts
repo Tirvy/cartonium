@@ -1,8 +1,10 @@
 import { db } from '#server/db'
 import { tables } from '#server/db/schema'
+import { requireClubGamemaster } from '#server/utils/require-rights'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
+  await requireClubGamemaster(event, body.club_id)
 
   let data
   if (body.id) {

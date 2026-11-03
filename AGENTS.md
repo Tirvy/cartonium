@@ -109,6 +109,7 @@ npm install
 cp .env.dist .env   # fill values — see docs/env.md
 npm run db:up       # local Postgres (Docker)
 npm run db:migrate  # apply Drizzle migrations
+npm run db:seed     # default club terra (+ optional SEED_ADMIN_*)
 npm run dev         # 0.0.0.0:80 (Telegram login needs this port)
 npm run build
 node .output/server/index.mjs
@@ -128,7 +129,7 @@ App Docker image: `docker build . -t cartonis -f Dockerfile` then `docker run -p
 - Query club domain tables directly from the browser when an API exists.
 - Enable Telegram bots in `telegram-bots-starter` without explicit request.
 - Commit `.env`, `creds.json`, or generated `i18n/locales/*.json` / `.generated/*`.
-- Turn on `typescript.typeCheck` in nuxt.config without fixing known supabase/auth-js issues.
+- Turn on `typescript.typeCheck` in nuxt.config without fixing known type issues first.
 - Mass-refactor i18n, gathering UI, or TG auth duplication without approval.
 - Add Pinia or a second CSS framework without approval.
 - Push to remote or force-push unless asked.

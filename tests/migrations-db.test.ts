@@ -28,12 +28,24 @@ describe('Drizzle SQL migrations for new DB stack', () => {
     expect(sql).not.toContain('auth.uid()')
   })
 
-  it('records both migrations in drizzle journal', () => {
+  it('records migrations in drizzle journal', () => {
     const journal = JSON.parse(
       readFileSync(resolve(root, 'server/db/migrations/meta/_journal.json'), 'utf8'),
     )
     const tags = journal.entries.map((e: { tag: string }) => e.tag)
     expect(tags).toContain('0000_init_domain')
     expect(tags).toContain('0001_better_auth')
+    expect(tags).toContain('0002_chat_id_bigint_indexes')
+  })
+
+  it('ships chat_id bigint + hot-path indexes migration', () => {
+    const path = resolve(root, 'server/db/migrations/0002_chat_id_bigint_indexes.sql')
+    expect(existsSync(path)).toBe(true)
+    const sql = readFileSync(path, 'utf8')
+    expect(sql).toContain('ALTER COLUMN "chat_id" SET DATA TYPE bigint')
+    expect(sql).toContain('clubs_url_name_uidx')
+    expect(sql).toContain('gatherings_club_id_start_date_idx')
+    expect(sql).toContain('user_telegram_id_idx')
   })
 })
+

@@ -23,10 +23,9 @@ logs
 .env.*
 !.env.dist
 
-# Supabase
+# Legacy Supabase CLI temp (migrations folder is reference-only)
 supabase/.temp
-!server/api/supabase
-.generated/supabase-database.ts
+.generated/
 
 # generated translations
 i18n/locales/*.json

@@ -1,33 +1,60 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { db } from '#server/db'
-import { gatherings, gatheringsGuests, gatheringsWithGuests } from '#server/db/schema'
+import { gatherings, gatheringsGuests, gatheringsWithGuests, profiles } from '#server/db/schema'
 import telegramNotify from '#server/utils/telegram-notify'
-import requireUser from '#server/utils/require-user'
+import { requireGatheringOwnerOrClubAdmin } from '#server/utils/require-rights'
 
 export default defineEventHandler(async (event) => {
-  const user = await requireUser(event)
   const body = await readBody(event)
+  if (!body.gathering_id) {
+    throw createError({ statusCode: 400, statusMessage: 'gathering_id required' })
+  }
+
+  const [gathering] = await db
+    .select()
+    .from(gatherings)
+    .where(eq(gatherings.id, body.gathering_id))
+    .limit(1)
+  if (!gathering) {
+    throw createError({ statusCode: 404, statusMessage: 'Gathering not found' })
+  }
+
+  await requireGatheringOwnerOrClubAdmin(event, gathering)
 
   const gatheringGuestsRows = await db
     .select()
     .from(gatheringsWithGuests)
     .where(eq(gatheringsWithGuests.id, body.gathering_id))
 
+  const guestIds = [
+    ...new Set(
+      gatheringGuestsRows
+        .filter((item) => item.user_id && item.guests_number && item.guests_number >= 1)
+        .map((item) => item.user_id as string),
+    ),
+  ]
+
+  const profileRows =
+    guestIds.length > 0
+      ? await db.select().from(profiles).where(inArray(profiles.id, guestIds))
+      : []
+  const chatByUser = new Map(profileRows.map((p) => [p.id, p.chat_id]))
+
   await db.delete(gatheringsGuests).where(eq(gatheringsGuests.gathering_id, body.gathering_id))
   await db.delete(gatherings).where(eq(gatherings.id, body.gathering_id))
 
-  gatheringGuestsRows.forEach((item) => {
-    if (item.guests_number && item.guests_number >= 1) {
-      const message = getMessage(item)
-      telegramNotify(event, {
-        to: user.user_metadata.telegram_id,
-        bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
-        type: 'gathering-removed',
-        why: `because i can`,
-        what: message,
-      })
-    }
-  })
+  for (const item of gatheringGuestsRows) {
+    if (!item.user_id || !item.guests_number || item.guests_number < 1) continue
+    const chatId = chatByUser.get(item.user_id)
+    if (!chatId) continue
+    telegramNotify(event, {
+      to: Number(chatId),
+      bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN,
+      type: 'gathering-removed',
+      why: `because i can`,
+      what: getMessage(item),
+    })
+  }
 
   return []
 })

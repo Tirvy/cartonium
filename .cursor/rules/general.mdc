@@ -13,4 +13,4 @@ alwaysApply: true
 - Never invent DB fields or business rules; check `server/db/schema/` and existing APIs (`supabase/migrations/` is legacy).
 - Do not commit secrets (`.env`, `creds.json`) or generated i18n JSON / `.generated/*`.
 - Telegram bots are disabled in `server/plugins/telegram-bots-starter.ts` — leave disabled unless asked.
-- No test suite: verify with `npm run dev` / `npm run build` as appropriate.
+- Vitest DB unit tests under `tests/` (`npm test`); still smoke with `npm run dev` / `npm run build` for risky changes.
