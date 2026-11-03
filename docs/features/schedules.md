@@ -14,13 +14,13 @@ Logged-in users maintain named weekly availability calendars as boolean time seg
 | Stubs | `compare.vue`, `not-found.vue` |
 | APIs | `schedule-list.ts`, `schedule-find.ts`, `schedule.post.ts` |
 | Types | `Schedule`, `ScheduleHistoryItem` |
-| Transform | `scheduleFromSupabase` |
+| Transform | `scheduleFromDb` |
 
 ## Data flow
 
-- List: `GET /api/supabase/schedule-list` (session user).
-- Load: `GET /api/supabase/schedule-find?scheduleId=`.
-- Save: `POST /api/supabase/schedule` creates/updates schedule and inserts history segments.
+- List: `GET /api/db/schedule-list` (session user).
+- Load: `GET /api/db/schedule-find?scheduleId=`.
+- Save: `POST /api/db/schedule` creates/updates schedule and inserts history segments.
 
 ## Notes for agents
 

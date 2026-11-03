@@ -13,7 +13,7 @@
         </v-card-text>
         <v-card-actions>
             <div>
-                <v-btn @click="sendGameboxesToSupabase">
+                <v-btn @click="sendGameboxesToDb">
                     Добавить выделенные
                 </v-btn>
             </div>
@@ -38,7 +38,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-    (e: 'sendGameboxesToSupabase', selected: Array<GameboxAddData>): void
+    (e: 'sendGameboxesToDb', selected: Array<GameboxAddData>): void
 }>()
 
 const gameboxes: ComputedRef<GameboxWithName[]> = computed(() => {
@@ -47,8 +47,8 @@ const gameboxes: ComputedRef<GameboxWithName[]> = computed(() => {
 
 const selected: Ref<number[]> = ref(gameboxes.value.map(item => item.id));
 
-async function sendGameboxesToSupabase() {
-    const ret = await $fetch('/api/supabase/add-games-to-club',
+async function sendGameboxesToDb() {
+    const ret = await $fetch('/api/db/add-games-to-club',
         {
             method: 'post',
             query: { clubid: currentClub.value.id },
@@ -58,7 +58,7 @@ async function sendGameboxesToSupabase() {
     const retValue = props.items.filter(item => {
         return selected.value.find(id => id === item.foundGamebox?.id);
     })
-    emit('sendGameboxesToSupabase', retValue);
+    emit('sendGameboxesToDb', retValue);
 }
 
 import columns from './gamebox-columns';

@@ -11,16 +11,10 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'Cartonis',
-    }
+    },
   },
 
-  modules: [
-    '@nuxtjs/supabase',
-    'dayjs-nuxt',
-    '@nuxtjs/i18n',
-    'vuetify-nuxt-module',
-    'nuxt-translation-manager',
-  ],
+  modules: ['dayjs-nuxt', '@nuxtjs/i18n', 'vuetify-nuxt-module', 'nuxt-translation-manager'],
   'translation-manager': {
     // for some reason it doesn't work with #shared/i18n/locales or in app/i18n/locales
     langDir: '../i18n/locales',
@@ -33,7 +27,6 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', name: 'English', file: 'en.json', language: 'en-US' },
       { code: 'ru', name: 'Русский', file: 'ru.json', language: 'ru-RU' },
-      // { code: 'ka', name: 'ქართული', file: 'ka.json', language: 'ka-GE'},
     ],
     bundle: {
       optimizeTranslationDirective: false,
@@ -48,39 +41,24 @@ export default defineNuxtConfig({
     dirs: ['types/*.ts'],
   },
 
-  supabase: {
-    redirect: true,
-    redirectOptions: {
-      login: '/',
-      callback: '/confirm',
-      include: ['/clubs/*/information/edit', '/clubs(/*)/settings(/*)?', '/admin(/*)?'],
-      exclude: ['users/*'],
-      saveRedirectToCookie: true,
-    },
-    cookieOptions: {
-      secure: true
-    }
-  },
   sourcemap: false,
   nitro: {
     experimental: {
-      tasks: true
+      tasks: true,
     },
     scheduledTasks: {
-      // Running `telegram messages` task every minute
       // '* * * * *': ['telegram:send-messages']
-    }
+    },
   },
 
   runtimeConfig: {
     public: {
       botLogin: '',
-    }
+      siteUrl: '',
+    },
   },
 
-
   typescript: {
-    // "have an 'override' modifier" error in supabase/auth-js @tirvy 10.24
     typeCheck: false,
   },
 
@@ -92,15 +70,6 @@ export default defineNuxtConfig({
         // transformAssetUrls,
       },
     },
-  },
-
-  $development: {
-    supabase: {
-      cookieOptions: {
-        secure: false
-      }
-    },
-    // ssr: false,
   },
 
   compatibilityDate: '2024-10-24',

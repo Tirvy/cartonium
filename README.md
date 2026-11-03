@@ -6,14 +6,12 @@ AI / contributor docs: [AGENTS.md](AGENTS.md) · [CODE_MAP.md](CODE_MAP.md) · [
 
 ```bash
 npm install
-cp .env.dist .env   # fill DATABASE_URL + Supabase Auth/Storage + Telegram secrets — see docs/env.md
+cp .env.dist .env   # fill DATABASE_URL + BETTER_AUTH_* + Telegram secrets — see docs/env.md
 npm run db:up       # local Postgres via Docker Compose
-npm run db:migrate  # apply Drizzle domain schema
+npm run db:migrate  # apply Drizzle schema (domain + Better Auth tables)
 ```
 
-Supabase is still required for **Auth** and **Storage** (`SUPABASE_URL` / `SUPABASE_KEY`). Domain tables live in local Postgres.
-
-Optional Auth-era typegen: `npx supabase login` then `npm run type` / `sh execs/supabase-type.sh`.
+Auth is **Better Auth** (email/password + Telegram). Domain data and auth tables live in local Postgres. Gamebox images are stored under `public/gamebox-pics/`.
 
 ## Development Server
 

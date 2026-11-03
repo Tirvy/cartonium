@@ -1,6 +1,6 @@
 import { db } from '#server/db'
 import { gatherings, gatheringsGuests } from '#server/db/schema'
-import { gatheringFromSupabase } from '#server/transformers'
+import { gatheringFromDb } from '#server/transformers'
 import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
@@ -37,5 +37,5 @@ export default defineEventHandler(async (event) => {
     guests_number: (+body.with_host || 0) + 1,
   })
 
-  return gatheringFromSupabase(data)
+  return gatheringFromDb(data)
 })

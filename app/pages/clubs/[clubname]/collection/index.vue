@@ -118,7 +118,7 @@ const collectionFiltered: ComputedRef<GameBox[]> = computed(() => {
 
 const fetchData = async () => {
     loading.value = true;
-    const ret: GameBox[] = await $fetch(`/api/supabase/club-collection`, {
+    const ret: GameBox[] = await $fetch(`/api/db/club-collection`, {
         query: {
             clubid: currentClub.value.id,
         }

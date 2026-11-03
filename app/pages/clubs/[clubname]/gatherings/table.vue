@@ -49,14 +49,14 @@ import { useDate } from 'vuetify';
 const dateAdapter = useDate();
 const currentClub: Ref<Club> = useState('club');
 const { data: gatherings, refresh: updateGatherings, status: gatheringUpdateStatus } = await useLazyFetch<GatheringWithGuests[]>(
-  '/api/supabase/gatherings', {
+  '/api/db/gatherings', {
   query: {
     clubid: currentClub.value.id,
   },
 });
 
 const { clubPermissions } = useClubPermissions();
-const user = useSupabaseUser();
+const user = useAuthUser();
 
 const loading = ref({
   gatheringId: 0,
@@ -129,7 +129,7 @@ const gatheringsWithDates = computed<GatheringsWithDates[]>(() => {
 
 async function guestSet(gatheringId: number, number: number) {
   loading.value.gatheringId = gatheringId;
-  const data: any = await $fetch('/api/supabase/gatherings-set-guest', {
+  const data: any = await $fetch('/api/db/gatherings-set-guest', {
     method: 'POST',
     body: {
       gathering_id: gatheringId,
@@ -186,7 +186,7 @@ async function removeGatheringConfirmed() {
   if (!gatheringToRemove.value) return;
 
   loading.value.removeDialogYes = true;
-  let res = await $fetch('/api/supabase/gathering-remove', {
+  let res = await $fetch('/api/db/gathering-remove', {
     method: 'POST',
     body: {
       gathering_id: gatheringToRemove.value.id,

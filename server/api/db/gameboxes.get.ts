@@ -2,7 +2,7 @@ import { and, asc, desc, ilike } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gameboxes } from '#server/db/schema'
 import type { GameBoxWithClub } from '#shared/types/frontend.js'
-import { gameBoxFromSupabase } from '#server/transformers.js'
+import { gameBoxFromDb } from '#server/transformers.js'
 
 export default defineEventHandler(async (event): Promise<{ items: GameBoxWithClub[] }> => {
   const query = getQuery(event) as {
@@ -36,6 +36,6 @@ export default defineEventHandler(async (event): Promise<{ items: GameBoxWithClu
     .offset(offset)
 
   return {
-    items: data.map(gameBoxFromSupabase),
+    items: data.map(gameBoxFromDb),
   }
 })

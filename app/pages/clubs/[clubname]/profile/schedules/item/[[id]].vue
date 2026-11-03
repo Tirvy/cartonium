@@ -66,7 +66,7 @@ async function saveSchedule() {
   if (!savedObject.id) {
 
     loaders.value.save = true;
-    const data: any = await $fetch('/api/supabase/schedule', {
+    const data: any = await $fetch('/api/db/schedule', {
       method: 'post',
       body: {
         ...savedObject,
@@ -77,7 +77,7 @@ async function saveSchedule() {
   } else {
 
     loaders.value.save = true;
-    const data: any = await $fetch('/api/supabase/schedule', {
+    const data: any = await $fetch('/api/db/schedule', {
       method: 'post',
       body: {
         ...savedObject,
@@ -97,7 +97,7 @@ const changeSchedule = (value: boolean[]) => {
 const queryScheduleId = +route.params.id;
 if (queryScheduleId) {
   const { data: foundSchedule, execute: getSchedule, status: getScheduleStatus } = await useLazyFetch<Schedule>(
-    '/api/supabase/schedule-find',
+    '/api/db/schedule-find',
     {
       query: {
         scheduleId: +route.params.id,

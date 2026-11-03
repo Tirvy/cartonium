@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { clubs, clubsSettings } from '#server/db/schema'
-import { clubFromSupabase } from '#server/transformers'
+import { clubFromDb } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(clubsSettings.club_id, clubData.id))
     .limit(1)
 
-  return clubFromSupabase(clubData, clubSettings || baseSettings)
+  return clubFromDb(clubData, clubSettings || baseSettings)
 })
 
 const baseSettings = {

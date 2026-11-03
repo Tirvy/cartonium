@@ -44,7 +44,7 @@ Where things live and where to put new work. Path inventory: `CODE_MAP.md`.
 
 | Put here | Examples |
 |----------|----------|
-| Club/domain CRUD | `server/api/supabase/*.ts` |
+| Club/domain CRUD | `server/api/db/*.ts` |
 | External game DBs | `server/api/bgg/`, `server/api/tesera/` |
 | Auth helpers / pictures | `server/api/common/` |
 | Row mappers | `server/transformers.ts` |

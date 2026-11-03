@@ -10,7 +10,7 @@
         </v-card-text>
         <v-card-actions>
             <div>
-                <v-btn @click="sendGameboxesToSupabase" :loading="loading">
+                <v-btn @click="sendGameboxesToDb" :loading="loading">
                     Отправить в супабейз
                 </v-btn>
             </div>
@@ -34,13 +34,13 @@ const props = defineProps({
 const selected: Ref<string[]> = ref([]);
 
 const emit = defineEmits<{
-    (e: 'sendGameboxesToSupabase', selected: GameBox[]): void
+    (e: 'sendGameboxesToDb', selected: GameBox[]): void
 }>()
 
-function sendGameboxesToSupabase() {
+function sendGameboxesToDb() {
     // const toSend = props.items.filter(item => selected.value.includes(item.title));
     const toSend = props.items;
-    emit('sendGameboxesToSupabase', toSend);
+    emit('sendGameboxesToDb', toSend);
 }
 
 // unused code когда хотелось сделать и тут галочки

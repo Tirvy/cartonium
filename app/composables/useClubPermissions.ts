@@ -8,10 +8,10 @@ export const useClubPermissions = () => {
   const currentClub: Ref<Club> = useState('club');
 
   async function update() {
-    const user = useSupabaseUser()
+    const user = useAuthUser()
     const currentClub: Ref<Club | null> = useState('club');
 
-    const clubs = await $fetch<ClubPermission[]>('/api/supabase/my-clubs-permissions', {
+    const clubs = await $fetch<ClubPermission[]>('/api/db/my-clubs-permissions', {
       query: {
         userid: user?.value?.id,
         clubid: currentClub.value?.id,

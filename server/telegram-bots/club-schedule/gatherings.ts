@@ -1,5 +1,5 @@
 import { and, asc, eq, gte } from 'drizzle-orm'
-import { gatheringWithGuestsFromSupabase } from '#server/transformers'
+import { gatheringWithGuestsFromDb } from '#server/transformers'
 import { db } from '#server/db'
 import { gatheringsWithGuests, profiles } from '#server/db/schema'
 import type { GatheringWithGuests } from '~/types/frontend.js'
@@ -31,7 +31,7 @@ export async function fetchUpcomingGatherings(clubId: string): Promise<Gathering
     )
     .orderBy(asc(gatheringsWithGuests.start_date))
 
-  return clampGatherings(data.map(gatheringWithGuestsFromSupabase))
+  return clampGatherings(data.map(gatheringWithGuestsFromDb))
 }
 
 export async function findProfileIdByTelegramChatId(telegramId: number): Promise<string | null> {

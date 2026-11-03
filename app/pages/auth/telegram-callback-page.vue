@@ -1,26 +1,9 @@
 <template>
-  <div>
-
-  </div>
+  <div class="pa-4">Telegram login uses the widget callback via Better Auth. Redirecting…</div>
 </template>
 
 <script lang="ts" setup>
-
-onMounted(async () => {
-
-  const route = useRoute();
-  const query = route.query;
-  const tgData = query as unknown as TelegramLoginPayload;
-
-  const tryLogin = await $fetch<{ url: string }>('/api/common/telegram-callback', { query });
-  if (tryLogin?.url) {
-    navigateTo(tryLogin.url, {
-      replace: true,
-    })
-    return;
-  }
-});
-
+onMounted(() => {
+  navigateTo(useDefaultPage().path, { replace: true })
+})
 </script>
-
-<style scoped></style>

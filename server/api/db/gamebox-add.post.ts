@@ -1,10 +1,10 @@
 import { db } from '#server/db'
 import { gameboxes } from '#server/db/schema'
-import { gameBoxToSupabase } from '#server/transformers'
+import { gameBoxToDb } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
   const gameboxesBody = await readBody(event)
-  const gameboxesFormattedForBd = gameboxesBody.map(gameBoxToSupabase)
+  const gameboxesFormattedForBd = gameboxesBody.map(gameBoxToDb)
 
   // onConflict: alias_tesera — same temp fix as before [31.08.2024]
   const data = await db

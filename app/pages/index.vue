@@ -172,7 +172,7 @@
 
 <script setup lang="ts">
 
-const user = useSupabaseUser()
+const user = useAuthUser()
 const defaultPage = useDefaultPage();
 
 watch(user, () => {

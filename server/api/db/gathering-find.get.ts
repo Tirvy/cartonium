@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gatherings } from '#server/db/schema'
-import { gatheringFromSupabase } from '#server/transformers'
+import { gatheringFromDb } from '#server/transformers'
 import type { Gathering } from '#shared/types/frontend'
 
 export default defineEventHandler(async (event): Promise<Gathering> => {
@@ -23,5 +23,5 @@ export default defineEventHandler(async (event): Promise<Gathering> => {
     throw createError({ statusMessage: 'Gathering not found' })
   }
 
-  return gatheringFromSupabase(data)
+  return gatheringFromDb(data)
 })

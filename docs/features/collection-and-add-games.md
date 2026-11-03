@@ -17,11 +17,11 @@ Browse a club’s game library with filters. Admins/staff add games via a multi-
 
 ## Data flow
 
-1. List: `GET /api/supabase/club-collection?clubid&search&limit`.
+1. List: `GET /api/db/club-collection?clubid&search&limit`.
 2. Wizard step1: POST titles to `check-games-exists` / `check-games-in-club`.
 3. Step2: select existing → `add-games-to-club`.
 4. Step3: `GET /api/tesera/search`, `/api/bgg/search` (and get-gamebox) to pick variants.
-5. Step4–5: merge → `POST /api/supabase/gamebox-add` → `add-games-to-club`.
+5. Step4–5: merge → `POST /api/db/gamebox-add` → `add-games-to-club`.
 
 BGG traffic is rate-limited by `server/plugins/bgg-timeout.ts`.
 
@@ -33,6 +33,6 @@ BGG traffic is rate-limited by `server/plugins/bgg-timeout.ts`.
 
 ## Extend safely
 
-- New catalog fields: update `gameboxes` migration, `GameBox`, `gameBoxFromSupabase` / `gameBoxToSupabase`, admin + wizard columns (`gamebox-columns.ts`).
+- New catalog fields: update `gameboxes` migration, `GameBox`, `gameBoxFromDb` / `gameBoxToDb`, admin + wizard columns (`gamebox-columns.ts`).
 - Do not call BGG in a tight loop from the client — go through `/api/bgg` so the queue plugin applies.
 - Stale helper `server/api/common/gamebox-check-exists.ts` proxies a wrong path; prefer `check-games-exists.post.ts` directly.

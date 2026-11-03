@@ -88,6 +88,10 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  middleware: ['auth-required'],
+})
+
 const tables = ref<Table[]>([]);
 const currentClub: Ref<Club> = useState('club');
 import { ruleIsNumber } from '@/utils/rules.js';
@@ -121,7 +125,7 @@ function getDefaultTableValues() {
 
 
 async function getTables() {
-  const { data, error } = await useFetch('/api/supabase/club-tables', {
+  const { data, error } = await useFetch('/api/db/club-tables', {
     query: {
       clubid: currentClub.value.id,
     }
@@ -156,7 +160,7 @@ async function saveTable() {
     return;
   }
 
-  const { data, error } = await useFetch('/api/supabase/club-tables', {
+  const { data, error } = await useFetch('/api/db/club-tables', {
     method: 'POST',
     query: {
       clubid: currentClub.value.id,

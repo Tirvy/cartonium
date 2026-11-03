@@ -1,9 +1,12 @@
 export async function gameboxPictureGet(gamebox: GameBox) {
-    const client = useSupabaseClient();
-    const { data } = client.storage.from('gamebox-pics').getPublicUrl(gamebox.id.toString());
-    const resp = await fetch(data.publicUrl);
+  const publicUrl = `/gamebox-pics/${gamebox.id}`
+  try {
+    const resp = await fetch(publicUrl, { method: 'HEAD' })
     if (!resp.ok) {
-        return gamebox.photoUrl;
+      return gamebox.photoUrl
     }
-    return data.publicUrl;
+    return publicUrl
+  } catch {
+    return gamebox.photoUrl
+  }
 }

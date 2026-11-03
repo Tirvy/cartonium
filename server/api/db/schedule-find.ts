@@ -1,7 +1,7 @@
 import { and, asc, eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { userSchedules, userSchedulesHistory } from '#server/db/schema'
-import { scheduleFromSupabase } from '#server/transformers'
+import { scheduleFromDb } from '#server/transformers'
 import type { Schedule } from '#shared/types/frontend'
 import requireUser from '#server/utils/require-user'
 
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<Schedule> => {
     .where(eq(userSchedulesHistory.schedule_id, id))
     .orderBy(asc(userSchedulesHistory.created_at))
 
-  return scheduleFromSupabase({
+  return scheduleFromDb({
     ...schedule,
     history,
   })

@@ -5,9 +5,9 @@ alwaysApply: true
 
 # Cartonium — general
 
-- Product: Cartonis boardgame club app (Nuxt 4 + local Postgres/Drizzle + Supabase Auth/Storage + Vuetify).
+- Product: Cartonis boardgame club app (Nuxt 4 + local Postgres/Drizzle + Better Auth + Vuetify).
 - Read `AGENTS.md` and `CODE_MAP.md` before non-trivial changes; deep docs in `docs/`.
-- Preserve architecture: server APIs own DB via `#server/db`; `server/transformers.ts` maps snake↔camel; UI types in `shared/types/frontend.ts`.
+- Preserve architecture: server APIs own DB via `#server/db`; auth via Better Auth (`#server/utils/auth`, `useAuthUser`); `server/transformers.ts` maps snake↔camel (`*FromDb`); UI types in `shared/types/frontend.ts`.
 - State: Nuxt `useState` only (`club`, `clubPermissions`, `lastGathering`, `lastGatheringName`) — no Pinia.
 - Prefer smallest diff; match local style; no drive-by refactors.
 - Never invent DB fields or business rules; check `server/db/schema/` and existing APIs (`supabase/migrations/` is legacy).

@@ -2,8 +2,7 @@ import { and, eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gatheringsGuests, gatheringsWithGuests } from '#server/db/schema'
 import telegramNotify from '#server/utils/telegram-notify'
-import requireUser from '#server/utils/require-user'
-import type { User } from '@supabase/auth-js'
+import requireUser, { type AppUser } from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
   const user = await requireUser(event)
@@ -52,7 +51,7 @@ export default defineEventHandler(async (event) => {
 })
 
 function creatMessage(
-  user: User,
+  user: AppUser,
   newData: typeof gatheringsGuests.$inferSelect,
   previousData: (typeof gatheringsWithGuests.$inferSelect)[],
 ) {

@@ -15,7 +15,7 @@ Club staff configure guest permissions, reservation contacts, collection filter 
 | Edit info | `.../information/edit.vue` (Quill) | `club-info.post.ts` |
 | Parent gate | `.../settings.vue` | non-admins bounced to gatherings |
 
-Types: `Club`, `Table`, `ClubInfo`. Transformers: `clubFromSupabase`, `tablesFromSupabase`, `clubInfoFromSupabase`.
+Types: `Club`, `Table`, `ClubInfo`. Transformers: `clubFromDb`, `tablesFromDb`, `clubInfoFromDb`.
 
 ## Business rules
 
@@ -25,5 +25,5 @@ Types: `Club`, `Table`, `ClubInfo`. Transformers: `clubFromSupabase`, `tablesFro
 
 ## Extend safely
 
-- New setting flag: DB `clubs_settings` column → `clubFromSupabase` / `Club` type → settings form → POST body field names as existing handler expects.
+- New setting flag: DB `clubs_settings` column → `clubFromDb` / `Club` type → settings form → POST body field names as existing handler expects.
 - Themes save is incomplete — confirm intended persistence before wiring a new API.

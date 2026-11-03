@@ -51,10 +51,10 @@ async function getGamesBaseInfo() {
     const onlyGoodStrings: string[] = splitted.filter((q: string) => !!q).map((item: string) => item.trim());
     const stringsHashed = onlyGoodStrings.reduce((total, title) => ({ ...total, [title]: true }), {});
 
-    const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: Object.keys(stringsHashed) } });
+    const gameboxesFound: GameBox[] = await $fetch('/api/db/check-games-exists', { method: 'POST', body: { titles: Object.keys(stringsHashed) } });
     let gameboxesInClub: number[] = [];
     if (gameboxesFound.length) {
-        gameboxesInClub = await $fetch('/api/supabase/check-games-in-club',
+        gameboxesInClub = await $fetch('/api/db/check-games-in-club',
             {
                 method: 'POST',
                 query:

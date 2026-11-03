@@ -149,7 +149,7 @@ const updateSearch = useDebounce((string: string) => {
 async function loadItems({ page, itemsPerPage, sortBy, search }: { page: number, itemsPerPage: number, sortBy: { key: string, order: string }, search: string }) {
   loading.value.table = true;
 
-  const data = await $fetch('/api/supabase/gameboxes', {
+  const data = await $fetch('/api/db/gameboxes', {
     query: { page, itemsPerPage, sortBy, search },
   }) as { items: GameBox[] };
 
@@ -205,7 +205,7 @@ function getNewGamebox(): GameBox {
 async function saveEdit() {
   loading.value.dialog = true;
   if (editedItem.value?.id) {
-    const ret = await $fetch('/api/supabase/gamebox-edit', {
+    const ret = await $fetch('/api/db/gamebox-edit', {
       method: 'POST',
       body: {
         gamebox: editedItem.value,

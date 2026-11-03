@@ -15,7 +15,7 @@
                 <v-divider />
                 <v-col cols="12" v-if="stepNumber === 2">
                     <pages-add-games-add-existing :items="controlDataFound"
-                        @sendGameboxesToSupabase="addTheseExisting" />
+                        @sendGameboxesToDb="addTheseExisting" />
                 </v-col>
                 <v-divider />
 
@@ -33,7 +33,7 @@
                 <v-divider />
 
                 <v-col cols="12" v-if="stepNumber === 4">
-                    <pages-add-games-data-verify :items="saveData" @sendGameboxesToSupabase="sendGameboxesToSupabase"
+                    <pages-add-games-data-verify :items="saveData" @sendGameboxesToDb="sendGameboxesToDb"
                         :loading="loaders.gettingData" />
                 </v-col>
                 <v-divider />
@@ -348,18 +348,18 @@ async function getGameBoxData(syncData: SyncTeseraBggMap) {
 
 // to supabase 
 
-async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
+async function sendGameboxesToDb(gameboxesData: GameBox[]) {
     if (gameboxesData.length) {
         try {
             const titles = gameboxesData.map(item => item.title);
-            const gameboxesFound: GameBox[] = await $fetch('/api/supabase/check-games-exists', { method: 'POST', body: { titles: titles } });
+            const gameboxesFound: GameBox[] = await $fetch('/api/db/check-games-exists', { method: 'POST', body: { titles: titles } });
 
             let toSend = gameboxesData.filter(item => {
                 const found = gameboxesFound.find(gamebox => gamebox.title === item.title);
                 return !found;
             });
 
-            let ret: GameBox[] | unknown = await $fetch('/api/supabase/gamebox-add', {
+            let ret: GameBox[] | unknown = await $fetch('/api/db/gamebox-add', {
                 method: "POST", body: toSend
             }).catch(error => {
                 console.log(error)
@@ -372,7 +372,7 @@ async function sendGameboxesToSupabase(gameboxesData: GameBox[]) {
             }
 
             loaders.value.gettingData = true;
-            await $fetch('/api/supabase/add-games-to-club',
+            await $fetch('/api/db/add-games-to-club',
                 {
                     method: 'post',
                     query: { clubid: currentClub.value.id },

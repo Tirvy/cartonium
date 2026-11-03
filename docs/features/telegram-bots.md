@@ -8,7 +8,7 @@ Side bots (not the main club app notify bot) live under `server/telegram-bots/`.
 
 | Bot | Role | Key deps |
 |-----|------|----------|
-| `club-schedule` | Club gatherings list via Telegram | Supabase (`SUPABASE_SERVICE_KEY`), `NUXT_BOT_SCHEDULE_TOKEN` |
+| `club-schedule` | Club gatherings list via Telegram | Postgres (`DATABASE_URL`), `NUXT_BOT_SCHEDULE_TOKEN` |
 | `blood-bowl-tbilisi` | League match prediction votes | Tourplay API, Google Sheet, `NUXT_BOT_BLOODBOWL_*` |
 | `luba-bot` | English quiz from sheet | Google Sheet `NUXT_BOT_LUBA_*` |
 | `flood-reader` | TTS experiment stub | polling only; handlers commented |

@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 
-const redirectPath = useCookie('sb-redirect-path');
+const redirectPath = useCookie('auth-redirect-path');
 const currentClub: Ref<Club> = useState('club');
 
 
@@ -174,7 +174,7 @@ const clubAvatar = computed(() => {
 });
 
 // setting up user avatar
-const user = useSupabaseUser();
+const user = useAuthUser();
 
 const initials = computed(() => {
   let source = user.value?.user_metadata?.full_name || user.value?.user_metadata?.name;

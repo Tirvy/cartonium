@@ -117,6 +117,10 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  middleware: ['auth-required'],
+})
+
 import { useTheme } from 'vuetify';
 
 interface themeColor {

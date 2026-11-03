@@ -1,7 +1,7 @@
 import { arrayOverlaps } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gameboxes } from '#server/db/schema'
-import { gameBoxFromSupabase } from '#server/transformers'
+import { gameBoxFromDb } from '#server/transformers'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -23,5 +23,5 @@ export default defineEventHandler(async (event) => {
     titlesLeft = titlesLeft.slice(toSlice)
   }
 
-  return retData.map((item) => gameBoxFromSupabase(item))
+  return retData.map((item) => gameBoxFromDb(item))
 })

@@ -66,6 +66,10 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  middleware: ['auth-required'],
+})
+
 
 const currentClub: Ref<Club> = useState('club');
 
@@ -79,7 +83,7 @@ const gatheringWarning = ref(currentClub.value.gatheringWarning ?? '');
 
 async function saveChanges() {
 
-  const response = await useFetch('/api/supabase/club-settings', {
+  const response = await useFetch('/api/db/club-settings', {
     method: 'POST',
     query: {
       clubid: currentClub.value.id,

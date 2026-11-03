@@ -23,33 +23,6 @@
       </v-card-actions>
     </template>
 
-    <template v-if="loginWithKeycloakAvailable">
-      <v-card-actions>
-        <v-btn @click="signInWithKeycloak">keycloak</v-btn>
-      </v-card-actions>
-    </template>
-
-    <template v-if="loginWithProviderAvailable">
-      <v-card-title>
-        login with providers
-      </v-card-title>
-      <v-card-actions>
-        <v-btn icon="mdi-github" @click="signInWithProvider('github')"></v-btn>
-        <v-btn icon="mdi-google" @click="signInWithProvider('google')"></v-btn>
-        <v-btn icon="mdi-facebook" @click="signInWithProvider('facebook')"></v-btn>
-        <v-btn icon="mdi-discord" @click="signInWithProvider('discord')">d</v-btn>
-      </v-card-actions>
-    </template>
-
-    <template v-if="guestAvailable">
-      <v-card-actions>
-        <v-btn @click="singInAsGuest" block variant="outlined">
-          Войти как гость
-        </v-btn>
-      </v-card-actions>
-    </template>
-
-
     <template v-if="registrationAvailable">
       <v-divider />
       <v-card-title>
@@ -62,7 +35,6 @@
           <v-btn @click="signUpNewUser">sign up</v-btn>
         </v-form>
       </v-card-actions>
-
     </template>
   </v-card>
 
@@ -72,31 +44,27 @@
 </template>
 
 <script lang="ts" setup>
-import type { Provider } from '~/node_modules/@supabase/auth-js/src/lib/types';
-import type { Loaders } from '#imports';
+import type { Loaders } from '#imports'
+import { authClient } from '~/utils/auth-client'
 
-const registrationAvailable = false;
-const loginWithEmailAvailable = true;
-const loginWithProviderAvailable = false;
-const loginWithTelegramAvailable = false;
-const loginWithKeycloakAvailable = false;
-const guestAvailable = false;
+const registrationAvailable = false
+const loginWithEmailAvailable = true
+const loginWithTelegramAvailable = true
 
 const snackbar = ref({
   show: false,
-  text: ''
-});
+  text: '',
+})
 
 const loaders: Ref<Loaders> = ref({
-  loginEmail: false
-});
+  loginEmail: false,
+})
 
-const user = useSupabaseUser()
-const { auth } = useSupabaseClient()
-const { update: updateUserPermissions } = useClubPermissions();
+const user = useAuthUser()
+const { update: updateUserPermissions } = useClubPermissions()
 
-const redirectPath = useCookie('sb-redirect-path');
-const defaultRedirectPath = useDefaultPage().path;
+const redirectPath = useCookie('auth-redirect-path')
+const defaultRedirectPath = useDefaultPage().path
 watchEffect(() => {
   if (user.value) {
     if (redirectPath.value) {
@@ -107,73 +75,52 @@ watchEffect(() => {
   }
 })
 
-async function authByTelegram(user: any) {
-  console.log(user, 'hehe');
+async function authByTelegram(_data: unknown) {
+  await updateUserPermissions()
 }
 
-async function signInWithProvider(provider: string) {
-  const { data, error } = await auth.signInWithOAuth({
-    provider: provider as Provider,
-  })
-}
-
-async function signInWithKeycloak() {
-  const { data, error } = await auth.signInWithOAuth({
-    provider: 'keycloak',
-    options: {
-      scopes: 'openid',
-    },
-  })
-  console.log(data, error);
-}
-
-const loginEmail = ref('');
-const loginPassword = ref('');
-const show = ref({ passwordLogin: false });
-const loginFormIsValid: Ref<null | boolean> = ref(null);
+const loginEmail = ref('')
+const loginPassword = ref('')
+const show = ref({ passwordLogin: false })
+const loginFormIsValid: Ref<null | boolean> = ref(null)
 
 async function signInWithEmail() {
   if (!loginFormIsValid.value) {
-    loginFormIsValid.value = false;
-    return;
+    loginFormIsValid.value = false
+    return
   }
-  loaders.value.loginEmail = true;
-  const { data, error } = await auth.signInWithPassword({
+  loaders.value.loginEmail = true
+  const { error } = await authClient.signIn.email({
     email: loginEmail.value,
     password: loginPassword.value,
   })
-  loaders.value.loginEmail = false;
+  loaders.value.loginEmail = false
   if (error) {
-    snackbar.value.text = error.message;
-    snackbar.value.show = true;
+    snackbar.value.text = error.message || 'Login failed'
+    snackbar.value.show = true
+    return
   }
-  updateUserPermissions();
+  await updateUserPermissions()
 }
 
-async function singInAsGuest() {
-  const { data, error } = await auth.signInAnonymously()
-  console.log(data, error);
-
-}
-
-const signupEmail = ref('');
-const signupPassword = ref('');
+const signupEmail = ref('')
+const signupPassword = ref('')
 async function signUpNewUser() {
-  const { data, error } = await auth.signUp({
+  const { error } = await authClient.signUp.email({
     email: signupEmail.value,
     password: signupPassword.value,
-    options: {
-      emailRedirectTo: defaultRedirectPath,
-    },
+    name: signupEmail.value.split('@')[0] || 'User',
   })
+  if (error) {
+    snackbar.value.text = error.message || 'Sign up failed'
+    snackbar.value.show = true
+  }
 }
 
 function required(v: string) {
   return !!v || 'Field is required'
 }
-
 </script>
-
 
 <style scoped>
 .login-card {

@@ -97,7 +97,7 @@ definePageMeta({
     ],
 });
 
-const { data: tables } = await useFetch<Table[]>('/api/supabase/club-tables', {
+const { data: tables } = await useFetch<Table[]>('/api/db/club-tables', {
     query: {
         clubid: currentClub.value.id,
     }
@@ -108,7 +108,7 @@ const lastDateFrom = ref(dateAdapter.startOfDay(dateAdapter.date()) as DateIOFor
 
 async function updateFilters() {
     loaders.value.dateRange = true;
-    const data = await $fetch('/api/supabase/gatherings', {
+    const data = await $fetch('/api/db/gatherings', {
         query: {
             clubid: currentClub.value.id,
             ['date-from']: dateAdapter.toISO(dateFrom.value)

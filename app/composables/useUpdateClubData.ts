@@ -7,7 +7,7 @@ export const useUpdateClubData = () => {
       return null;
     }
 
-    const clubData: Club = await $fetch('/api/supabase/club-data', {
+    const clubData: Club = await $fetch('/api/db/club-data', {
       query: {
         clubname: clubnameToCheck,
       }

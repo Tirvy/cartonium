@@ -2,7 +2,7 @@ import { and, arrayContains, desc, ilike } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gameboxesWithClubId } from '#server/db/schema'
 import type { GameBox } from '#shared/types/frontend.js'
-import { gameBoxFromSupabase } from '#server/transformers.js'
+import { gameBoxFromDb } from '#server/transformers.js'
 
 export default defineEventHandler(async (event): Promise<GameBox[]> => {
   const query = getQuery(event)
@@ -22,5 +22,5 @@ export default defineEventHandler(async (event): Promise<GameBox[]> => {
     .orderBy(desc(gameboxesWithClubId.rating_bgg))
     .limit(limit)
 
-  return data.map(gameBoxFromSupabase)
+  return data.map(gameBoxFromDb)
 })

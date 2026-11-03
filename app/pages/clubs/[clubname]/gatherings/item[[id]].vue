@@ -138,7 +138,7 @@ function allowedDates(val: Date) {
     return val > new Date();
 };
 const { data: gameboxesSearchList, refresh: getClubGameboxes, status: getClubGameboxesStatus } = await useLazyFetch<GameBox[]>(
-    '/api/supabase/club-collection',
+    '/api/db/club-collection',
     {
         query: {
             clubid: currentClub.value.id,
@@ -149,7 +149,7 @@ const { data: gameboxesSearchList, refresh: getClubGameboxes, status: getClubGam
     },
 );
 const { data: tables, execute: getClubTables, status: getClubTablesStatus } = await useLazyFetch<Table[]>(
-    '/api/supabase/club-tables',
+    '/api/db/club-tables',
     {
         query: {
             clubid: currentClub.value.id,
@@ -203,7 +203,7 @@ const updateGameboxSearch = useDebounce((search: string) => {
 const route = useRoute();
 const findingId = +route.params.id;
 const { data: foundGathering, execute: findGathering, status: findGatheringStatus } = await useLazyFetch<Gathering>(
-    '/api/supabase/gathering-find',
+    '/api/db/gathering-find',
     {
         query: {
             clubid: currentClub.value.id,
@@ -252,7 +252,7 @@ async function saveGathering() {
     dateToSend = dateAdapter.setMinutes(dateToSend, +hoursMinutes[1]);
 
     loaders.value.save = true;
-    const data: any = await $fetch('/api/supabase/gathering', {
+    const data: any = await $fetch('/api/db/gathering', {
         method: 'post',
         body: {
             club_id: currentClub.value.id,

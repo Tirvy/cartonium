@@ -19,4 +19,4 @@ alwaysApply: false
 - Permissions: `useClubPermissions().update()`, `useGetGlobalPermissions()` for `/admin`.
 - Guest mapping: `useCurrentUserAsGuest()`.
 - Default post-login club route: `useDefaultPage()` (currently club `terra`).
-- No Pinia. Cookies: `theme`, `sb-redirect-path`. localStorage: `gatherings-view`.
+- No Pinia. Cookies: `theme`, `auth-redirect-path`. localStorage: `gatherings-view`. Auth identity: `useAuthUser()`.

@@ -10,9 +10,9 @@ Club members create play sessions, browse upcoming tables, join/leave with guest
 |-------|-------|
 | Pages | `app/pages/clubs/[clubname]/gatherings/**` |
 | Components | `app/components/pages/gatherings/table-item.vue`, `table-item-skeleton.vue` |
-| APIs | `server/api/supabase/gatherings.get.ts`, `gathering.post.ts`, `gathering-find.get.ts`, `gathering-remove.post.ts`, `gatherings-set-guest.ts` |
+| APIs | `server/api/db/gatherings.get.ts`, `gathering.post.ts`, `gathering-find.get.ts`, `gathering-remove.post.ts`, `gatherings-set-guest.ts` |
 | Types | `Gathering*`, `GatheringComputedValue` in `shared/types/frontend.ts` |
-| Transform | `gatheringFromSupabase`, `gatheringWithGuestsFromSupabase` |
+| Transform | `gatheringFromDb`, `gatheringWithGuestsFromDb` |
 
 Route notes:
 
@@ -25,7 +25,7 @@ Route notes:
 ```mermaid
 sequenceDiagram
   participant UI as Gatherings UI
-  participant API as /api/supabase
+  participant API as /api/db
   participant DB as Supabase
   participant TG as telegramNotify
   UI->>API: GET gatherings?clubid&date-from

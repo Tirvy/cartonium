@@ -1,14 +1,14 @@
 import { eq } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gameboxes } from '#server/db/schema'
-import { gameBoxToSupabase } from '#server/transformers'
+import { gameBoxToDb } from '#server/transformers'
 import requireUser from '#server/utils/require-user'
 
 export default defineEventHandler(async (event) => {
   await requireUser(event)
   const body = await readBody(event)
   const gamebox = body.gamebox
-  const gameboxesFormattedForBd = gameBoxToSupabase(gamebox)
+  const gameboxesFormattedForBd = gameBoxToDb(gamebox)
 
   const data = await db
     .update(gameboxes)

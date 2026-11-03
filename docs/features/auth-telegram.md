@@ -1,39 +1,36 @@
-# Feature: Telegram / Supabase auth
+# Feature: Telegram / Better Auth
 
 ## What it does
 
-Users authenticate primarily via Telegram Login Widget. Server verifies the widget HMAC, ensures a Supabase user exists (synthetic email/password), and returns session tokens. Middleware applies tokens from the query string.
+Users authenticate primarily via Telegram Login Widget through the Better Auth Telegram plugin. Email/password is available for admins. Sessions are cookie-based Better Auth sessions; app profiles live in local Postgres (`profiles`).
 
 ## Where it lives
 
 | Layer | Paths |
 |-------|-------|
-| Widget UI | `app/components/common/telegramLoginButton.vue`, layouts |
-| Callback page | `app/pages/auth/telegram-callback-page.vue` |
-| Email login UI | `app/components/common/login.vue` (OAuth/guest flags largely off) |
-| Confirm | `app/pages/confirm.vue` (Supabase redirect callback) |
-| Middleware | `app/middleware/set-session.global.ts` |
-| Server route | `server/routes/auth/telegram-callback.ts` (redirect) |
-| APIs | `server/api/common/telegram-callback.ts`, `try-login.ts`, `try-register.ts`, `get-creds.ts` |
-| Utils | `server/utils/check-telegram-auth.ts`, `telegram-password-generator.ts` |
-| Config | `nuxt.config.ts` supabase redirectOptions; **dev server port 80** (required for TG login) |
+| Widget UI | `app/components/common/telegramLoginButton.vue` |
+| Email login UI | `app/components/common/login.vue` |
+| Confirm | `app/pages/confirm.vue` (redirect when session exists) |
+| Middleware | `auth-required.ts`, `club-admin-reroute.global.ts` |
+| Auth API | `server/api/auth/[...all].ts` |
+| Auth config | `server/utils/auth.ts` |
+| Client | `app/utils/auth-client.ts`, `app/composables/useAuthUser.ts` |
+| Profile sync | `server/utils/upsert-profile.ts` (hooks on user create/update) |
+| Config | **dev server port 80**; `BETTER_AUTH_*`, `NUXT_BOT_TOKEN`, `NUXT_PUBLIC_BOT_LOGIN` |
 
 ## Data flow
 
-1. Widget posts user payload to callback API/route.
-2. `checkTelegramAuth` HMAC with `NUXT_BOT_TOKEN`.
-3. Password from `telegram-password-generator` + `NUXT_TELEGRAM_PASSWORD_GENERATOR`.
-4. signUp/signIn → URL with `telegram_access_token` / refresh (names as implemented).
-5. `set-session.global` establishes Supabase session and strips tokens from the URL.
+1. Widget (`authClient.initTelegramWidget`) → `signInWithTelegram`.
+2. Better Auth verifies Telegram HMAC, creates/links user + session cookie.
+3. Database hook upserts `profiles` for the Better Auth user id.
+4. Email login: `authClient.signIn.email`.
 
 ## Business rules
 
-- Dev must bind port **80** (`nuxt.config.ts` `devServer`) for Telegram widget domain rules.
-- Protected routes listed in `supabase.redirectOptions.include` (settings, info edit, admin).
-- `/admin*` additionally gated by `club-admin-reroute.global.ts` + `useGetGlobalPermissions`.
+- Dev often binds port **80** (`nuxt.config.ts` `devServer`) for Telegram widget domain rules; Telegram also requires a public HTTPS origin for the widget in many setups.
+- Protected routes use `middleware: 'auth-required'` (settings, info edit); `/admin*` via `club-admin-reroute.global.ts` + `useGetGlobalPermissions`.
 
 ## Extend safely
 
-- Prefer fixing/extending one callback path rather than adding another copy of `getMetadataObject`.
-- Never log or commit bot tokens or password generator secrets.
-- `login.vue` `authByTelegram` is currently a stub (`console.log`) — real TG path is the widget → callback.
+- Prefer extending Better Auth config / Telegram plugin options rather than reintroducing custom HMAC password flows.
+- Never log or commit bot tokens or `BETTER_AUTH_SECRET`.

@@ -1,5 +1,5 @@
 export const useCurrentUserAsGuest = (): GatheringGuest => {
-  const user = useSupabaseUser();
+  const user = useAuthUser();
   if (!user.value) {
     throw 'omagad no user and useCurrentUserAsGuest';
   }

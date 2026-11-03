@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-const user = useSupabaseUser();
+const user = useAuthUser();
 const { clubPermissions } = useClubPermissions();
 
 const props = defineProps<{

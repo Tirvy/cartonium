@@ -2,8 +2,8 @@
 
 ## PROJECT
 NAME: cartonium (Cartonis) | ROLE: boardgame club site — gatherings, collections, schedules
-STACK: Nuxt 4 + Vuetify + local Postgres/Drizzle + Supabase Auth/Storage + i18n(ru/en) + Nitro tasks + Telegram bots
-AUTH: Telegram Login Widget → HMAC verify → synthetic email/password → Supabase tokens in query; profiles in local Postgres
+STACK: Nuxt 4 + Vuetify + local Postgres/Drizzle + Better Auth + i18n(ru/en) + Nitro tasks + Telegram bots
+AUTH: Telegram Login Widget / email via Better Auth; profiles in local Postgres
 AI_DOCS: AGENTS.md | CODE_MAP.md | docs/ | .cursor/rules/*.mdc
 
 ## COMMANDS
@@ -43,8 +43,8 @@ FILE: i18n/locales/translations.csv | ROLE: nuxt-translation-manager source stri
 FILE: public/privacy-policy.html | ROLE: static privacy page
 FILE: execs/supabase-type.sh | ROLE: optional remote Auth-era types → .generated/
 FILE: execs/docker-builder.sh | ROLE: docker build with .env as build-args
-ENV_KEYS: DATABASE_URL, POSTGRES_*, SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY, npm_config_supabase_id, NUXT_BOT_TOKEN, NUXT_TELEGRAM_PASSWORD_GENERATOR, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
-DOCKER_ARGS_EXTRA: NUXT_BOT_LOGER_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_LUBA_SPREADSHEET, GOOGLE_CREDS_URL, SUPABASE_ACCESS_TOKEN, NITRO_PORT, PORT
+ENV_KEYS: DATABASE_URL, POSTGRES_*, BETTER_AUTH_SECRET, BETTER_AUTH_URL, NUXT_PUBLIC_SITE_URL, NUXT_BOT_TOKEN, NUXT_PUBLIC_BOT_LOGIN, NUXT_BOT_BLOODBOWL_TOKEN, NUXT_BOT_BLOODBOWL_SPREADSHEET, NUXT_BOT_BLOODBOWL_LEAGUE, NUXT_BOT_SCHEDULE_TOKEN
+DOCKER_ARGS_EXTRA: NUXT_BOT_LOGER_TOKEN, NUXT_BOT_LUBA_TOKEN, NUXT_BOT_LUBA_SPREADSHEET, GOOGLE_CREDS_URL, NITRO_PORT, PORT
 
 ## SHARED TYPES
 FILE: shared/types/frontend.ts | ROLE: UI/domain camelCase types
@@ -56,8 +56,13 @@ FILE: shared/types/visit.d.ts | ROLE: Visit type (unused by app)
 FILE: server/db/index.ts | ROLE: postgres.js + drizzle singleton
 FILE: server/db/schema/index.ts | ROLE: domain tables + views (snake_case fields)
 FILE: server/db/migrations/ | ROLE: SQL migrations from drizzle-kit
-FILE: server/utils/require-user.ts | ROLE: require Supabase Auth user for domain writes
-FILE: server/utils/upsert-profile.ts | ROLE: TG login → local profiles upsert
+FILE: server/utils/auth.ts | ROLE: Better Auth instance (Drizzle + Telegram plugin)
+FILE: server/api/auth/[...all].ts | ROLE: Better Auth HTTP handler
+FILE: server/utils/require-user.ts | ROLE: require Better Auth session for domain writes
+FILE: server/utils/upsert-profile.ts | ROLE: auth user → local profiles upsert
+FILE: app/utils/auth-client.ts | ROLE: Better Auth client + telegramClient
+FILE: app/composables/useAuthUser.ts | ROLE: reactive session user for UI
+NOTE: /api/db/* handlers use Drizzle (#server/db); auth is Better Auth
 
 
 TYPE: GameBox { id, aliasTesera, idBgg, idTesera, linkBgg, linkTesera, photoUrl, playersGood, playersMax, playersMin, playtimeAvg, playtimeMax, playtimeMin, ratingBgg, ratingTesera, title, titles, year }
@@ -192,15 +197,15 @@ FILE: app/components/pages/add-games/data.js | ROLE: sample multiline game title
 
 ## SERVER — TRANSFORMERS / UTILS / PLUGINS / TASKS / ROUTES
 FILE: server/transformers.ts | ROLE: snake_case DB rows ↔ camelCase frontend
-FN: clubFromSupabase(data, clubSettingsData) → Club | ....
-FN: clubCollectionFromSupabase(data) → ClubCollection | ....
-FN: clubInfoFromSupabase(data) → ClubInfo | ....
-FN: gameBoxFromSupabase(data) → GameBoxWithClub | ....
-FN: gameBoxToSupabase(gameBox) → Tables<'gameboxes'> | ....
-FN: gatheringFromSupabase(data) → Gathering | ....
-FN: gatheringWithGuestsFromSupabase(data) → GatheringWithGuests | ....
-FN: tablesFromSupabase(data) → Table | ....
-FN: scheduleFromSupabase(data) → Schedule | ....
+FN: clubFromDb(data, clubSettingsData) → Club | ....
+FN: clubCollectionFromDb(data) → ClubCollection | ....
+FN: clubInfoFromDb(data) → ClubInfo | ....
+FN: gameBoxFromDb(data) → GameBoxWithClub | ....
+FN: gameBoxToDb(gameBox) → Tables<'gameboxes'> | ....
+FN: gatheringFromDb(data) → Gathering | ....
+FN: gatheringWithGuestsFromDb(data) → GatheringWithGuests | ....
+FN: tablesFromDb(data) → Table | ....
+FN: scheduleFromDb(data) → Schedule | ....
 FILE: server/utils/check-telegram-auth.ts | ROLE: HMAC-verify TG Login Widget payload
 FN: default(tgData: TelegramLoginPayload) → boolean | ....
 FILE: server/utils/telegram-password-generator.ts | ROLE: deterministic HMAC password from TG id
@@ -255,54 +260,53 @@ FILE: server/api/common/gamebox-check-exists.ts | ROLE: proxy existence check (s
 ENDPOINT: GET /api/common/gamebox-check-exists?alias= | ROLE: proxies check-game-exists
 
 ## SERVER — API SUPABASE
-NOTE: /api/supabase/* handlers use Drizzle (#server/db); Auth/Storage stay on Supabase
-FILE: server/api/supabase/club-data.get.ts | ROLE: club by url_name + settings
-ENDPOINT: GET /api/supabase/club-data?clubname= | ROLE: → Club
-FILE: server/api/supabase/club-info.get.ts | ROLE: club HTML info
-ENDPOINT: GET /api/supabase/club-info?clubid= | ROLE: clubs_info row
-FILE: server/api/supabase/club-info.post.ts | ROLE: upsert club HTML
-ENDPOINT: POST /api/supabase/club-info | ROLE: {club_id, text_html}
-FILE: server/api/supabase/club-settings.post.ts | ROLE: upsert club settings
-ENDPOINT: POST /api/supabase/club-settings | ROLE: upsert clubs_settings
-FILE: server/api/supabase/club-collection.get.ts | ROLE: club gameboxes search
-ENDPOINT: GET /api/supabase/club-collection?clubid=&search=&limit= | ROLE: → GameBox[]
-FILE: server/api/supabase/club-tables.get.ts | ROLE: club tables
-ENDPOINT: GET /api/supabase/club-tables?clubid= | ROLE: → Table[]
-FILE: server/api/supabase/club-tables.post.ts | ROLE: upsert tables
-ENDPOINT: POST /api/supabase/club-tables | ROLE: upsert on id
-FILE: server/api/supabase/add-games-to-club.post.ts | ROLE: add boxes to club collection
-ENDPOINT: POST /api/supabase/add-games-to-club?clubid= | ROLE: body.gameBoxIds
-FILE: server/api/supabase/check-games-in-club.post.ts | ROLE: which ids already in club
-ENDPOINT: POST /api/supabase/check-games-in-club?clubid= | ROLE: body.ids → present ids
-FILE: server/api/supabase/check-games-exists.post.ts | ROLE: find gameboxes by title overlap
-ENDPOINT: POST /api/supabase/check-games-exists | ROLE: body.titles[] → GameBox[]
-FILE: server/api/supabase/gameboxes.get.ts | ROLE: paginated global catalog
-ENDPOINT: GET /api/supabase/gameboxes?... | ROLE: {items: GameBoxWithClub[]}
-FILE: server/api/supabase/gamebox-add.post.ts | ROLE: upsert new gameboxes
-ENDPOINT: POST /api/supabase/gamebox-add | ROLE: body GameBox[] ignoreDuplicates alias_tesera
-FILE: server/api/supabase/gamebox-edit.post.ts | ROLE: update one gamebox
-ENDPOINT: POST /api/supabase/gamebox-edit | ROLE: body.gamebox by id
-FILE: server/api/supabase/my-global-permissions.ts | ROLE: current user club rights
-ENDPOINT: GET /api/supabase/my-global-permissions | ROLE: profiles_club_rights for session
-FILE: server/api/supabase/my-clubs-permissions.ts | ROLE: rights for user+club
-ENDPOINT: GET /api/supabase/my-clubs-permissions?userid=&clubid= | ROLE: filtered rights
-FILE: server/api/supabase/gatherings.get.ts | ROLE: upcoming gatherings w/ guests
-ENDPOINT: GET /api/supabase/gatherings?clubid=&date-from= | ROLE: merged by id
+FILE: server/api/db/club-data.get.ts | ROLE: club by url_name + settings
+ENDPOINT: GET /api/db/club-data?clubname= | ROLE: → Club
+FILE: server/api/db/club-info.get.ts | ROLE: club HTML info
+ENDPOINT: GET /api/db/club-info?clubid= | ROLE: clubs_info row
+FILE: server/api/db/club-info.post.ts | ROLE: upsert club HTML
+ENDPOINT: POST /api/db/club-info | ROLE: {club_id, text_html}
+FILE: server/api/db/club-settings.post.ts | ROLE: upsert club settings
+ENDPOINT: POST /api/db/club-settings | ROLE: upsert clubs_settings
+FILE: server/api/db/club-collection.get.ts | ROLE: club gameboxes search
+ENDPOINT: GET /api/db/club-collection?clubid=&search=&limit= | ROLE: → GameBox[]
+FILE: server/api/db/club-tables.get.ts | ROLE: club tables
+ENDPOINT: GET /api/db/club-tables?clubid= | ROLE: → Table[]
+FILE: server/api/db/club-tables.post.ts | ROLE: upsert tables
+ENDPOINT: POST /api/db/club-tables | ROLE: upsert on id
+FILE: server/api/db/add-games-to-club.post.ts | ROLE: add boxes to club collection
+ENDPOINT: POST /api/db/add-games-to-club?clubid= | ROLE: body.gameBoxIds
+FILE: server/api/db/check-games-in-club.post.ts | ROLE: which ids already in club
+ENDPOINT: POST /api/db/check-games-in-club?clubid= | ROLE: body.ids → present ids
+FILE: server/api/db/check-games-exists.post.ts | ROLE: find gameboxes by title overlap
+ENDPOINT: POST /api/db/check-games-exists | ROLE: body.titles[] → GameBox[]
+FILE: server/api/db/gameboxes.get.ts | ROLE: paginated global catalog
+ENDPOINT: GET /api/db/gameboxes?... | ROLE: {items: GameBoxWithClub[]}
+FILE: server/api/db/gamebox-add.post.ts | ROLE: upsert new gameboxes
+ENDPOINT: POST /api/db/gamebox-add | ROLE: body GameBox[] ignoreDuplicates alias_tesera
+FILE: server/api/db/gamebox-edit.post.ts | ROLE: update one gamebox
+ENDPOINT: POST /api/db/gamebox-edit | ROLE: body.gamebox by id
+FILE: server/api/db/my-global-permissions.ts | ROLE: current user club rights
+ENDPOINT: GET /api/db/my-global-permissions | ROLE: profiles_club_rights for session
+FILE: server/api/db/my-clubs-permissions.ts | ROLE: rights for user+club
+ENDPOINT: GET /api/db/my-clubs-permissions?userid=&clubid= | ROLE: filtered rights
+FILE: server/api/db/gatherings.get.ts | ROLE: upcoming gatherings w/ guests
+ENDPOINT: GET /api/db/gatherings?clubid=&date-from= | ROLE: merged by id
 FN: clampGatherings(gatheringsArray) | ....
-FILE: server/api/supabase/gathering-find.get.ts | ROLE: one gathering
-ENDPOINT: GET /api/supabase/gathering-find?clubid=&gatheringid= | ROLE: → Gathering
-FILE: server/api/supabase/gathering.post.ts | ROLE: create/update gathering + host guest
-ENDPOINT: POST /api/supabase/gathering | ROLE: upsert gatherings + host guest
-FILE: server/api/supabase/gathering-remove.post.ts | ROLE: delete gathering + notify
-ENDPOINT: POST /api/supabase/gathering-remove | ROLE: delete + TG cancel msgs
-FILE: server/api/supabase/gatherings-set-guest.ts | ROLE: upsert guest count + notify
-ENDPOINT: POST /api/supabase/gatherings-set-guest | ROLE: {gathering_id, guest_id, number}
-FILE: server/api/supabase/schedule-list.ts | ROLE: user’s schedules
-ENDPOINT: GET /api/supabase/schedule-list | ROLE: → Schedule[]
-FILE: server/api/supabase/schedule-find.ts | ROLE: one schedule + history
-ENDPOINT: GET /api/supabase/schedule-find?scheduleId= | ROLE: → Schedule
-FILE: server/api/supabase/schedule.post.ts | ROLE: create/rename schedule + history
-ENDPOINT: POST /api/supabase/schedule | ROLE: insert/update + history segments → id
+FILE: server/api/db/gathering-find.get.ts | ROLE: one gathering
+ENDPOINT: GET /api/db/gathering-find?clubid=&gatheringid= | ROLE: → Gathering
+FILE: server/api/db/gathering.post.ts | ROLE: create/update gathering + host guest
+ENDPOINT: POST /api/db/gathering | ROLE: upsert gatherings + host guest
+FILE: server/api/db/gathering-remove.post.ts | ROLE: delete gathering + notify
+ENDPOINT: POST /api/db/gathering-remove | ROLE: delete + TG cancel msgs
+FILE: server/api/db/gatherings-set-guest.ts | ROLE: upsert guest count + notify
+ENDPOINT: POST /api/db/gatherings-set-guest | ROLE: {gathering_id, guest_id, number}
+FILE: server/api/db/schedule-list.ts | ROLE: user’s schedules
+ENDPOINT: GET /api/db/schedule-list | ROLE: → Schedule[]
+FILE: server/api/db/schedule-find.ts | ROLE: one schedule + history
+ENDPOINT: GET /api/db/schedule-find?scheduleId= | ROLE: → Schedule
+FILE: server/api/db/schedule.post.ts | ROLE: create/rename schedule + history
+ENDPOINT: POST /api/db/schedule | ROLE: insert/update + history segments → id
 
 ## TELEGRAM BOTS
 NOTE: telegram-bots-starter starts club-schedule when NUXT_BOT_SCHEDULE_TOKEN is set; other bots remain commented out

@@ -1,7 +1,7 @@
-import type { ClubCollection, ClubInfo, Club, GameBoxWithClub, Gathering, GatheringWithGuests, Schedule } from '~/types/frontend.js';
+import type { Club, GameBoxWithClub, Gathering, GatheringWithGuests, Schedule } from '~/types/frontend.js';
 
 // clubs
-export function clubFromSupabase(data: any, clubSettingsData: any): Club {
+export function clubFromDb(data: any, clubSettingsData: any): Club {
     return {
         id: data.id,
         title: data.title,
@@ -19,25 +19,8 @@ export function clubFromSupabase(data: any, clubSettingsData: any): Club {
     };
 }
 
-// clubCollections 
-export function clubCollectionFromSupabase(data: any): ClubCollection {
-    return {
-        clubId: data.club_id,
-        gameBoxId: data.game_box_id,
-        id: data.id
-    };
-}
-
-// clubInfo
-export function clubInfoFromSupabase(data: any): ClubInfo {
-    return {
-        clubId: data.club_id,
-        textHtml: data.text_html
-    };
-}
-
 // gameBox (snake_case rows from local Postgres / Drizzle)
-export function gameBoxFromSupabase(data: any): GameBoxWithClub {
+export function gameBoxFromDb(data: any): GameBoxWithClub {
     return {
         aliasTesera: data.alias_tesera || undefined,
         id: data.id,
@@ -60,7 +43,7 @@ export function gameBoxFromSupabase(data: any): GameBoxWithClub {
         clubId: 'club_id' in data ? data.club_id : null,
     };
 }
-export function gameBoxToSupabase(gameBox: GameBoxWithClub): Record<string, unknown> {
+export function gameBoxToDb(gameBox: GameBoxWithClub): Record<string, unknown> {
     return {
         alias_tesera: gameBox.aliasTesera || null,
         id_bgg: gameBox.idBgg || null,
@@ -84,7 +67,7 @@ export function gameBoxToSupabase(gameBox: GameBoxWithClub): Record<string, unkn
 }
 
 // gathering
-export function gatheringFromSupabase(data: any): Gathering {
+export function gatheringFromDb(data: any): Gathering {
     return {
         id: data.id,
         ownerId: data.owner_id,
@@ -99,7 +82,7 @@ export function gatheringFromSupabase(data: any): Gathering {
     };
 }
 
-export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests {
+export function gatheringWithGuestsFromDb(data: any): GatheringWithGuests {
     const userDataSource = data.raw_user_meta_data || data;
     const userData = data.guests_number && {
         title: getName(userDataSource),
@@ -119,7 +102,7 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
         commentClub: data.comment_club,
         commentOwner: data.comment_owner,
         gameboxId: data.gamebox.id,
-        gamebox: gameBoxFromSupabase(data.gamebox),
+        gamebox: gameBoxFromDb(data.gamebox),
         ownTitle: data.own_name,
         tableId: data.table_id,
         guestsMax: data.guests_max,
@@ -134,7 +117,7 @@ export function gatheringWithGuestsFromSupabase(data: any): GatheringWithGuests 
 
 }
 
-export function tablesFromSupabase(data: any): Table {
+export function tablesFromDb(data: any): Table {
     return {
         id: data.id,
         clubId: data.club_id,
@@ -144,7 +127,7 @@ export function tablesFromSupabase(data: any): Table {
     };
 }
 
-export function scheduleFromSupabase(data: any): Schedule {
+export function scheduleFromDb(data: any): Schedule {
     return {
         id: data.id,
         title: data.title,

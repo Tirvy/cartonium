@@ -8,8 +8,6 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "type": "npx supabase gen types typescript --project-id 'impmukiwmihnyyzvyjyp' --schema public,pgmq_public > .generated/supabase-database.ts",
-    "type-local": "npx supabase gen types typescript --local > types/supabase-generated.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -20,7 +18,6 @@
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^9.5.3",
-    "@nuxtjs/supabase": "^1.5.0",
     "dayjs-nuxt": "^2.1.11",
     "dotenv": "^18.0.9",
     "drizzle-kit": "^0.31.11",
@@ -35,8 +32,11 @@
     "vuetify-nuxt-module": "^0.18.6"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.7.15",
     "@date-io/dayjs": "^2.17.0",
     "@mdi/font": "^7.3.67",
+    "better-auth": "^1.7.15",
+    "better-auth-telegram": "^3.1.1",
     "drizzle-orm": "^0.45.4",
     "fast-xml-parser": "^4.2.7",
     "googleapis": "^105.0.0",

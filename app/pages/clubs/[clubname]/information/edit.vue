@@ -36,6 +36,9 @@ import Quill from 'quill';
 import { defineAsyncComponent } from 'vue';
 import type { Club, Loaders } from '~/types/frontend.js';
 
+definePageMeta({
+  middleware: ['auth-required'],
+})
 
 const quillElem = ref<HTMLInputElement | null>(null);
 const quillToolbar = ref<HTMLInputElement | null>(null);
@@ -97,7 +100,7 @@ const snackbarText = ref('');
 getInitialValues();
 
 async function getInitialValues() {
-    const data: { text_delta: any } = await $fetch('/api/supabase/club-info', {
+    const data: { text_delta: any } = await $fetch('/api/db/club-info', {
         query: {
             clubid: currentClub.value.id,
         }
@@ -113,7 +116,7 @@ async function saveToDatabase() {
         return;
     }
     loaders.value.save = true;
-    let ret: any = await $fetch('/api/supabase/club-info', {
+    let ret: any = await $fetch('/api/db/club-info', {
         method: "POST",
         body: {
             club_id: currentClub.value.id,

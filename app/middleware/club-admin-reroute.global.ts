@@ -1,15 +1,15 @@
-import { defineNuxtRouteMiddleware, navigateTo } from "nuxt/app";
+export default defineNuxtRouteMiddleware(async (to) => {
+  if (!to.path.startsWith('/admin')) {
+    return
+  }
 
-export default defineNuxtRouteMiddleware(async (to, from) => {
-    if (to.fullPath.includes('/admin')) {
-        const defaultRedirectPath = useDefaultPage();
-        const user = useSupabaseUser()
-        if (!user.value) {
-            return navigateTo(defaultRedirectPath)
-        }
-        const isAdmin = await useGetGlobalPermissions();
-        if (!isAdmin) {
-            return navigateTo(defaultRedirectPath)
-        }
-    }
-});
+  const user = useAuthUser()
+  if (!user.value) {
+    return navigateTo('/')
+  }
+
+  const { data: permissions } = await useGetGlobalPermissions()
+  if (!permissions.value?.length) {
+    return navigateTo('/')
+  }
+})

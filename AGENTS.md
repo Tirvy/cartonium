@@ -12,7 +12,8 @@ Boardgame club platform: organize gatherings (RSVP), manage game collections (Te
 |-------|------|
 | App | Nuxt 4 (`nuxt` ^4.4), Vue 3, Vuetify (`vuetify-nuxt-module`) |
 | Domain DB | Local Postgres + Drizzle (`DATABASE_URL`) |
-| Auth / Storage | Supabase Auth + Storage (`gamebox-pics`) via `@nuxtjs/supabase` |
+| Auth | Better Auth (email/password + Telegram plugin); `/api/auth/*` |
+| Storage | Local files under `public/gamebox-pics/` |
 | i18n | `@nuxtjs/i18n` + `nuxt-translation-manager` (`i18n/locales/translations.csv`) |
 | Server | Nitro API routes, optional Nitro tasks, Telegram bots (`typescript-telegram-bot-api`) |
 | External | BoardGameGeek XML API, Tesera API, Google Sheets (bots) |
@@ -22,27 +23,28 @@ Boardgame club platform: organize gatherings (RSVP), manage game collections (Te
 ## Architecture principles
 
 1. **File-based Nuxt routing** under `app/pages/`; club routes nest under `/clubs/[clubname]/`.
-2. **Server owns DB access** — pages call `$fetch('/api/supabase/...')`; domain queries use Drizzle (`#server/db`). Client may use Supabase Auth (`useSupabaseClient` / `useSupabaseUser`) and Storage public URLs only.
-3. **Transform at the boundary** — snake_case DB rows ↔ camelCase UI types in `server/transformers.ts`.
-4. **Shared types** live in `shared/types/frontend.ts` (UI). Domain schema types come from Drizzle (`server/db/schema`). `shared/types/supabase.ts` is legacy Auth-era overrides.
+2. **Server owns DB access** — pages call `$fetch('/api/db/...')`; domain queries use Drizzle (`#server/db`). Client auth via `useAuthUser` / `authClient`.
+3. **Transform at the boundary** — snake_case DB rows ↔ camelCase UI types in `server/transformers.ts` (`*FromDb` / `*ToDb`).
+4. **Shared types** live in `shared/types/frontend.ts` (UI). Domain + auth schema in `server/db/schema`.
 5. **No Pinia** — shared UI state uses Nuxt `useState` keys: `club`, `clubPermissions`, `lastGathering`, `lastGatheringName`.
 6. **Telegram bots are optional** — `server/plugins/telegram-bots-starter.ts` currently starts none (`bots={}`).
-7. **Identity** — Supabase Auth UUID (`serverSupabaseUser` / `requireUser`); write `owner_id` / profile ids explicitly (no `auth.uid()` on local Postgres).
+7. **Identity** — Better Auth user id (`requireUser` / `useAuthUser`); write `owner_id` / profile ids explicitly.
 
 ## Project structure (short)
 
 ```
 app/           pages, components, composables, layouts, middleware, plugins, utils
-server/api/    Nitro handlers (bgg, tesera, common, supabase route prefix)
-server/db/     Drizzle client + schema + migrations (domain Postgres)
-server/utils/  TG auth, notify, rights, require-user
+server/api/    Nitro handlers (db, bgg, tesera, common, auth)
+server/db/     Drizzle client + schema + migrations (domain + Better Auth tables)
+server/utils/  Better Auth instance, require-user, notify, rights
 server/telegram-bots/  optional side bots
-shared/types/  frontend (+ legacy supabase overrides)
+shared/types/  frontend types
 supabase/migrations/  LEGACY cloud schema reference only
 i18n/locales/  translations.csv → generated *.json (gitignored)
 docs/          human/AI architecture docs
 CODE_MAP.md    path → role inventory (token-efficient)
 docker-compose.yml  local Postgres
+public/gamebox-pics/  local gamebox images
 ```
 
 ## Coding conventions
@@ -61,7 +63,7 @@ docker-compose.yml  local Postgres
 |------|------------|
 | Pages / components | kebab-case Vue files |
 | Composables | `useX.ts` |
-| API routes | `/api/{supabase\|bgg\|tesera\|common}/resource` |
+| API routes | `/api/{db\|bgg\|tesera\|common\|auth}/resource` |
 | Domain types | PascalCase in `shared/types/frontend.ts` |
 | DB columns | snake_case (migrations) |
 
@@ -71,7 +73,7 @@ docker-compose.yml  local Postgres
 2. Types first in `shared/types/frontend.ts`; schema changes in `server/db/schema` then `npm run db:generate` / `db:migrate`.
 3. Server: add `server/api/...` handler using `#server/db`; transform via `server/transformers.ts` if mapping rows.
 4. Client: page under `app/pages/`, reuse components; `$fetch` existing API style.
-5. Permissions: check `profiles_club_rights` / composables (`useClubPermissions`, `useGetGlobalPermissions`) and supabase redirect includes in `nuxt.config.ts` if the route must be auth-gated.
+5. Permissions: check `profiles_club_rights` / composables (`useClubPermissions`, `useGetGlobalPermissions`); gate routes with `middleware: 'auth-required'` or admin middleware.
 6. Update `CODE_MAP.md` and feature doc if the surface area changes.
 
 ## Modifying features
@@ -83,10 +85,10 @@ docker-compose.yml  local Postgres
 
 ## API & data
 
-- Client: `$fetch('/api/supabase/...')` or `useFetch` (rare). Typing `$fetch<>` is encouraged for new calls. Route prefix is historical; handlers use Drizzle.
-- Server domain: `db` from `#server/db` + `requireUser` when auth is required. Auth/Storage still via `#supabase/server`.
+- Client: `$fetch('/api/db/...')` or `useFetch` (rare). Auth via `authClient` / `useAuthUser`.
+- Server domain: `db` from `#server/db` + `requireUser` when auth is required. Auth handler: `/api/auth/*` (`#server/utils/auth`).
 - Errors: prefer `createError({ statusCode, statusMessage })`. External BGG/Tesera often return `{ items: [], error }` with HTTP 200 — preserve that pattern when extending those proxies.
-- Domain schema: Drizzle (`server/db/schema`, `server/db/migrations`). Optional remote Auth typing: `npm run type` → `.generated/supabase-database.ts` (gitignored).
+- Schema: Drizzle (`server/db/schema`, `server/db/migrations`).
 
 ## Error handling
 
@@ -113,7 +115,6 @@ node .output/server/index.mjs
 npm run preview
 npm run db:generate # after schema edits
 npm run db:studio
-npm run type        # optional remote Supabase Auth-era types
 npm run format      # Prettier write
 npm run format:check
 ```

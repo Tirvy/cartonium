@@ -57,6 +57,6 @@ definePageMeta({
 
 
 const { data: schedules, refresh: getSchedules, status: getSchedulesStatus } = await useFetch<Schedule[]>(
-  '/api/supabase/schedule-list'
+  '/api/db/schedule-list'
 );
 </script>

@@ -46,12 +46,13 @@
 </template>
 
 <script setup>
-const client = useSupabaseClient()
-const user = useSupabaseUser()
+import { authClient } from '~/utils/auth-client'
+
+const user = useAuthUser()
 const { update: updateUserPermissions } = useClubPermissions();
 
 const logout = async () => {
-  await client.auth.signOut();
+  await authClient.signOut();
   updateUserPermissions();
 }
 

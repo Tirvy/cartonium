@@ -1,6 +1,6 @@
 
 export const useGetGlobalPermissions = async () => {
-  const allPermissions = await $fetch('/api/supabase/my-global-permissions');
+  const allPermissions = await $fetch('/api/db/my-global-permissions');
   if (!Array.isArray(allPermissions)) {
     return false;
   }

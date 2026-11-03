@@ -22,7 +22,7 @@
 
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay();
-const user = useSupabaseUser();
+const user = useAuthUser();
 const currentClub: Ref<Club | null> = useState('club');
 
 const props = defineProps<{

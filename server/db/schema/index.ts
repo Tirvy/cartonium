@@ -18,6 +18,8 @@ import {
   unique,
 } from 'drizzle-orm/pg-core'
 
+export * from './auth'
+
 /** Snake_case field names match existing transformers / API bodies. */
 export const gameboxes = pgTable(
   'gameboxes',
@@ -89,7 +91,7 @@ export const clubsSettings = pgTable('clubs_settings', {
 export const gatherings = pgTable('gatherings', {
   id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  owner_id: uuid('owner_id').notNull(),
+  owner_id: text('owner_id').notNull(),
   start_date: timestamp('start_date', { withTimezone: true }),
   comment_owner: text('comment_owner').default('').notNull(),
   guests_max: bigint('guests_max', { mode: 'number' }).notNull(),
@@ -104,7 +106,7 @@ export const gatheringsGuests = pgTable(
   'gatherings_guests',
   {
     gathering_id: bigint('gathering_id', { mode: 'number' }).notNull(),
-    user_id: uuid('user_id').notNull(),
+    user_id: text('user_id').notNull(),
     guests_number: smallint('guests_number').notNull(),
   },
   (t) => [
@@ -113,21 +115,22 @@ export const gatheringsGuests = pgTable(
   ],
 )
 
+/** App profile; id matches Better Auth `user.id` (text). */
 export const profiles = pgTable('profiles', {
-  id: uuid('id').primaryKey(),
+  id: text('id').primaryKey(),
   updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   full_name: text('full_name'),
   avatar_url: text('avatar_url'),
   telegram_username: text('telegram_username'),
   bot_name: text('bot_name').default('').notNull(),
-  chat_id: integer('chat_id').notNull(),
+  chat_id: integer('chat_id').default(0).notNull(),
 })
 
 export const profilesClubRights = pgTable('profiles_club_rights', {
   id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   relation_type: text('relation_type').notNull(),
-  profile_id: uuid('profile_id'),
+  profile_id: text('profile_id'),
   club_id: uuid('club_id'),
 })
 
@@ -144,7 +147,7 @@ export const telegramChats = pgTable(
   'telegram_chats',
   {
     created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    user_id: uuid('user_id').notNull(),
+    user_id: text('user_id').notNull(),
     bot_name: text('bot_name').notNull(),
     chat_id: integer('chat_id').notNull(),
   },
@@ -160,7 +163,7 @@ export const telegramChatsLogs = pgTable('telegram_chats_logs', {
 export const userSchedules = pgTable('user_schedules', {
   id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  owner_id: uuid('owner_id').notNull(),
+  owner_id: text('owner_id').notNull(),
   visibility: text('visibility').notNull(),
   archive: boolean('archive').default(false).notNull(),
   title: text('title').notNull(),
@@ -244,7 +247,7 @@ export const gameboxesWithClubId = pgView('gameboxes_with_club_id', {
 export const gatheringsWithGuests = pgView('gatherings_with_guests', {
   id: bigint('id', { mode: 'number' }),
   created_at: timestamp('created_at', { withTimezone: true }),
-  owner_id: uuid('owner_id'),
+  owner_id: text('owner_id'),
   start_date: timestamp('start_date', { withTimezone: true }),
   comment_owner: text('comment_owner'),
   guests_max: bigint('guests_max', { mode: 'number' }),
@@ -253,7 +256,7 @@ export const gatheringsWithGuests = pgView('gatherings_with_guests', {
   table_id: bigint('table_id', { mode: 'number' }),
   own_name: text('own_name'),
   gamebox_id: bigint('gamebox_id', { mode: 'number' }),
-  user_id: uuid('user_id'),
+  user_id: text('user_id'),
   guests_number: smallint('guests_number'),
   raw_user_meta_data: jsonb('raw_user_meta_data'),
   telegram_username: text('telegram_username'),

@@ -1,7 +1,7 @@
 import { and, asc, eq, gte } from 'drizzle-orm'
 import { db } from '#server/db'
 import { gatheringsWithGuests } from '#server/db/schema'
-import { gatheringWithGuestsFromSupabase } from '#server/transformers'
+import { gatheringWithGuestsFromDb } from '#server/transformers'
 import type { GatheringWithGuests } from '#shared/types/frontend'
 
 export default defineEventHandler(async (event) => {
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     )
     .orderBy(asc(gatheringsWithGuests.start_date))
 
-  return clampGatherings(data.map(gatheringWithGuestsFromSupabase))
+  return clampGatherings(data.map(gatheringWithGuestsFromDb))
 })
 
 function clampGatherings(gatheringsArray: GatheringWithGuests[]) {

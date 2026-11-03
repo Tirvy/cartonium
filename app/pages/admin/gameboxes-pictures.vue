@@ -21,7 +21,7 @@ import type { GameBoxWithClub } from '@/types/frontend';
 
 // gameboxes.value = data as GameBoxWithClub[];
 
-const { data, status, error, refresh, clear } = await useFetch('/api/supabase/gameboxes');
+const { data, status, error, refresh, clear } = await useFetch('/api/db/gameboxes');
 const gameboxes: Ref<GameBoxWithClub[]> = ref(data.value.items);
 
 const columns = useConstants('columns');
@@ -36,7 +36,7 @@ async function getNewPictures() {
     });
 
   refresh()
-  // gameboxes.value = await $fetch('/api/supabase/gameboxes');
+  // gameboxes.value = await $fetch('/api/db/gameboxes');
 }
 
 const headersGameBoxList = [...columns.map((key: string) => {

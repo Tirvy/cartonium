@@ -16,12 +16,12 @@
 </template>
 
 <script setup>
-const client = useSupabaseClient()
-const user = useSupabaseUser()
+import { authClient } from '~/utils/auth-client'
+
+const user = useAuthUser()
 
 const logout = async () => {
-  await client.auth.signOut()
+  await authClient.signOut()
   navigateTo('/')
 }
-
 </script>

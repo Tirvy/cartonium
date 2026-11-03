@@ -1,5 +1,6 @@
 import { inArray } from 'drizzle-orm'
-import { serverSupabaseClient } from '#supabase/server'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { db } from '#server/db'
 import { gameboxesWithClubId } from '#server/db/schema'
 import { apiURL } from '../bgg/common'
@@ -11,8 +12,6 @@ const parser = new XMLParser({
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const client = await serverSupabaseClient(event)
-
   const gameBoxIds = body.gameBoxIds as number[]
 
   const data = await db
@@ -27,7 +26,6 @@ export default defineEventHandler(async (event) => {
 
   function getThumbnails() {
     const target = ret.items?.item
-
     if (Array.isArray(target)) {
       return target.map((item: any) => item?.thumbnail)
     }
@@ -37,36 +35,25 @@ export default defineEventHandler(async (event) => {
   const thumbnailsURLs = getThumbnails()
 
   if (thumbnailsURLs.length !== gameBoxIds.length) {
-    return new Error(
-      'Not all thumbnails were downloaded' + thumbnailsURLs.length + ' / ' + gameBoxIds.length,
-    )
-  }
-
-  function getMime(url: string): string {
-    const imgExt = url.split('.').pop() as string
-    let mimeType = 'image/png'
-    if (imgExt.toLowerCase() !== 'png') {
-      mimeType = 'image/jpeg'
-    }
-    return mimeType
-  }
-
-  const requests = []
-
-  for (let i = 0; i < thumbnailsURLs.length; i++) {
-    requests.push(await fetchUrlAndSend(thumbnailsURLs[i], gameBoxIds[i]))
-  }
-
-  const responses = await Promise.all(requests)
-
-  async function fetchUrlAndSend(url: string, id: number) {
-    const picture = await fetch(url).then((x) => x.arrayBuffer())
-
-    // Storage remains on Supabase
-    const res = await client.storage.from('gamebox-pics').upload(id + '', picture, {
-      contentType: getMime(url),
+    throw createError({
+      statusMessage:
+        'Not all thumbnails were downloaded' + thumbnailsURLs.length + ' / ' + gameBoxIds.length,
     })
-    return res
+  }
+
+  const picsDir = join(process.cwd(), 'public', 'gamebox-pics')
+  await mkdir(picsDir, { recursive: true })
+
+  const responses = []
+  for (let i = 0; i < thumbnailsURLs.length; i++) {
+    responses.push(await fetchUrlAndSave(thumbnailsURLs[i], gameBoxIds[i]))
+  }
+
+  async function fetchUrlAndSave(url: string, id: number) {
+    const picture = await fetch(url).then((x) => x.arrayBuffer())
+    const filePath = join(picsDir, String(id))
+    await writeFile(filePath, Buffer.from(picture))
+    return { path: `/gamebox-pics/${id}`, id }
   }
 
   return responses
