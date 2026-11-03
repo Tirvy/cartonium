@@ -19,7 +19,8 @@ export type AppUser = {
   }
 }
 
-function toAppUser(sessionUser: {
+/** Pure mapper: Better Auth session user → AppUser (for handlers / tests). */
+export function sessionUserToAppUser(sessionUser: {
   id: string
   email?: string | null
   name?: string | null
@@ -56,7 +57,7 @@ export default async function requireUser(event: H3Event): Promise<AppUser> {
     throw createError({ statusCode: 401, statusMessage: 'User not found' })
   }
 
-  return toAppUser(session.user as Parameters<typeof toAppUser>[0])
+  return sessionUserToAppUser(session.user as Parameters<typeof sessionUserToAppUser>[0])
 }
 
 export async function getOptionalUser(event: H3Event): Promise<AppUser | null> {
@@ -66,5 +67,5 @@ export async function getOptionalUser(event: H3Event): Promise<AppUser | null> {
   if (!session?.user) {
     return null
   }
-  return toAppUser(session.user as Parameters<typeof toAppUser>[0])
+  return sessionUserToAppUser(session.user as Parameters<typeof sessionUserToAppUser>[0])
 }

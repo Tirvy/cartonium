@@ -13,6 +13,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:up": "docker compose up -d postgres",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "npx prettier --write \"app/**/*.{ts,vue,js}\" \"server/**/*.{ts,js}\" \"shared/**/*.ts\" \"docs/**/*.md\" AGENTS.md CODE_MAP.md nuxt.config.ts vuetify.config.ts",
     "format:check": "npx prettier --check \"app/**/*.{ts,vue,js}\" \"server/**/*.{ts,js}\" \"shared/**/*.ts\" \"docs/**/*.md\" AGENTS.md CODE_MAP.md nuxt.config.ts vuetify.config.ts"
   },
@@ -26,6 +28,7 @@
     "prettier": "^3.3.3",
     "typescript": "^5.6.3",
     "vite-plugin-vuetify": "^2.0.4",
+    "vitest": "^5.1.0",
     "vue": "latest",
     "vue-router": "latest",
     "vue-tsc": "^2.1.6",

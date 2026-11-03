@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Testing & quality
 
-- No unit/e2e suite. Do not add Jest/Vitest/Playwright unless requested.
+- Vitest unit tests under `tests/` for DB layer (`npm test`). Do not add Playwright/e2e or mass-expand coverage unless asked.
 - Format with Prettier: `npm run format` / `npm run format:check` (`.prettierrc`).
 - `typescript.typeCheck` is **false** in `nuxt.config.ts` (known supabase/auth-js issue). Do not flip it casually.
 - `vue-tsc` is installed but not wired; prefer targeted manual checks over enabling broken global typecheck.

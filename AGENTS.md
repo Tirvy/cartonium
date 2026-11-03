@@ -98,7 +98,7 @@ public/gamebox-pics/  local gamebox images
 
 ## Testing
 
-No test runner. Do not add a full test stack unless asked. Manually verify: `npm run dev`, affected routes, and `npm run build` for production risk.
+Vitest unit tests for the DB layer live under `tests/` (`npm test` / `npm run test:watch`). They cover transformers, schema shapes, auth→profile mapping, and migration SQL — no live Postgres required. Do not expand into a full e2e stack unless asked. Still manually verify risky changes with `npm run dev` / `npm run build`.
 
 `npm run format:check` exists but the legacy tree is largely unformatted — do **not** run repo-wide `npm run format` unless asked.
 

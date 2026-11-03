@@ -24,7 +24,9 @@ TYPES_SH: sh execs/supabase-type.sh
 DOCKER_BUILD: docker build . -t cartonis -f Dockerfile
 DOCKER_RUN: docker run -p 80:80 --env-file .env -d cartonis
 DOCKER_LOCAL: sh execs/docker-builder.sh
-TEST: none
+TEST: npm test
+TEST_WATCH: npm run test:watch
+TEST_DIR: tests/ (Vitest; DB transformers/schema/auth mapping/migrations)
 FORMAT: npm run format
 FORMAT_CHECK: npm run format:check
 

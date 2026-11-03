@@ -1,7 +1,7 @@
 import { db } from '#server/db'
 import { profiles } from '#server/db/schema'
 
-type AuthUserLike = {
+export type AuthUserLike = {
   id: string
   name?: string | null
   image?: string | null
@@ -9,18 +9,27 @@ type AuthUserLike = {
   telegramUsername?: string | null
 }
 
-/** Upsert app profile from Better Auth user (email or Telegram). */
-export async function upsertProfileFromAuthUser(user: AuthUserLike) {
+/** Map Better Auth user → `profiles` row (snake_case). Pure helper for tests. */
+export function authUserToProfileValues(
+  user: AuthUserLike,
+  botName = process.env.NUXT_PUBLIC_BOT_LOGIN || '',
+  now = new Date(),
+) {
   const chatId = user.telegramId ? Number(user.telegramId) : 0
-  const values = {
+  return {
     id: user.id,
-    updated_at: new Date(),
+    updated_at: now,
     full_name: user.name || null,
     avatar_url: user.image || null,
     telegram_username: user.telegramUsername || null,
-    bot_name: process.env.NUXT_PUBLIC_BOT_LOGIN || '',
+    bot_name: botName,
     chat_id: Number.isFinite(chatId) ? chatId : 0,
   }
+}
+
+/** Upsert app profile from Better Auth user (email or Telegram). */
+export async function upsertProfileFromAuthUser(user: AuthUserLike) {
+  const values = authUserToProfileValues(user)
 
   await db
     .insert(profiles)
